@@ -1,0 +1,388 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  userId     String     @id @default(auto()) @map("_id") @db.ObjectId
+  email      String
+  password   String?
+  name       String
+  department String
+  position   String?
+  image      String?
+  manDay     Int?       @default(0)
+  phone      String?
+  userStatus UserStatus @default(InActice)
+  role       Role?      @relation(fields: [roleId], references: [roleId])
+  roleId     String?    @db.ObjectId
+  address    String?
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  Repairman Repairman[]
+
+  @@index([email])
+}
+
+model Role {
+  roleId      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        RoleName
+  description String?
+  users       User[]
+  userIds     String[] @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name])
+}
+
+model Category {
+  categoryId   String      @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String
+  categoryDesc String?
+  equipments   Equipment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EquipmentType {
+  equipmentTypeId   String      @id @default(auto()) @map("_id") @db.ObjectId
+  equipmentTypeName String
+  equipmentTypeDesc String?
+  equipments        Equipment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Equipment {
+  equipmentId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  equipmentName String // ชื่อสินค้า
+  serialNo      String? // รหัสสินค้า
+  model         String? // รหัสสินค้า
+  brand         String? // ยี่ห้อ/แบรนด์ (อาจเป็น null ได้)
+  description   String? // คำอธิบายสินค้า
+
+  equipmentOwn   Boolean         @default(true)
+  aboutEquipment AboutEquipment?
+
+  category   Category? @relation(fields: [categoryId], references: [categoryId])
+  categoryId String?   @db.ObjectId
+
+  equipmentType   EquipmentType? @relation(fields: [equipmentTypeId], references: [equipmentTypeId])
+  equipmentTypeId String?        @db.ObjectId
+
+  brokenItems BrokenItems[]
+
+  rental Rental[]
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model AboutEquipment {
+  aboutEquipmentId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  equipment   Equipment @relation(fields: [equipmentId], references: [equipmentId], onDelete: Cascade)
+  equipmentId String    @unique @db.ObjectId
+
+  //Price
+  equipmentPrice Float? @default(0)
+  rentalPricePre Float?
+
+  rentalPriceCurrent Float
+  rentalUpdateAt     DateTime
+  purchaseDate       DateTime?
+  registerDate       DateTime?
+  PO                 String?
+  fixAssetsNumber    String?
+  QTY                Int?      @default(0)
+  MFD                String?
+  BTLNumber          String?
+  unitName           String    @default("Unit")
+
+  stockStatus EquipmentStatus
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Site {
+  siteId   String  @id @default(auto()) @map("_id") @db.ObjectId
+  siteName String  @unique
+  siteDesc String?
+
+  contactorName  String?
+  contactorEmail String?
+  contactorTel   String?
+
+  Document Document[]
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Document {
+  documentId   String @id @default(auto()) @map("_id") @db.ObjectId
+  documentIdNo String
+
+  docType  String
+  docMonth String
+  docYear  String
+
+  documentDetials String?
+  documentType    DocumentCategory @default(Rental)
+
+  site   Site?   @relation(fields: [siteId], references: [siteId])
+  siteId String? @db.ObjectId
+
+  documentStatus DocumentStatus @default(Open)
+  documentStep   DocumentStep   @default(Location)
+
+  rental      Rental[]
+  maintenance Maintenance?
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Rental {
+  rentalId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  erentionDatePlan    DateTime //วันติดตั้ง
+  dismantlingDatePlan DateTime? // วันรื้อถอน
+
+  document   Document @relation(fields: [documentId], references: [documentId], onDelete: Cascade)
+  documentId String   @db.ObjectId
+
+  equipment   Equipment @relation(fields: [equipmentId], references: [equipmentId])
+  equipmentId String    @db.ObjectId
+
+  rentalRemark String?
+  rentalStatus RentalStatus @default(Renting)
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Maintenance {
+  maintenanceId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  natureOfBreakdown String? //Description
+  causes            String?
+
+  repairingStart DateTime?
+  repairingEnd   DateTime?
+
+  TOFstart DateTime? // Time Of Breakdown
+  TOFend   DateTime?
+
+  repairman Repairman[]
+  // TORstart  DateTime? // Time Of Repairing
+  // TORend    DateTime?
+
+  brokenItems BrokenItems[]
+
+  maintenanceType MaintenanceType @default(IRP)
+
+  repairLocation LocationType? @default(OnPlant) // For Ma Only
+  // equipmentOwner EquipmentOwner? @default(Plant) // For Ma Only
+
+  maintenanceRamark String?
+  technicianName    String?
+  plantEngineer     String?
+  plantApproval     String?
+
+  document   Document @relation(fields: [documentId], references: [documentId], onDelete: Cascade)
+  documentId String   @unique @db.ObjectId
+
+  additional Additional[]
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model BrokenItems {
+  brokenItemsId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // equipmentOwn Boolean @default(true)
+  equipmentOwner EquipmentOwner? @default(Plant)
+
+  equipment   Equipment? @relation(fields: [equipmentId], references: [equipmentId], onDelete: Cascade)
+  equipmentId String     @db.ObjectId
+
+  repairStatus   RepairStatus     @default(Waiting)
+  oldstockStatus EquipmentStatus?
+
+  quantity Int    @default(1)
+  parts    Part[]
+
+  maintenance   Maintenance @relation(fields: [maintenanceId], references: [maintenanceId], onDelete: Cascade)
+  maintenanceId String      @db.ObjectId
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Repairman {
+  repairmanId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  activities      String? //Action
+  manHours        Int
+  cost            Int?
+  repairmanRemark String?
+
+  user   User   @relation(fields: [userId], references: [userId])
+  userId String @db.ObjectId
+
+  maintenance   Maintenance? @relation(fields: [maintenanceId], references: [maintenanceId], onDelete: Cascade)
+  maintenanceId String?      @db.ObjectId
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Part {
+  partId   String  @id @default(auto()) @map("_id") @db.ObjectId
+  partName String
+  partDesc String?
+
+  // for Report
+  partSerialNo String?
+  brand        String?
+
+  //for repair paper
+  partStatus PartStatus @default(Stock)
+
+  quantity  Int     @default(1)
+  unitName  String?
+  partPrice Float   @default(0)
+
+  // Maintenance
+  brokenItems   BrokenItems? @relation(fields: [brokenItemsId], references: [brokenItemsId], onDelete: Cascade)
+  brokenItemsId String?      @db.ObjectId
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+model Additional {
+  additionalId String @id @default(auto()) @map("_id") @db.ObjectId
+
+  additionalName  String //Action
+  additionalDesc  String?
+  additionalPrice Float?
+
+  maintenance   Maintenance? @relation(fields: [maintenanceId], references: [maintenanceId], onDelete: Cascade)
+  maintenanceId String?      @db.ObjectId
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+}
+
+enum DocumentStep {
+  Location
+  Equipment
+  Repairman
+  Part
+  AdditionalFee
+  WaitingApprove
+  Approve
+  WithdrawPart
+  RepairStared
+  RepairComplete
+}
+
+enum Mouth {
+  JAN
+  FEB
+  MAR
+  APR
+  MAY
+  JUN
+  JUL
+  AUG
+  SEP
+  OCT
+  NOV
+  DEC
+}
+
+enum RepairStatus {
+  Waiting
+  Completed
+  Unrepairable
+  Unknown
+  Cancel
+}
+
+enum EquipmentOwner {
+  Plant
+  Site
+}
+
+enum LocationType {
+  OnPlant
+  OnSite
+}
+
+enum DocumentStatus {
+  Draft
+  WaitingApprove
+  Approve
+  Open
+  Close
+  Cancel
+}
+
+enum DocumentCategory {
+  Rental
+  Maintenance
+}
+
+enum PartStatus {
+  Stock
+  Order
+}
+
+enum MaintenanceType {
+  IRP //IncludedInRentalPrice
+  MQ //Make Quotation
+}
+
+enum RentalStatus {
+  Renting
+  Returned
+  Cancel
+}
+
+enum RoleName {
+  Developer
+  Admin
+  User
+  Employee
+}
+
+enum EquipmentStatus {
+  InStock
+  Booked
+  // WillBeSold
+  CurrentlyRenting
+  Damaged
+  // RepairingAtSupplier
+  Broken
+  InActive
+}
+
+enum UserStatus {
+  Active
+  InActice
+  Busy
+}
