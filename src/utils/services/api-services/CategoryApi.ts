@@ -1,4 +1,4 @@
-import { Category } from "@/interfaces/Category_Type";
+import { Category } from "@/interfaces/Category";
 import APIServices from "../APIServices";
 
 export const CATEGORY_API_BASE_URL = "/api/equipment/category";

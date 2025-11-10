@@ -1,12 +1,12 @@
 {
-  "name": "repair-notification-system",
+  "name": "salon-booking",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "clean-metadata": "find . -name '._*' -delete",
     "dev": "npx prisma generate --no-engine && npx prisma db push && next dev",
     "build": "npm run clean-metadata && next build",
-    "docker": "docker build --platform linux/amd64 --build-arg NEXTAUTH_SECRET=NEXTAUTH_SECRET_FAKE --build-arg NEXTAUTH_SECRET=NEXTAUTH_SECRET_FAKE --build-arg NEXTAUTH_URL=NEXTAUTH_URL_FAKE -t thanapongc/project:repair . && docker push thanapongc/project:repair",
+    "docker": "docker build --platform linux/amd64 --build-arg NEXTAUTH_SECRET=NEXTAUTH_SECRET_FAKE --build-arg NEXTAUTH_SECRET=NEXTAUTH_SECRET_FAKE --build-arg NEXTAUTH_URL=NEXTAUTH_URL_FAKE -t thanapongc/project:salon-booking . && docker push thanapongc/project:salon-booking",
     "start": "next start",
     "lint": "next lint"
   },

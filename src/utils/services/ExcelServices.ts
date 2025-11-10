@@ -1,6 +1,6 @@
 
 import fs from "fs";
-import { Category, CategoryQuery } from "@/interfaces/Category_Type";
+import { Category, CategoryQuery } from "@/interfaces/Category";
 import ExcelJS from 'exceljs';
 import * as path from "path";
 import { calculateRentalDays, calculateRentalYears, formatDateMonthDay, formatUtcDate } from "../utils";

@@ -1,7 +1,7 @@
 
     server {
         listen 80;
-        server_name bouyguesthai.khanghai.site;
+        server_name booking.icutethink.site;
 
         location / {
             proxy_pass http://localhost:3002;  # ส่งต่อคำขอไปยัง Next.js app

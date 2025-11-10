@@ -1,5 +1,5 @@
 services:
-  bouyguesthai-system:
+  salon-booking-system:
     # build:
     #   context: .  # กำหนดว่า context คือโฟลเดอร์ปัจจุบัน (รวม Dockerfile)
     image: thanapongc/project:repair
@@ -10,29 +10,15 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    container_name: bouyguesthai-system
+    container_name: salon-booking-system
     ports:
       - "3002:3000"  # เชื่อมต่อพอร์ต 3002 ของเครื่องโฮสต์กับพอร์ต 3000 ในคอนเทนเนอร์
     networks:
-      - bouyguesthai-system
+      - salon-booking-system
     # depends_on:
     #   - nginx
 
-  #nginx:
-    #image: nginx:latest
-    #container_name: nginx-proxy-cutting-app-ui
-    #ports:
-      #- "80:80"  # เปิดพอร์ต 80 สำหรับ Nginx
-      #- "443:443"
-    #volumes:
-      #- ./nginx.conf:/etc/nginx/nginx.conf  # ใช้ไฟล์ nginx.conf ที่กำหนดเอง
-      #- ./nginx/logs:/var/log/nginx  # แชร์ log (ถ้าต้องการ)
-    #restart: always
-    #depends_on:
-      #- cutting-app-ui
-    #networks:
-      #- cutting-ui-network
 
 networks:
-  bouyguesthai-system:
+  salon-booking-system:
     driver: bridge

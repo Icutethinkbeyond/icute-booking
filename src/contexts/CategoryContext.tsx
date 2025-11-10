@@ -9,7 +9,7 @@ import {
   initialEquipmentType,
   CategorySelect,
   TypeSelect,
-} from "@/interfaces/Category_Type";
+} from "@/interfaces/Category";
 import { faker } from "@faker-js/faker";
 import React, {
   createContext,

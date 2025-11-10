@@ -22,30 +22,6 @@ model Report {
   @@unique([storeId, reportDate, reportType])
 }
 
-// enum NotificationType {
-//   NEW_BOOKING_TO_STORE
-//   CANCELED_BY_STORE_TO_CUSTOMER
-//   RESCHEDULED_BY_STORE_TO_CUSTOMER
-//   CONFIRMED_TO_CUSTOMER
-//   // ฯลฯ
-// }
-
-// model Notification {
-//   id         String             @id @default(auto()) @map("_id") @db.ObjectId
-//   type       NotificationType
-//   message    String             // ข้อความที่ส่ง/จะส่ง
-//   sentViaLine Boolean            // 2.7, 2.8, 2.9 ส่ง LINE
-//   sentViaEmail Boolean           // 2.10 ส่ง Email
-//   target     String             // CustomerPhone, CustomerEmail หรือ StoreId
-//   isSent     Boolean            @default(false)
-//   sentAt     DateTime?
-  
-//   storeId    String             @db.ObjectId
-//   store      Store              @relation(fields: [storeId], references: [id])
-  
-//   bookingId  String?            @db.ObjectId
-//   booking    Booking?           @relation(fields: [bookingId], references: [id])
-// }
 
 enum BookingStatus {
   PENDING    // รอลูกค้ายืนยัน (ถ้ามี), หรือรอยืนยันจากร้าน (ถ้าตั้งค่าไว้)
@@ -55,6 +31,7 @@ enum BookingStatus {
   COMPLETED  // เสร็จสิ้นบริการ
   WALK_IN    // คิว Walk-in (2.4)
 }
+
 
 model Booking {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
@@ -86,6 +63,9 @@ model Booking {
   @@index([employeeId, startTime]) // ช่วยในการตรวจสอบคิวซ้ำ/ค้นหาคิว
 
   // 3.7 ข้อความ LINE ส่งไปหาลูกค้า (ต้องใช้ Logic ใน Application)
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
 }
 
 
@@ -101,6 +81,9 @@ model Service {
   employees      Employee[] @relation(references: [id], fields: [employeeIds]) // พนักงานที่ทำบริการนี้ได้
   employeeIds    String[]  @db.ObjectId // Reference IDs
   bookings       Booking[]
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
 }
 
 model Employee {
@@ -115,6 +98,9 @@ model Employee {
   bookings       Booking[] // คิวที่พนักงานคนนี้รับผิดชอบ
   services       Service[] @relation(references: [id], fields: [serviceIds]) // บริการที่พนักงานคนนี้ทำได้
   serviceIds     String[]  @db.ObjectId // Reference IDs
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
 }
 
 model OperatingHour {
@@ -128,6 +114,9 @@ model OperatingHour {
   store     Store      @relation(fields: [storeId], references: [id])
 
   @@unique([storeId, date]) // ไม่ให้ตั้งค่าเวลาทำการซ้ำวัน
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
 }
 
 model Store {
@@ -151,6 +140,9 @@ model Store {
   operatingHours   OperatingHour[]   // เวลาเปิด-ปิด/วันหยุดพิเศษ
   notifications    Notification[] // เชื่อมกับ Notification
   reports          Report[]
+
+  createdAt DateTime @default(now()) // วันที่สร้าง
+  updatedAt DateTime @updatedAt // อัปเดตล่าสุด
 }
 
 enum NotificationType {

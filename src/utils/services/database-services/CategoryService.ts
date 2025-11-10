@@ -1,4 +1,4 @@
-import { CategorySelect } from "@/interfaces/Category_Type";
+import { CategorySelect } from "@/interfaces/Category";
 import { PrismaClient, Category } from "@prisma/client";
 
 const prisma = new PrismaClient();
