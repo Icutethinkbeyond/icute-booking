@@ -3,20 +3,14 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { UserProvider } from "@/contexts/UserContext";
 import { CategoryProvider } from "@/contexts/CategoryContext";
-import { EquipmentProvider } from "@/contexts/EquipmentContext";
 import { Prompt } from "next/font/google";
 
 // import mutiMassages next-intl
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { SessionProviders } from "../../lib/SessionProviders";
-import { DocumentProvider } from "@/contexts/DocumentContext";
-import { SiteProvider } from "@/contexts/SiteContext";
-import { RentalProvider } from "@/contexts/RentalContext";
 import { NotifyProvider } from "@/contexts/NotifyContext";
 import { BreadcrumbProvider } from "@/contexts/BreadcrumbContext";
-import { MaintenanceProvider } from "@/contexts/MaintenanceContext";
-import { ReportProvider } from "@/contexts/ReportContext";
 
 export const dynamic = "force-dynamic";
 
@@ -47,24 +41,12 @@ export default async function RootLayout({
             <NotifyProvider>
               <BreadcrumbProvider>
                 <UserProvider>
-                  <EquipmentProvider>
                     <CategoryProvider>
-                      <DocumentProvider>
-                        <SiteProvider>
-                          <RentalProvider>
-                            <MaintenanceProvider>
-                              <ReportProvider>
-                                <NextIntlClientProvider messages={messages}>
-                                  {children}
-                                </NextIntlClientProvider>
-                              </ReportProvider>
-                            </MaintenanceProvider>
-                          </RentalProvider>
-                        </SiteProvider>
-                      </DocumentProvider>
+                      <NextIntlClientProvider messages={messages}>
+                        {children}
+                      </NextIntlClientProvider>
                     </CategoryProvider>
-                  </EquipmentProvider>
-                </UserProvider>
+                    </UserProvider>
               </BreadcrumbProvider>
             </NotifyProvider>
           </SessionProviders>

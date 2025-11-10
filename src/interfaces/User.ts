@@ -1,4 +1,5 @@
-import { RoleName, UserStatus } from "@prisma/client";
+
+import { Role, UserStatus } from "@prisma/client";
 
 // Interface สำหรับ User
 export interface User {

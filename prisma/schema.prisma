@@ -7,20 +7,93 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Report {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  reportDate DateTime   @db.Date             // วันที่ของรายงาน
-  reportType String     // เช่น "Daily", "Monthly"
-  totalBookings Int
-  totalRevenue  Float
-  details      Json     // ข้อมูลละเอียด เช่น { "serviceA": 10, "serviceB": 5 }
-  generatedAt  DateTime   @default(now())
-  
-  storeId    String     @db.ObjectId
-  store      Store      @relation(fields: [storeId], references: [id])
-  
-  @@unique([storeId, reportDate, reportType])
+model User {
+
+  userId     String     @id @default(auto()) @map("_id") @db.ObjectId
+  email      String
+  password   String?
+  name       String
+  userStatus UserStatus @default(ACTIVE)
+
+  role       Role?      @relation(fields: [roleId], references: [roleId])
+  roleId     String?    @db.ObjectId
+
+  store       Store?    
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([email])
+
 }
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Role {
+
+  roleId      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        RoleName
+  description String?
+  users       User[]
+  userIds     String[] @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name])
+
+}
+
+enum RoleName {
+  ADMIN
+  STOREADMIN
+}
+
+model Customer {
+  
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+
+  // 2. LINE Login Data
+  // lineUserId คือ ID หลักที่ได้จาก LINE ใช้สำหรับส่ง Push Message และต้องไม่ซ้ำกัน
+  lineUserId     String     @unique 
+  displayName    String?    // ชื่อที่ LINE ตั้งไว้ (Nullable)
+  pictureUrl     String?    // URL รูปโปรไฟล์ (Nullable)
+  statusMessage  String?    // สถานะข้อความ (Nullable)
+  isLineLinked   Boolean    @default(true) // ยืนยันว่าผูก LINE แล้ว
+
+  // 3. Contact Data - ข้อมูลติดต่อที่ได้จากการจอง
+  phone          String?    // เบอร์โทรศัพท์ (Nullable)
+  email          String?    // อีเมล (Nullable)
+
+  booking       Booking[]
+  
+  // 4. Metadata
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt // อัปเดตวันที่เองเมื่อมีการแก้ไข Record
+
+  // (Optional) หากมีตารางจอง (Booking) ให้เพิ่มความสัมพันธ์
+  // bookings      Booking[] // ตัวอย่างความสัมพันธ์ 1:N 
+  
+  // @@map("customers") // กำหนดชื่อตารางใน Database
+}
+
+// model Report {
+
+//   id         String     @id @default(auto()) @map("_id") @db.ObjectId
+//   reportDate DateTime   @db.Date             // วันที่ของรายงาน
+//   reportType String     // เช่น "Daily", "Monthly"
+//   totalBookings Int
+//   totalRevenue  Float
+//   details      Json     // ข้อมูลละเอียด เช่น { "serviceA": 10, "serviceB": 5 }
+//   generatedAt  DateTime   @default(now())
+  
+//   storeId    String     @db.ObjectId
+//   store      Store      @relation(fields: [storeId], references: [id])
+  
+//   @@unique([storeId, reportDate, reportType])
+// }
 
 
 enum BookingStatus {
@@ -34,6 +107,7 @@ enum BookingStatus {
 
 
 model Booking {
+
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
   customerName    String          // 3.6
   customerPhone   String          // 3.6
@@ -54,6 +128,9 @@ model Booking {
   employeeId      String          @db.ObjectId
   employee        Employee        @relation(fields: [employeeId], references: [id])
 
+  customerId      String          @db.ObjectId
+  customer        Customer        @relation(fields: [customerId], references: [id])
+
   notifications    Notification[] // เชื่อมกับ Notification
 
   // 2.12 ระบบกันคิวซ้ำ: ต้องใช้ Logic ใน Application หรือใช้ Unique Index แบบ Compound 
@@ -66,10 +143,13 @@ model Booking {
 
   createdAt DateTime @default(now()) // วันที่สร้าง
   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+
+  
 }
 
 
 model Service {
+
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   name           String    // "ตัดผม 30 นาที", "นวดตัว 1 ชม."
   durationMinutes Int      // ระยะเวลาเป็นนาที เช่น 30, 60
@@ -84,6 +164,7 @@ model Service {
 
   createdAt DateTime @default(now()) // วันที่สร้าง
   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+
 }
 
 model Employee {
@@ -98,6 +179,9 @@ model Employee {
   bookings       Booking[] // คิวที่พนักงานคนนี้รับผิดชอบ
   services       Service[] @relation(references: [id], fields: [serviceIds]) // บริการที่พนักงานคนนี้ทำได้
   serviceIds     String[]  @db.ObjectId // Reference IDs
+
+  userId    String     @db.ObjectId
+
 
   createdAt DateTime @default(now()) // วันที่สร้าง
   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
@@ -120,9 +204,11 @@ model OperatingHour {
 }
 
 model Store {
+
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
   storeName        String
-  bookingLink      String            @unique // 3.2 ลิงก์ร้านค้า
+  storeUsername    String            @unique 
+  // bookingLink      String            @unique // 3.2 ลิงก์ร้านค้า
   // 2.1 กำหนดวันหยุด (วันหยุดประจำสัปดาห์ เช่น [1, 7] = จันทร์, อาทิตย์)
   weeklyHolidays   Int[]
   // 2.1 เวลาเปิด-ปิดต่อวัน (สำหรับวันทำงาน)
@@ -133,13 +219,16 @@ model Store {
   lineChannelId    String?     // สำหรับ LINE Messaging API (ถ้าใช้)
   lineChannelSecret String?    // สำหรับ LINE Messaging API (ถ้าใช้)
 
+  userId    String              @db.ObjectId @unique
+  user      User                @relation(fields: [userId], references: [userId])
+
   // ความสัมพันธ์
   employees        Employee[]
   services         Service[]
   bookings         Booking[]
   operatingHours   OperatingHour[]   // เวลาเปิด-ปิด/วันหยุดพิเศษ
   notifications    Notification[] // เชื่อมกับ Notification
-  reports          Report[]
+  // reports          Report[]
 
   createdAt DateTime @default(now()) // วันที่สร้าง
   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
