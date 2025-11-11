@@ -20,6 +20,8 @@ model User {
 
   store       Store?    
 
+  resetPasswordTokens ResetPasswordToken[]
+
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
@@ -49,6 +51,29 @@ model Role {
 enum RoleName {
   ADMIN
   STOREADMIN
+}
+
+model ResetPasswordToken {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // ความสัมพันธ์กับ User
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // โทเค็นที่ใช้สำหรับรีเซ็ตรหัสผ่าน
+  token       String   @unique   // UUID หรือ random string ที่เข้ารหัสแล้วก็ได้
+
+  // วันหมดอายุ (เช่น 15 นาที - 1 ชม.)
+  expiresAt   DateTime
+
+  // สถานะการใช้งาน
+  used        Boolean  @default(false)
+
+  // วันที่สร้างและอัปเดต
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Customer {

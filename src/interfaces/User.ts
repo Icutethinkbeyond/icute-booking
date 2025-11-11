@@ -30,6 +30,17 @@ export interface Role {
   updatedAt: string;
 }
 
+export interface ResetPasswordToken {
+  id: string;
+  userId: string;
+  user?: User;
+  token: string;
+  expiresAt: string; // ISO Date string
+  used: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Customer {
   id: string;
 
