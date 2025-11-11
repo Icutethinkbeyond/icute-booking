@@ -36,7 +36,7 @@ const LoginPage = () => {
           >
             <Grid2 container justifyContent={"center"}>
               <Typography variant="h1" color="white">
-                {/* Asset Management Software{" "} */}
+                Reset Password
               </Typography>
             </Grid2>
           </Box>

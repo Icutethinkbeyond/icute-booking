@@ -208,6 +208,10 @@ const AuthForm: React.FC<loginType> = ({
                   เข้าสู่ระบบ
                 </LoadingButton>
               </Grid2>
+              <Grid2 size={{ xs: 6 }}>
+                <Button variant="text">ลืมรหัสผ่าน</Button>
+                <Button variant="text">สมัครสมาชิก</Button>
+              </Grid2>
             </Grid2>
           </Form>
         )}
