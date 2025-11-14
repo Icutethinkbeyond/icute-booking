@@ -37,13 +37,13 @@ const BreadcrumbCustom: React.FC<BreadcrumbProps> = (
             <Link
               key={index}
               underline="hover"
-              color="inherit"
+              color="#fff"
               href={breadcrumb.href}
             >
               {breadcrumb.name}
             </Link>
           ) : (
-            <Typography key={index} color="text.primary">
+            <Typography key={index} color="#fff">
               {breadcrumb.name}
             </Typography>
           )

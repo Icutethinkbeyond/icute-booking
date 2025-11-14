@@ -21,7 +21,7 @@ import {
 import { useLocale } from "next-intl";
 import StatusEmployee from "@/components/shared/used/Status";
 import dayjs from "dayjs";
-import { Bath, MonitorCog } from "lucide-react";
+import { Bath, MonitorCog, Plus, Save } from "lucide-react";
 import { AutoFixHigh, Category, Handyman, More } from "@mui/icons-material";
 import { IconCurrencyBaht } from "@tabler/icons-react";
 import { employeeService } from "@/utils/services/api-services/EmployeeAPI";
@@ -211,79 +211,39 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
                   <Grid2 size={{ xs: 12 }} mb={2}>
                     <Grid2 container alignItems="center">
                       <Avatar sx={{ bgcolor: "primary.main" }}>
-                        <MonitorCog size={20} />
+                        <Plus size={20} />
                       </Avatar>
                       <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                        รายละเอียดอุปกรณ์
+                        เพิ่มพนักงาน
                       </Typography>
                     </Grid2>
                   </Grid2>
-                  {/* {Employee.aboutEmployee?.stockStatus !==
-                    EmployeeStatus.InStock && (
-                    <StatusEmployee
-                      status={Employee.aboutEmployee?.stockStatus}
-                      message='อุปกรณ์อยู่ระหว่างใช้งาน "ไม่สามารถแก้ไข" หรือ "ยกเลิกใช้งานได้"'
-                    />
-                  )} */}
-                </Grid2>
-
-                {/* Employee ID */}
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="serialNo">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="serialNo"
-                        label="รหัสอุปกรณ์ (จำเป็น)"
-                        // sx={{ textTransform: "uppercase" }}
-                        // value={values.serialNo ? values.serialNo : ""}
-                        onChange={(e) => {
-                          setFieldValue(
-                            "serialNo",
-                            e.target.value.toUpperCase()
-                          );
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        // placeholder="EXAMPLE: SN-00001"
-                        // error={touched.serialNo && Boolean(errors.serialNo)}
-                        // helperText={touched.serialNo && errors.serialNo}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
                 </Grid2>
 
                 {/* Employee Name */}
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="EmployeeName">
+                  <Field name="name">
                     {({ field }: FieldProps) => (
                       <TextField
                         {...field}
-                        name="EmployeeName"
-                        label="ชื่ออุปกรณ์ (จำเป็น)"
-                        // value={values.EmployeeName}
+                        name="name"
+                        label="ชื่อช่าง (จำเป็น)"
+                        value={values.name}
                         onChange={(e) => {
-                          setFieldValue("EmployeeName", e.target.value);
+                          setFieldValue("name", e.target.value);
                         }}
-                        placeholder="EXAMPLE: Crane Tower"
                         slotProps={{
                           inputLabel: { shrink: true },
                           input: {
                             readOnly: viewOnly ? true : false,
                           },
                         }}
-                        // error={
-                        //   touched.EmployeeName && Boolean(errors.EmployeeName)
-                        // }
-                        // helperText={
-                        //   touched.EmployeeName && errors.EmployeeName
-                        // }
+                        error={
+                          touched.name && Boolean(errors.name)
+                        }
+                        helperText={
+                          touched.name && errors.name
+                        }
                         fullWidth
                         disabled={openBackdrop || isSubmitting || disabledForm}
                       />
@@ -292,17 +252,17 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="model">
+                  <Field name="role">
                     {({ field }: FieldProps) => (
                       <TextField
                         {...field}
-                        name="model"
-                        label="Model"
+                        name="role"
+                        label="ตำเเหน่ง (จำเป็น)"
                         // sx={{ textTransform: "uppercase" }}
-                        // value={values.model ? values.model : ""}
+                        value={values.role ? values.role : ""}
                         onChange={(e) => {
                           setFieldValue(
-                            "model",
+                            "role",
                             e.target.value
                           );
                         }}
@@ -313,124 +273,8 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
                           },
                         }}
                         placeholder=""
-                        // error={touched.model && Boolean(errors.model)}
-                        // helperText={touched.model && errors.model}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                {/* Rental Price */}
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.rentalPriceCurrent">
-                    {({ field }: any) => (
-                      <TextField
-                        {...field}
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                        name="aboutEmployee.rentalPriceCurrent"
-                        // placeholder="EXAMPLE: 999999999"
-                        label="ราคาเช่าปัจจุบัน/เดือน (จำเป็น)"
-                        // value={values.aboutEmployee?.rentalPriceCurrent ?? ""}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                            endAdornment: <IconCurrencyBaht />,
-                          },
-                        }}
-                        type="number"
-                        onChange={(e) => {
-                          const newValue = e.target.value.replace(/\D/g, ""); // กรองเฉพาะตัวเลข
-                          setFieldValue(
-                            "aboutEmployee.rentalPriceCurrent",
-                            newValue || ""
-                          ); // ป้องกัน NaN
-                        }}
-                        // error={
-                        //   touched.aboutEmployee?.rentalPriceCurrent &&
-                        //   Boolean(errors.aboutEmployee?.rentalPriceCurrent)
-                        // }
-                        // helperText={
-                        //   touched.aboutEmployee?.rentalPriceCurrent &&
-                        //   errors.aboutEmployee?.rentalPriceCurrent
-                        // }
-                        fullWidth
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.EmployeePrice">
-                    {({ field }: any) => (
-                      <TextField
-                        {...field}
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                        name="aboutEmployee.EmployeePrice"
-                        label="ราคาอุปกรณ์ (ถ้ามี)"
-                        // placeholder="EXAMPLE: 9999999"
-                        // value={values.aboutEmployee?.EmployeePrice ?? ""}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                            endAdornment: <IconCurrencyBaht />,
-                          },
-                        }}
-                        type="number"
-                        onChange={(e) => {
-                          const newValue = e.target.value.replace(/\D/g, ""); // กรองเฉพาะตัวเลข
-                          setFieldValue(
-                            "aboutEmployee.EmployeePrice",
-                            newValue || ""
-                          ); // ป้องกัน NaN
-                        }}
-                        // error={
-                        //   touched.aboutEmployee?.EmployeePrice &&
-                        //   Boolean(errors.aboutEmployee?.EmployeePrice)
-                        // }
-                        // helperText={
-                        //   touched.aboutEmployee?.EmployeePrice &&
-                        //   errors.aboutEmployee?.EmployeePrice
-                        // }
-                        fullWidth
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.QTY">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="aboutEmployee.QTY"
-                        label="จำนวน (จำเป็น)"
-                        // value={values.aboutEmployee?.QTY ? values.aboutEmployee?.QTY : ""}
-                        onChange={(e) => {
-                          // setFieldValue("aboutEmployee.QTY", e.target.value);
-                          const newValue = e.target.value.replace(/\D/g, ""); // กรองเฉพาะตัวเลข
-                          setFieldValue(
-                            "aboutEmployee.QTY",
-                            newValue || ""
-                          ); // ป้องกัน NaN
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        // error={
-                        //   touched.aboutEmployee?.QTY &&
-                        //   Boolean(errors.aboutEmployee?.QTY)
-                        // }
-                        // helperText={
-                        //   touched.aboutEmployee?.QTY &&
-                        //   errors.aboutEmployee?.QTY
-                        // }
+                        error={touched.role && Boolean(errors.role)}
+                        helperText={touched.role && errors.role}
                         fullWidth
                         disabled={openBackdrop || isSubmitting || disabledForm}
                       />
@@ -439,391 +283,43 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="purchaseDate">
-                    {({ field }: FieldProps) => (
-                      <DatePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                        label="วันที่ซื้ออุปกรณ์ (ถ้ามี)"
-                        name="purchaseDate"
-                        sx={{ minWidth: "100%" }}
-                        // value={
-                        //   values.aboutEmployee?.purchaseDate !== undefined
-                        //     ? dayjs(values.aboutEmployee.purchaseDate)
-                        //     : null
-                        // }
-                        onChange={(newValue) => {
-                          setFieldValue(
-                            "aboutEmployee.purchaseDate",
-                            newValue
-                          );
-                        }}
-                        slotProps={
-                          {
-                            // textField: {
-                            //   helperText: "DD/MM/YYYY",
-                            // },
-                          }
-                        }
-                      />
-                    )}
-                  </Field>
+                        {/* <FormControl sx={{ m: 1, width: 300 }}>
+                          <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+                          <Select
+                            labelId="demo-multiple-chip-label"
+                            id="demo-multiple-chip"
+                            multiple
+                            value={personName}
+                            onChange={handleChange}
+                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                            renderValue={(selected) => (
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                  <Chip key={value} label={value} />
+                                ))}
+                              </Box>
+                            )}
+                            MenuProps={MenuProps}
+                          >
+                            {names.map((name) => (
+                              <MenuItem
+                                key={name}
+                                value={name}
+                                style={getStyles(name, personName, theme)}
+                              >
+                                {name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl> */}
                 </Grid2>
 
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="registerDate">
-                    {({ field }: FieldProps) => (
-                      <DatePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                        label="วันที่ลงทะเบียน (ถ้ามี)"
-                        name="registerDate"
-                        sx={{ minWidth: "100%" }}
-                        // value={
-                        //   values.aboutEmployee?.registerDate !== undefined
-                        //     ? dayjs(values.aboutEmployee.registerDate)
-                        //     : null
-                        // }
-                        onChange={(newValue) => {
-                          setFieldValue(
-                            "aboutEmployee.registerDate",
-                            newValue
-                          );
-                        }}
-                        slotProps={
-                          {
-                            // textField: {
-                            //   helperText: "DD/MM/YYYY",
-                            // },
-                          }
-                        }
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                {/* Status */}
-                {/* <Grid2 size={{ xs: 6 }}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      touched.aboutEmployee?.stockStatus &&
-                      Boolean(errors.aboutEmployee?.stockStatus)
-                    }
-                    disabled={openBackdrop || isSubmitting || disabledForm}
-                  >
-                    <InputLabel id="stockStatus-label">สถานะอุปกรณ์</InputLabel>
-                    <Field name="aboutEmployee.stockStatus">
-                      {({ field }: any) => (
-                        <Select
-                          type="hidden"
-                          {...field}
-                          label="สถานะอุปกรณ์ (จำเป็น)"
-                          labelId="stockStatus-label"
-                          value={values.aboutEmployee.stockStatus}
-                          onChange={(event) => {
-                            console.log(event.target);
-                            const value = event.target.value as EmployeeStatus;
-                            setFieldValue("aboutEmployee.stockStatus", value);
-                          }}
-                          slotProps={{
-                            inputLabel: { shrink: true },
-                            input: {
-                              readOnly: viewOnly ? true : false,
-                            },
-                          }}
-                        >
-                          {Object.values(EmployeeStatus).map((status) => (
-                            <MenuItem key={status} value={status}>
-                              {status}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                    {touched.aboutEmployee?.stockStatus &&
-                      errors.aboutEmployee?.stockStatus && (
-                        <FormHelperText>
-                          {errors.aboutEmployee?.stockStatus}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Grid2> */}
               </Grid2>
 
-              <Grid2 container spacing={3}>
-                <Grid2 size={{ xs: 12 }} sx={{ mt: 5 }}>
-                  <Grid2 size={{ xs: 12 }} mb={2}>
-                    <Grid2 container alignItems="center">
-                      <Avatar sx={{ bgcolor: "primary.main" }}>
-                        <Category />
-                      </Avatar>
-                      <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                        กำหนดหมวดหมู่
-                      </Typography>
-                    </Grid2>
-                  </Grid2>
-                </Grid2>
-                {/* Category */}
-                <Grid2 size={{ xs: 6 }}>
-                  {/* <Field name="categoryId">
-                    {({ field }: FieldProps) => (
-                      <Autocomplete
-                        disabled={disabledForm || isLoading}
-                        id="categoryId"
-                        placeholder="เลือกหมวดหมู่"
-                        value={
-                          values.categoryId
-                            ? values.category?.categoryName
-                            : null
-                        }
-                        options={categorySelectState}
-                        getOptionLabel={(option: CategorySelect | string) =>
-                          typeof option === "string"
-                            ? option
-                            : option.categoryName
-                        }
-                        loading
-                        onChange={(event, value) => {
-                          if (typeof value !== "string") {
-                            setFieldValue(
-                              "categoryId",
-                              value !== null ? value.categoryId : ""
-                            );
-                          }
-                        }}
-                        readOnly={viewOnly ? true : false}
-                        renderInput={(params) => (
-                          <TextField
-                            value={
-                              values.categoryId
-                                ? values.category?.categoryName
-                                : null
-                            }
-                            label="หมวดหมู่"
-                            name="categoryId"
-                            {...params}
-                          />
-                        )}
-                      />
-                    )}
-                  </Field> */}
-                  {/* <Field name="categoryId">
-                    {({ field }: FieldProps) => (
-                      <Autocomplete
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                        id="categoryId"
-                        // options={categorySelectState}
-                        // getOptionLabel={(option: CategorySelect) =>
-                        //   option.categoryName
-                        // }
-                        // isOptionEqualToValue={(option, value) =>
-                        //   option.categoryId === value.categoryId
-                        // }
-                        // value={
-                        //   categorySelectState.find(
-                        //     (cat) => cat.categoryId === values.categoryId
-                        //   ) || null
-                        // }
-                        // onChange={(event, value) => {
-                        //   setFieldValue(
-                        //     "categoryId",
-                        //     value ? value.categoryId : ""
-                        //   );
-                        // }}
-                        readOnly={viewOnly}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="หมวดหมู่"
-                            name="categoryId"
-                          />
-                        )}
-                      />
-                    )}
-                  </Field> */}
-                </Grid2>
-              </Grid2>
 
-              <Grid2 container spacing={3}>
-                <Grid2 size={{ xs: 12 }} sx={{ mb: 2, mt: 5 }}>
-                  <Grid2 size={{ xs: 12 }} mb={2}>
-                    <Grid2 container alignItems="center">
-                      <Avatar sx={{ bgcolor: "primary.main" }}>
-                        <More fontSize="small" />
-                      </Avatar>
-                      <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                        เพิ่มเติม
-                      </Typography>
-                    </Grid2>
-                  </Grid2>
-                </Grid2>
-
-                {/* Employee Brand */}
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="brand">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="brand"
-                        label="แบรนด์ (ถ้ามี)"
-                        // value={values.brand ? values.brand : ""}
-                        onChange={(e) => {
-                          setFieldValue("brand", e.target.value);
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.PO">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="PO"
-                        label="PO (ถ้ามี)"
-                        // value={values.aboutEmployee?.PO ? values.aboutEmployee?.PO : ""}
-                        onChange={(e) => {
-                          setFieldValue("aboutEmployee.PO", e.target.value);
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.fixAssetsNumber">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="aboutEmployee.fixAssetsNumber"
-                        label="fixAssetsNumber (ถ้ามี)"
-                        // value={values.aboutEmployee?.fixAssetsNumber ? values.aboutEmployee?.fixAssetsNumber : ""}
-                        onChange={(e) => {
-                          setFieldValue("aboutEmployee.fixAssetsNumber", e.target.value);
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="aboutEmployee.BTLNumber">
-                    {({ field }: FieldProps) => (
-                      <TextField
-                        {...field}
-                        name="aboutEmployee.BTLNumber"
-                        label="BTLNumber (ถ้ามี)"
-                        // value={values.aboutEmployee?.BTLNumber ? values.aboutEmployee?.BTLNumber : ""}
-                        onChange={(e) => {
-                          setFieldValue("aboutEmployee.BTLNumber", e.target.value);
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                {/* Employee Description */}
-                <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
-                    {({ field }: any) => (
-                      <TextField
-                        {...field}
-                        name="description"
-                        label="รายละเอียดอุปกรณ์ (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
-                        multiline
-                        rows={4}
-                        onChange={(e) => {
-                          setFieldValue("description", e.target.value);
-                        }}
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          input: {
-                            readOnly: viewOnly ? true : false,
-                          },
-                        }}
-                        fullWidth
-                        disabled={openBackdrop || isSubmitting || disabledForm}
-                      />
-                    )}
-                  </Field>
-                </Grid2>
-
-                {/* Type */}
-                {/* <Grid2 size={{ xs: 6 }}>
-                  <Field name="EmployeeTypeId">
-                    {({ field }: FieldProps) => (
-                      <Autocomplete
-                        disabled={disabledForm}
-                        id="EmployeeTypeId"
-                        options={typeSelectState}
-                        getOptionLabel={(option: TypeSelect) =>
-                          option.EmployeeTypeName
-                        }
-                        loading
-                        onChange={(e, value) => {
-                          setFieldValue(
-                            "EmployeeTypeId",
-                            value !== null ? value.EmployeeTypeId : ""
-                          );
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            label="ประเภทอุปกรณ์"
-                            name="EmployeeTypeId"
-                            {...params}
-                          />
-                        )}
-                      />
-                    )}
-                  </Field>
-                </Grid2> */}
-              </Grid2>
               <Grid2
-                sx={{ mt: 5, display: "flex", justifyContent: "flex-end" }}
+                sx={{ mt: 5, display: "flex", justifyContent: "flex-start" }}
               >
-                {/* {EmployeeEdit === false ? (
-                    <Button
-                      variant="outlined"
-                      onClick={makeFakeData}
-                      sx={{ mr: 1 }}
-                      startIcon={<AutoFixHigh />}
-                    >
-                      สร้างแบบรวดเร็ว
-                    </Button>
-                  ) : (
-                    ""
-                  )} */}
 
                 <LoadingButton
                   variant="contained"
@@ -832,9 +328,9 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
                   sx={{ mr: 1 }}
                   disabled={openBackdrop || isSubmitting || disabledForm}
                   loading={openBackdrop || isSubmitting}
-                  startIcon={<Handyman />}
+                  startIcon={<Save />}
                 >
-                  {/* {!EmployeeEdit ? "เพิ่มอุปกรณ์" : "แก้ไขอุปกรณ์"} */}
+                  เพิ่มพนักงาน
                 </LoadingButton>
                 <ConfirmDelete
                   itemId={uniqueId()}

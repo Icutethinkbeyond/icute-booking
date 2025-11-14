@@ -22,8 +22,8 @@ export default function ServiceTabs() {
           onChange={handleChange}
           aria-label=""
         >
-          <Tab label="บริการทั้งหมดทั้งหมด" {...a11yProps(0)} />
-          <Tab label="เพิ่มบริการใหม่ใหม่" {...a11yProps(1)} />
+          <Tab label="บริการทั้งหมด" {...a11yProps(0)} />
+          <Tab label="เพิ่มบริการใหม่" {...a11yProps(1)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>

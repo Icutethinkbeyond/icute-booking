@@ -42,6 +42,7 @@ const LanguageSwitcher: React.FC = () => {
         onChange={handleLanguageChange}
         variant="outlined"
         size="small"
+        
         defaultValue={localActive}
         disabled={isPending}
       >

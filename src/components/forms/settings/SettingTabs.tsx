@@ -11,7 +11,7 @@ import LineSettings from "./LineSettings";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 export default function ServiceTabs() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(2);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

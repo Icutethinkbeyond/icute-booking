@@ -44,13 +44,15 @@ export default function RootLayout({
         isMobileSidebarOpen={isMobileSidebarOpen}
         onSidebarClose={() => setMobileSidebarOpen(false)}
       />
-      <PageWrapper className="page-wrapper">
+      <PageWrapper className="page-wrapper" sx={{
+            background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)"
+          }}>
         <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
         <Container
           sx={{
             paddingTop: "20px",
             maxWidth: "1200px",
-          }}
+             }}
         >
           <Box sx={{ minHeight: "calc(100vh - 170px)" }}>
             <CustomNotifications/>

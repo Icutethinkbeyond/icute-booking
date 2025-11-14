@@ -214,6 +214,7 @@ model Employee {
 
 model OperatingHour {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  
   date      DateTime   @db.Date
   isOpen    Boolean    @default(true) // true = เปิด, false = ปิด (วันหยุดพิเศษ)
   openTime  String?    // "09:00" ถ้า isOpen = true

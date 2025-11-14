@@ -14,25 +14,25 @@ const baselightTheme = createTheme({
   direction: "ltr",
   palette: {
     primary: {
-      main: "#E7510C",
-      light: "#FF7A3D", // Lighter shade of main
-      dark: "#B33C00", // Darker shade of main
+      main: "#45BDBB", // Primary: Teal/Green accent color (Active status/Menu)
+      light: "#50E3C2", // Lighter shade (matching the light end of the gradient)
+      dark: "#2F855A", // Darker shade
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#2D3748", // Neutral dark color that complements the orange
-      light: "#4A5568",
-      dark: "#1A202C",
+      main: "#4A90E2", // Secondary: Action Blue (Save button color)
+      light: "#6AAEEA", // Lighter shade
+      dark: "#3A7BD5", // Darker shade
       contrastText: "#ffffff",
     },
     success: {
-      main: "#38A169", // Adjusted green for better harmony
+      main: "#38A169", // Kept a robust green for success messages
       light: "#F0FFF4",
       dark: "#2F855A",
       contrastText: "#ffffff",
     },
     info: {
-      main: "#3182CE", // Adjusted blue for better harmony
+      main: "#3182CE", // Kept a robust blue for info messages
       light: "#EBF8FF",
       dark: "#2C5282",
       contrastText: "#ffffff",
@@ -68,8 +68,8 @@ const baselightTheme = createTheme({
     },
     divider: "#E2E8F0",
     background: {
-      default: "#F7FAFC",
-      paper: "#FFFFFF",
+      default: "#F7FAFC", // Main background, the blue-green gradient is applied in a higher-level component/CSS
+      paper: "#FFFFFF", // Card/Paper background (white)
     },
   },
 
@@ -247,4 +247,3 @@ const baselightTheme = createTheme({
 })
 
 export { baselightTheme }
-

@@ -23,9 +23,9 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
   
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     // boxShadow: 'none',
-    // background: theme.palette.background.paper,
-    boxShadow: '10px 0.1px 10px #ff9e75',
-    background: '#ffffff',
+     background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)",
+    // boxShadow: '10px 0.1px 10px #ff9e75',
+    // background: '#ffffff',
     justifyContent: 'center',
     backdropFilter: 'blur(4px)',
     [theme.breakpoints.up('lg')]: {
@@ -59,7 +59,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
         
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
-          <LanguageSwitcher/>
+          {/* <LanguageSwitcher/> */}
           <Profile />
         </Stack>
       </ToolbarStyled>

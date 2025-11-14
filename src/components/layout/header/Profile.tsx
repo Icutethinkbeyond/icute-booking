@@ -93,7 +93,7 @@ const Profile = () => {
           }}
         >
           <Typography
-            color="textSecondary"
+            color="#fff"
             variant="h5"
             fontWeight="400"
             sx={{ ml: 1 }}
@@ -109,7 +109,7 @@ const Profile = () => {
           >
             {session?.user?.name}
           </Typography>
-          <IconChevronDown width="20" height="20" />
+          <IconChevronDown width="20" height="20" color="#fff" />
         </Box>
       </IconButton>
       {/* ------------------------------------------- */}

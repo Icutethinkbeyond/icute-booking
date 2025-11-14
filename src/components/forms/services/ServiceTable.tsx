@@ -270,13 +270,13 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
 
   return (
     <>
-      <FloatingButton
+      {/* <FloatingButton
         onClick={() => router.push(`/${localActive}/protected/inventory/new`)}
-      />
-      <Typography variant="h4" mt={2}>
+      /> */}
+      {/* <Typography variant="h4" mt={2}>
         อปุกรณ์ทั้งหมด
-      </Typography>
-      <form onSubmit={handleSubmit}>
+      </Typography> */}
+      {/* <form onSubmit={handleSubmit}>
         <Box sx={{ display: "grid", gap: 3 }} mb={4} mt={4}>
           <Grid2 container spacing={2}>
             <Grid2 size={3}>
@@ -335,11 +335,11 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
                   inputLabel: { shrink: true },
                 }}
               >
-                {/* {Object.values(ServiceStatus).map((option) => (
+                {Object.values(ServiceStatus).map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
-                ))} */}
+                ))}
               </TextField>
             </Grid2>
             <Grid2 size={3} container spacing={1}>
@@ -363,7 +363,7 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
             </Grid2>
           </Grid2>
         </Box>
-      </form>
+      </form> */}
       <BaseCard>
         <>
           <DataGrid
