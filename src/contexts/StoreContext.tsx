@@ -3,6 +3,8 @@
 "use client";
 
 import {
+  Service,
+  ServiceSelect,
   Store,
   initialStore,
   // initialStore,
@@ -29,19 +31,20 @@ interface StoreContextProps {
   // setTypeForm: Dispatch<React.SetStateAction<Store>>;
   // setStoreSelectState: Dispatch<React.SetStateAction<StoreSelect[]>>;
   // StoreSelectState: StoreSelect[];
+  setServicesSelect: Dispatch<React.SetStateAction<ServiceSelect[]>>;
+  servicesSelect: ServiceSelect[];
 }
 
 // สร้าง Context
-const StoreContext = createContext<StoreContextProps | undefined>(
-  undefined
-);
+const StoreContext = createContext<StoreContextProps | undefined>(undefined);
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
   const [Stores, setStores] = useState<Store[]>([]);
   // const [StoreSelectState, setStoreSelectState] = useState<
   //   StoreSelect[]
   // >([]);
-  const [StoreForm, setStoreForm] = useState<Store>(initialStore)
+  const [servicesSelect, setServicesSelect] = useState<ServiceSelect[]>([]);
+  const [StoreForm, setStoreForm] = useState<Store>(initialStore);
   const [StoreEdit, setStoreEdit] = useState<boolean>(false);
 
   useEffect(() => {
@@ -72,6 +75,8 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
         setStoreEdit,
         // StoreSelectState,
         // setStoreSelectState,
+        setServicesSelect,
+        servicesSelect,
       }}
     >
       {children}

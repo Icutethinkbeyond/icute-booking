@@ -99,6 +99,11 @@ export interface DefaultOperatingHour {
   updatedAt: string;
 }
 
+export interface ServiceSelect {
+  id: string;
+  name: string; // เช่น "ตัดผม 30 นาที"
+}
+
 export interface Service {
   id: string;
   name: string; // เช่น "ตัดผม 30 นาที"

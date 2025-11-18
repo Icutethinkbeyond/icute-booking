@@ -23,12 +23,16 @@ import {
 } from "@mui/icons-material";
 import { ButtonType } from "@/interfaces/ShredType";
 import ConfirmDelete from "@/components/shared/used/ConfirmDelete";
-import { useCategoryContext } from "@/contexts/CategoryContext";
 import { useReportContext } from "@/contexts/ReportContext";
 import PageTitle from "@/components/shared/used/PageTitle";
 import { categoryService } from "@/utils/services/api-services/CategoryApi";
+import { initialReport, ReportSetting } from "@/interfaces/Report";
 import { uniqueId } from "lodash";
 import { FilePenLine } from "lucide-react";
+import { ServiceSelect } from "@/interfaces/Store";
+import { useStoreContext } from "@/contexts/StoreContext";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface Props {
   // reportType: ReportType;
@@ -46,12 +50,8 @@ const ReportExport: React.FC<Props> = (
   }
 ) => {
   // const { reportForm, setReportForm } = useReportContext();
-  // const { equipmentSelectState, setEquipmentSelectState } =
-  //   useEquipmentContext();
-  // const { setRepairmanStateSelect, repairmanStateSelect } =
-  //   useMaintenanceContext();
-  // const { categorySelectState, setCategorySelectState } = useCategoryContext();
-  // const { siteSelectState, setSiteSelectState } = useSiteContext();
+  const { servicesSelect } = useStoreContext();
+  const { reportForm } = useReportContext();
   const { setNotify, notify, setOpenBackdrop } = useNotifyContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -204,10 +204,8 @@ const ReportExport: React.FC<Props> = (
 
   return (
     <>
-      {/* <Formik<ReportExport> */}
-      <Formik<any>
-        // initialValues={reportForm} // ใช้ state เป็น initialValues
-        initialValues
+      <Formik<ReportSetting>
+        initialValues={reportForm} // ใช้ state เป็น initialValues
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -240,54 +238,40 @@ const ReportExport: React.FC<Props> = (
                     <Category />
                   </Avatar>
                   <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                    เลือกหมวดหมู่
+                    เลือกบริการ
                   </Typography>
                 </Grid2>
               </Grid2>
               <Grid2 container spacing={2} mb={5}>
                 <Grid2 size={{ xs: 12 }}>
-                  <Field name="reportSettings.categoryId">
+                  <Field name="id">
                     {({ field }: FieldProps) => (
                       <Autocomplete
-                        id="reportSettings.categoryId"
-                        options={[
-                          {
-                            categoryId: "test",
-                          },
-                        ]}
-                        // getOptionLabel={(option: CategorySelect) =>
-                        getOptionLabel={(option: any) => option.categoryName}
+                        id="id"
+                        options={servicesSelect}
+                        getOptionLabel={(option: ServiceSelect) => option.name}
                         loading
-                        // onInputChange={(event, value) => {
-                        //   // Handle typed value when no matching option
-                        //   // if (
-                        //   //   value &&
-                        //   //   !categorySelectState.some(
-                        //   //     (opt) => opt.categoryId === value
-                        //   //   )
-                        //   // ) {
-                        //   //   setFieldValue("reportSettings.categoryId", value);
-                        //   // }
-                        // }}
+                        onInputChange={(event, value) => {
+                          // Handle typed value when no matching option
+                          if (
+                            value &&
+                            !servicesSelect.some((opt) => opt.id === value)
+                          ) {
+                            setFieldValue("id", value);
+                          }
+                        }}
                         onChange={(event, value) => {
-                          setFieldValue(
-                            "reportSettings.categoryId",
-                            value !== null ? value.categoryId : ""
-                          );
+                          setFieldValue("id", value !== null ? value.id : "");
                         }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            label="ชื่อหมวดหมู่ (จำเป็น)"
-                            name="reportSettings.categoryId"
-                            // error={
-                            //   touched.reportSettings?.categoryId &&
-                            //   Boolean(errors.reportSettings?.categoryId)
-                            // }
-                            // helperText={
-                            //   touched.reportSettings?.categoryId &&
-                            //   errors.reportSettings?.categoryId
-                            // }
+                            label="ชื่อบริการ (จำเป็น)"
+                            name="id"
+                            error={
+                              touched.serviceId && Boolean(errors.serviceId)
+                            }
+                            helperText={touched.serviceId && errors.serviceId}
                           />
                         )}
                       />
@@ -298,31 +282,27 @@ const ReportExport: React.FC<Props> = (
 
               <PageTitle title="กำหนดรูปแบบ" icon={<DocumentScanner />} />
               <Grid2 container spacing={2} mt={4} mb={4}>
-                <Field name="reportSettings.categoryAll">
+                <Field name="exportAll">
                   {({ field }: FieldProps) => (
                     <>
                       <Grid2 container spacing={2} mb={2} flexDirection={"row"}>
                         <DeliveryCard
-                          // isSelected={
-                          //   values.reportSettings.categoryAll === true
-                          // }
-                          onClick={() =>
-                            setFieldValue("reportSettings.categoryAll", true)
-                          }
+                          isSelected={values.exportAll === true}
+                          onClick={() => setFieldValue("exportAll", true)}
                           elevation={0}
                         >
                           <Box sx={{ flex: 1 }}>
                             <Typography
                               variant="h6"
-                              // sx={{
-                              //   color:
-                              //     values.reportSettings.categoryAll === true
-                              //       ? "#fff"
-                              //       : "text.primary",
-                              //   mb: 0.5,
-                              // }}
+                              sx={{
+                                color:
+                                  values.exportAll === true
+                                    ? "#fff"
+                                    : "text.primary",
+                                mb: 0.5,
+                              }}
                             >
-                              ออกรายงานทุกทั้งหมด
+                              ออกรายงานทั้งหมด
                             </Typography>
                           </Box>
                           <Box
@@ -333,16 +313,9 @@ const ReportExport: React.FC<Props> = (
                             }}
                           >
                             <Radio
-                              // checked={
-                              //   values.reportSettings.categoryAll === true
-                              // }
+                              checked={values.exportAll === true}
                               disabled={isSubmitting || isLoading}
-                              onChange={() =>
-                                setFieldValue(
-                                  "reportSettings.categoryAll",
-                                  true
-                                )
-                              }
+                              onChange={() => setFieldValue("exportAll", true)}
                               value={true}
                               name="delivery-method"
                               sx={{
@@ -354,26 +327,23 @@ const ReportExport: React.FC<Props> = (
                           </Box>
                         </DeliveryCard>
                         <DeliveryCard
-                          // isSelected={
-                          //   values.reportSettings.categoryAll === false
-                          // }
+                          isSelected={values.exportAll === false}
                           onClick={() => {
-                            setFieldValue("reportSettings.categoryAll", false);
-                            handleGetSelectCategory();
+                            setFieldValue("exportAll", false);
+                            // handleGetSelectCategory();
                           }}
                           elevation={0}
                         >
                           <Box sx={{ flex: 1 }}>
                             <Typography
                               variant="h6"
-                              // sx={{
-                              //   color:
-                              //     values.reportSettings.categoryAll ===
-                              //     false
-                              //       ? "#fff"
-                              //       : "text.primary",
-                              //   mb: 0.5,
-                              // }}
+                              sx={{
+                                color:
+                                  values.exportAll === false
+                                    ? "#fff"
+                                    : "text.primary",
+                                mb: 0.5,
+                              }}
                             >
                               กำหนดระยะเวลา
                             </Typography>
@@ -386,16 +356,11 @@ const ReportExport: React.FC<Props> = (
                             }}
                           >
                             <Radio
-                              // checked={
-                              //   values.reportSettings.categoryAll === false
-                              // }
+                              checked={values.exportAll === false}
                               disabled={isSubmitting || isLoading}
                               onChange={() => {
-                                setFieldValue(
-                                  "reportSettings.categoryAll",
-                                  false
-                                );
-                                handleGetSelectCategory();
+                                setFieldValue("exportAll", false);
+                                // handleGetSelectCategory();
                               }}
                               value={false}
                               name="delivery-method"
@@ -423,6 +388,82 @@ const ReportExport: React.FC<Props> = (
                   </Typography>
                 </Grid2>
               </Grid2>
+
+              {values.exportAll === false && (
+                <>
+                  <Grid2 container size={{ xs: 12 }} mb={4} spacing={2}>
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field name="dateStart">
+                        {({ field, form }: FieldProps) => (
+                          <DatePicker
+                            // disabled={openBackdrop || isSubmitting || disabledForm}
+                            label="วันที่เริ่ม"
+                            sx={{ minWidth: "100%" }}
+                            // ✔ เวลา (dayjs) หรือ null
+                            value={
+                              values.dateStart ? dayjs(values.dateStart) : null
+                            }
+                            // ✔ อัปเดตค่าเวลาใน Formik อย่างถูกต้อง
+                            onChange={(newValue) => {
+                              form.setFieldValue(
+                                "dateStart",
+                                newValue ? newValue.toISOString() : null
+                              );
+                            }}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: Boolean(
+                                  touched.dateStart && errors.dateStart
+                                ),
+                                helperText:
+                                  touched.dateStart && errors.dateStart
+                                    ? String(errors.dateStart)
+                                    : "",
+                              },
+                            }}
+                          />
+                        )}
+                      </Field>
+                    </Grid2>
+
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field name="dateEnd">
+                        {({ field, form }: FieldProps) => (
+                          <DatePicker
+                            // disabled={openBackdrop || isSubmitting || disabledForm}
+                            label="วันที่หยุด"
+                            sx={{ minWidth: "100%" }}
+                            // ✔ เวลา (dayjs) หรือ null
+                            value={
+                              values.dateEnd ? dayjs(values.dateEnd) : null
+                            }
+                            // ✔ อัปเดตค่าเวลาใน Formik อย่างถูกต้อง
+                            onChange={(newValue) => {
+                              form.setFieldValue(
+                                "dateEnd",
+                                newValue ? newValue.toISOString() : null
+                              );
+                            }}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: Boolean(
+                                  touched.dateEnd && errors.dateEnd
+                                ),
+                                helperText:
+                                  touched.dateEnd && errors.dateEnd
+                                    ? String(errors.dateEnd)
+                                    : "",
+                              },
+                            }}
+                          />
+                        )}
+                      </Field>
+                    </Grid2>
+                  </Grid2>
+                </>
+              )}
 
               <Grid2 size={{ xs: 12 }} mt={4} mb={4}>
                 <Field name="filename">
