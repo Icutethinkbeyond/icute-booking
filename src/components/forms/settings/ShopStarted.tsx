@@ -44,7 +44,7 @@ interface ServiceProps {
   viewOnly?: boolean;
 }
 
-const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
+const ShopStarted: FC<ServiceProps> = ({ viewOnly = false }) => {
   const { setServiceForm, serviceEdit, setServiceEdit, setServices, services } =
     useServiceContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
@@ -222,7 +222,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         <StoreIcon size={20} />
                       </Avatar>
                       <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                        รายละเอียดร้านค้า
+                        ตั้งค่าร้านค้าของคุณ
                       </Typography>
                     </Grid2>
                   </Grid2>
@@ -329,4 +329,4 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   );
 };
 
-export default ServiceForm;
+export default ShopStarted;
