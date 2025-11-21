@@ -6,7 +6,9 @@ import {
   Service,
   ServiceSelect,
   Store,
+  StoreRegister,
   initialStore,
+  initialStoreRegister,
   // initialStore,
   // StoreSelect,
 } from "@/interfaces/Store";
@@ -33,6 +35,8 @@ interface StoreContextProps {
   // StoreSelectState: StoreSelect[];
   setServicesSelect: Dispatch<React.SetStateAction<ServiceSelect[]>>;
   servicesSelect: ServiceSelect[];
+  setStoreRegister: Dispatch<React.SetStateAction<StoreRegister>>;
+  storeRegister: StoreRegister;
 }
 
 // สร้าง Context
@@ -40,9 +44,8 @@ const StoreContext = createContext<StoreContextProps | undefined>(undefined);
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
   const [Stores, setStores] = useState<Store[]>([]);
-  // const [StoreSelectState, setStoreSelectState] = useState<
-  //   StoreSelect[]
-  // >([]);
+  const [storeRegister, setStoreRegister] =
+    useState<StoreRegister>(initialStoreRegister);
   const [servicesSelect, setServicesSelect] = useState<ServiceSelect[]>([]);
   const [StoreForm, setStoreForm] = useState<Store>(initialStore);
   const [StoreEdit, setStoreEdit] = useState<boolean>(false);
@@ -77,6 +80,8 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
         // setStoreSelectState,
         setServicesSelect,
         servicesSelect,
+        setStoreRegister,
+        storeRegister,
       }}
     >
       {children}

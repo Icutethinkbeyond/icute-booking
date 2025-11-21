@@ -1,8 +1,18 @@
-import { Box, Card, Typography } from "@mui/material";
-import AuthRegisterForm from "@/components/forms/auth/AuthRegisterForm";
-import Image from "next/image";
+"use client";
 
-const AuthRegister = () => {
+import {
+  Grid2,
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Link,
+  Card,
+} from "@mui/material";
+import Image from "next/image";
+import AuthForm from "@/components/forms/auth/AuthForm";
+const LoginPage = () => {
+
   return (
     <Box
       sx={{
@@ -16,9 +26,9 @@ const AuthRegister = () => {
     >
       <Card
         sx={{
+          minHeight: "70vh",
           width: "100%",
           maxWidth: "1200px",
-          minHeight: "70vh",
           display: "flex",
           borderRadius: "16px",
           overflow: "hidden",
@@ -67,14 +77,14 @@ const AuthRegister = () => {
             justifyContent: "center",
           }}
         >
-          {/* <Typography variant="h3" fontWeight="bold" textAlign="center" mb={4}>
-            สมัครใช้งานระบบจัดการร้านเสริมสวย
-          </Typography> */}
-          <AuthRegisterForm />
+          <Typography variant="h3" fontWeight="bold" textAlign="center" mb={4}>
+            เข้าสู่ระบบ
+          </Typography>
+          <AuthForm />
         </Box>
       </Card>
     </Box>
   );
 };
 
-export default AuthRegister;
+export default LoginPage;

@@ -3,6 +3,24 @@ import { User } from "./User";
 import { Booking } from "./Booking";
 import { Dayjs } from "dayjs";
 
+export interface StoreRegister {
+  storeName: string;
+  storeUsername: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  termsAccepted: boolean
+}
+
+export const initialStoreRegister: StoreRegister = {
+  storeName: '',
+  storeUsername: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  termsAccepted: false
+}
+
 export interface Role {
   roleId: string;
   name: RoleName;

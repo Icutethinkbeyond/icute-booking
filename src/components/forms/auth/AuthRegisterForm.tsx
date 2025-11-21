@@ -11,14 +11,19 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
+  Grid2,
+  Avatar,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Field, Form, Formik } from "formik";
+import { Field, FieldProps, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useNotifyContext } from "@/contexts/NotifyContext";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
+import { StoreRegister } from "@/interfaces/Store";
+import { useStoreContext } from "@/contexts/StoreContext";
+import { Copy, KeyRound, StoreIcon } from "lucide-react";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("กรุณากรอกชื่อ"),
@@ -38,9 +43,13 @@ const validationSchema = Yup.object().shape({
 const AuthRegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [disabledForm, setDisabledForm] = useState<boolean>(false);
   const [registeredName, setRegisteredName] = useState(""); // เก็บชื่อผู้ใช้ที่สมัครสำเร็จ
-  const { setNotify } = useNotifyContext();
-  
+  const { setNotify, notify, setOpenBackdrop, openBackdrop } =
+    useNotifyContext();
+  const { storeRegister } = useStoreContext();
+
   const router = useRouter();
   const localActive = useLocale();
 
@@ -76,10 +85,11 @@ const AuthRegisterForm = () => {
         });
 
         if (loginRes?.error) {
-          setNotify({ 
+          setNotify({
             open: true,
-            message: loginRes.error, 
-            color: "error" });
+            message: loginRes.error,
+            color: "error",
+          });
         } else {
           router.push("/protected/dashboard"); // ไปหน้า Dashboard
         }
@@ -116,130 +126,88 @@ const AuthRegisterForm = () => {
         </Typography>
       )}
 
-      <Formik
-        initialValues={{
-          name: "",
-          username: "",
-          address: "",
-          phone: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          termsAccepted: false,
-        }}
+      <Formik<StoreRegister>
+        initialValues={storeRegister} // ใช้ state เป็น initialValues
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
       >
-        {({ errors, touched, values, setFieldValue }) => (
+        {({
+          values,
+          setFieldValue,
+          errors,
+          touched,
+          isSubmitting,
+          resetForm,
+        }) => (
           <Form>
-            <Grid container spacing={2}>
-              {/* <Grid item xs={6}>
-                <Field name="name">
-                  {({ field }: any) => (
-                    <TextField
-                      {...field}
-                      label="ชื่อ"
-                      placeholder="กรุณากรอกชื่อ"
-                      fullWidth
-                      error={touched.name && Boolean(errors.name)}
-                      helperText={touched.name && errors.name}
-                    />
-                  )}
-                </Field>
-              </Grid> */}
-              <Grid item xs={12}>
-                <Field name="username">
-                  {({ field }: any) => (
-                    <TextField
-                      {...field}
-                      label="ชื่อผู้ใช้งาน"
-                      placeholder="กรุณากรอกชื่อผู้ใช้งาน"
-                      fullWidth
-                      error={touched.username && Boolean(errors.username)}
-                      helperText={touched.username && errors.username}
-                    />
-                  )}
-                </Field>
-              </Grid>
-              {/* <Grid item xs={12}>
-                <Field name="address">
-                  {({ field }: any) => (
-                    <TextField
-                      {...field}
-                      label="ที่อยู่"
-                      placeholder="บ้านเลขที่, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์ "
-                      fullWidth
-                      error={touched.address && Boolean(errors.address)}
-                      helperText={touched.address && errors.address}
-                    />
-                  )}
-                </Field>
-              </Grid> */}
-              {/* <Grid item xs={6}>
-                <Field name="phone">
-                  {({ field }: any) => (
-                    <TextField
-                      {...field}
-                      label="เบอร์โทร"
-                      placeholder="กรุณากรอกเบอร์โทร เช่น 0901234567"
-                      fullWidth
-                      error={touched.phone && Boolean(errors.phone)}
-                      helperText={touched.phone && errors.phone}
-                    />
-                  )}
-                </Field>
-              </Grid> */}
-              <Grid item xs={12}>
+            <Grid2 container spacing={2}>
+              <Grid2 size={{ xs: 12 }}>
+                <Grid2 size={{ xs: 12 }} mb={1} mt={1}>
+                  <Grid2 container alignItems="center">
+                    <Avatar sx={{ bgcolor: "primary.main" }}>
+                      <KeyRound size={20} />
+                    </Avatar>
+                    <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
+                      สำหรับเข้าสู่ระบบ
+                    </Typography>
+                  </Grid2>
+                </Grid2>
+              </Grid2>
+              <Grid2 size={{ xs: 12 }}>
                 <Field name="email">
                   {({ field }: any) => (
                     <TextField
                       {...field}
                       label="อีเมล"
-                      placeholder="กรุณากรอกอีเมล"
                       type="email"
                       fullWidth
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                      }}
                       error={touched.email && Boolean(errors.email)}
                       helperText={touched.email && errors.email}
                     />
                   )}
                 </Field>
-              </Grid>
-              <Grid item xs={6}>
+              </Grid2>
+              <Grid2 size={{ xs: 6 }}>
                 <Field name="password">
                   {({ field }: any) => (
                     <TextField
                       {...field}
                       label="รหัสผ่าน"
                       type={showPassword ? "text" : "password"}
-                      placeholder="กรุณากรอกรหัสผ่าน"
                       fullWidth
                       error={touched.password && Boolean(errors.password)}
                       helperText={touched.password && errors.password}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={handleTogglePassword}>
-                              {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={handleTogglePassword}>
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
                       }}
                     />
                   )}
                 </Field>
-              </Grid>
-              <Grid item xs={6}>
+              </Grid2>
+              <Grid2 size={{ xs: 6 }}>
                 <Field name="confirmPassword">
                   {({ field }: any) => (
                     <TextField
                       {...field}
                       label="ยืนยันรหัสผ่าน"
                       type={showPassword ? "text" : "password"}
-                      placeholder="กรุณากรอกยืนยันรหัสผ่าน"
                       fullWidth
                       error={
                         touched.confirmPassword &&
@@ -248,24 +216,102 @@ const AuthRegisterForm = () => {
                       helperText={
                         touched.confirmPassword && errors.confirmPassword
                       }
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={handleTogglePassword}>
-                              {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={handleTogglePassword}>
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
                       }}
                     />
                   )}
                 </Field>
-              </Grid>
-              <Grid item xs={12}>
+              </Grid2>
+
+              <Grid2 container spacing={3}>
+                <Grid2 size={{ xs: 12 }}>
+                  <Grid2 size={{ xs: 12 }} mb={1} mt={1}>
+                    <Grid2 container alignItems="center">
+                      <Avatar sx={{ bgcolor: "primary.main" }}>
+                        <StoreIcon size={20} />
+                      </Avatar>
+                      <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
+                        สร้างร้านค้าของคุณ
+                      </Typography>
+                    </Grid2>
+                  </Grid2>
+                </Grid2>
+
+                {/* Store */}
+                <Grid2 size={{ xs: 12 }}>
+                  <Field name="storeName">
+                    {({ field }: FieldProps) => (
+                      <TextField
+                        {...field}
+                        name="storeName"
+                        label="ชื่อร้านค้า (จำเป็น)"
+                        // sx={{ textTransform: "uppercase" }}
+                        value={values.storeName ? values.storeName : ""}
+                        onChange={(e) => {
+                          setFieldValue(
+                            "storeName",
+                            e.target.value.toUpperCase()
+                          );
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                        }}
+                        error={touched.storeName && Boolean(errors.storeName)}
+                        helperText={touched.storeName && errors.storeName}
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+
+                <Grid2 size={{ xs: 12 }}>
+                  <Field name="storeUsername">
+                    {({ field }: FieldProps) => (
+                      <TextField
+                        {...field}
+                        name="storeUsername"
+                        label="ID ร้านค้า (จำเป็น)"
+                        // sx={{ textTransform: "uppercase" }}
+                        value={values.storeUsername ? values.storeUsername : ""}
+                        onChange={(e) => {
+                          setFieldValue(
+                            "storeUsername",
+                            e.target.value.toUpperCase()
+                          );
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                        }}
+                        error={
+                          touched.storeUsername && Boolean(errors.storeUsername)
+                        }
+                        helperText={
+                          touched.storeUsername && errors.storeUsername
+                        }
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+              </Grid2>
+
+              <Grid2 size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -281,8 +327,8 @@ const AuthRegisterForm = () => {
                 {errors.termsAccepted && (
                   <Typography color="error">{errors.termsAccepted}</Typography>
                 )}
-              </Grid>
-              <Grid item xs={12}>
+              </Grid2>
+              <Grid2 size={{ xs: 12 }}>
                 {isSubmitting ? (
                   <CircularProgress />
                 ) : (
@@ -290,15 +336,18 @@ const AuthRegisterForm = () => {
                     สมัครสมาชิก
                   </Button>
                 )}
-              </Grid>
-              <Grid item xs={12}>
-
-              <Button type="submit" variant="outlined" fullWidth onClick={() => router.push(`/${localActive}/auth/sign-in`)}>
-                    คุณมีบัญชีอยู่เเล้ว?
-              </Button>
-              </Grid>
-
-            </Grid>
+              </Grid2>
+              <Grid2 size={{ xs: 12 }}>
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => router.push(`/${localActive}/auth/sign-in`)}
+                >
+                  คุณมีบัญชีอยู่เเล้ว?
+                </Button>
+              </Grid2>
+            </Grid2>
           </Form>
         )}
       </Formik>
