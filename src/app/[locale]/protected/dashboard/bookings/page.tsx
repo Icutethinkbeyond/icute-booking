@@ -15,7 +15,6 @@ import { useTranslations } from "next-intl";
 import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import BookingTable from "@/components/forms/booking/BookingTable";
 import BookingTabs from "@/components/forms/booking/BookingTabs";
 
 const Booking = () => {

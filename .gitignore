@@ -44,3 +44,4 @@ jspm_packages
 
 prisma/seed.ts
 prisma/seed.js
+/src/generated/prisma

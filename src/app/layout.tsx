@@ -52,6 +52,7 @@ export default async function RootLayout({
                           <EmployeeProvider>
                             {/* <CategoryProvider> */}
                             <NextIntlClientProvider messages={messages}>
+                              
                               {children}
                             </NextIntlClientProvider>
                             {/* </CategoryProvider> */}
