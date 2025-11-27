@@ -7,22 +7,48 @@ import ShopSettings from "./ShopSettings";
 import TimeSettings from "./TimeSettings";
 import LineSettings from "./LineSettings";
 import ResetPasswordForm from "./ResetPasswordForm";
+import { useEffect } from "react";
+import { useStoreContext } from "@/contexts/StoreContext";
+import { initialStore } from "@/interfaces/Store";
+import { useNotifyContext } from "@/contexts/NotifyContext";
+import { storeService } from "@/utils/services/api-services/StoreAPI";
 
 export default function ServiceTabs() {
   const [value, setValue] = React.useState(0);
+  const { setStoreForm, StoreForm } = useStoreContext();
+  const { setNotify, notify, setOpenBackdrop, openBackdrop } =
+    useNotifyContext();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
+  // const getStore = async () => {
+  //   let result = await storeService.getStore();
+
+  //   if (result.success) {
+  //     setStoreForm(result.data);
+  //   } else {
+  //     setNotify({
+  //       open: true,
+  //       message: result.message,
+  //       color: result.success ? "success" : "error",
+  //     });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   // setIsLoading(true);
+  //   getStore();
+  //   return () => {
+  //     setStoreForm(initialStore);
+  //   };
+  // }, []);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label=""
-        >
+        <Tabs value={value} onChange={handleChange} aria-label="">
           <Tab label="ตั้งค่าข้อมูลร้าน" {...a11yProps(0)} />
           <Tab label="กำหนดเวลาเปิด-ปิดร้าน" {...a11yProps(1)} />
           <Tab label="ตั้งค่า Line Token" {...a11yProps(2)} />
@@ -31,17 +57,17 @@ export default function ServiceTabs() {
       </Box>
       <CustomTabPanel value={value} index={0}>
         <Grid2 container justifyContent="center">
-          <ShopSettings/>
+          <ShopSettings />
         </Grid2>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <Grid2 container justifyContent="center">
-          <TimeSettings/>
+          <TimeSettings />
         </Grid2>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         <Grid2 container justifyContent="center">
-          <LineSettings/>
+          <LineSettings />
         </Grid2>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>

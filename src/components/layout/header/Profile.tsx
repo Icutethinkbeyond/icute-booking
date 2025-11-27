@@ -45,9 +45,9 @@ const Profile = () => {
   const router = useRouter();
   const localActive = useLocale();
 
-  useEffect(() => {
-console.log(session)
-  }, [session])
+//   useEffect(() => {
+// console.log(session)
+//   }, [session])
 
   const handleEdit = () => {
     if (session?.user?.id) {

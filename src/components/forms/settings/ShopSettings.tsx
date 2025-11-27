@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as Yup from "yup";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
 import Autocomplete from "@mui/material/Autocomplete";
 import { uniqueId } from "lodash";
 
@@ -36,20 +36,24 @@ import {
   initialService,
   initialStore,
 } from "@/interfaces/Store";
+import { storeService } from "@/utils/services/api-services/StoreAPI";
+import { useSession } from "next-auth/react";
+import { useStoreContext } from "@/contexts/StoreContext";
 
 interface ServiceProps {
   viewOnly?: boolean;
 }
 
 const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
-  const { setServiceForm, serviceEdit, setServiceEdit, setServices, services } =
-    useServiceContext();
+  const { setStoreForm, StoreForm } =
+    useStoreContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabledForm, setDisabledForm] = useState<boolean>(false);
 
+  const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -67,109 +71,75 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     // }),
   });
 
-  const handleFormSubmit = (value: Store, { resetForm, validateForm }: any) => {
-    // validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    // setIsLoading(true);
-    // console.log(value);
+  const handleFormSubmit = async (
+    values: Store,
+    { setSubmitting, setErrors, resetForm, validateForm }: FormikHelpers<Store> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
+  ) => {
+    validateForm(); // บังคับ validate หลังจากรีเซ็ต
+    // ล้างสถานะข้อความก่อนเริ่ม
+    // setGlobalError(null);
+    // setSuccessMessage(null);
+    setSubmitting(true); // เริ่มสถานะ Loading/Submitting
+
+    if (!session?.user?.storeId) {
+      setNotify({
+        open: true,
+        message: "ไม่พบร้านค้าของคุณ โปรดออกจากระบบ",
+        color: "error",
+      });
+      return null;
+    }
+
+    values = {
+      ...values,
+      id: session?.user?.storeId,
+      userId: session?.user?.id,
+    };
+
+    // 2. เรียกใช้ API
+    let result;
+
     // if (serviceEdit) {
-    //   handleUpdateService(value);
+    result = await storeService.updateStore(values);
     // } else {
-    //   handleCreateService(value);
+    //   result = await serviceService.updateService(values);
     // }
-    // resetForm(); // รีเซ็ตค่าฟอร์ม
+
+    // // // 3. จัดการเมื่อสำเร็จ
+    setNotify({
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
   };
 
-  const handleUpdateService = async (Service: Store) => {
-    // setOpenBackdrop(true);
-    // const result = await serviceService.updateService(Service);
-    // setOpenBackdrop(false);
-    // setNotify({
-    //   open: true,
-    //   message: result.message,
-    //   color: result.success ? "success" : "error",
-    // });
-    // if (result.success) {
-    //   router.push(`/${localActive}/protected/inventory`);
-    // }
-  };
+  const getStore = async () => {
 
-  const handleCreateService = async (Service: Store) => {
-    // setOpenBackdrop(true);
-    // const result = await serviceService.createService(Service);
-    // setOpenBackdrop(false);
-    // setNotify({
-    //   open: true,
-    //   message: result.message,
-    //   color: result.success ? "success" : "error",
-    // });
-    // if (result.success) {
-    //   router.push(`/${localActive}/protected/inventory`);
-    // }
-  };
+    let result = await storeService.getStore();
 
-  const handleGetSelectCategory = async () => {
-    // const result = await categoryService.getSelectCategory();
-    // if (result.success) {
-    //   setCategorySelectState(result.data);
-    // } else {
-    //   setNotify({
-    //     open: true,
-    //     message: result.message,
-    //     color: result.success ? "success" : "error",
-    //   });
-    // }
-  };
-
-  const getDataService = () => {
-    const ServiceId = params.get("ServiceId");
-    axios
-      .get(`/api/Service?ServiceId=${ServiceId}`)
-      .then(({ data }) => {
-        // const modifiedData: Service = {
-        //   ...data,
-        //   aboutService: {
-        //     ...data.aboutService,
-        //     purchaseDate: dayjs(data.aboutService.purchaseDate),
-        //   },
-        // };
-        // setServices(modifiedData);
-      })
-      .catch((error) => {
-        if (error.name === "AbortError") {
-          console.log("Request cancelled");
-        } else {
-          console.error("Fetch error:", error);
-        }
-      })
-      .finally(() => {});
+    if (result.success) {
+      setStoreForm(result.data);
+    } else {
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
+      });
+    }
   };
 
   useEffect(() => {
     setIsLoading(true);
-
-    if (pathname.includes("new")) {
-      setServiceForm(initialService);
-      setServiceEdit(false);
-      setDisabledForm(false);
-    } else {
-      setServiceEdit(true);
-      getDataService();
-    }
-
-    // getTypeData();
-    handleGetSelectCategory();
-
+     getStore();
     return () => {
-      setServiceForm(initialService);
-      setServiceEdit(false);
-      setDisabledForm(false);
+      setStoreForm(initialStore);
     };
   }, []);
 
   return (
     <>
       <Formik<Store>
-        initialValues={initialStore} // ใช้ state เป็น initialValues
+        initialValues={StoreForm} // ใช้ state เป็น initialValues
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -209,10 +179,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         // sx={{ textTransform: "uppercase" }}
                         value={values.storeName ? values.storeName : ""}
                         onChange={(e) => {
-                          setFieldValue(
-                            "storeName",
-                            e.target.value
-                          );
+                          setFieldValue("storeName", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -239,10 +206,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         // sx={{ textTransform: "uppercase" }}
                         value={values.lineOALink ? values.lineOALink : ""}
                         onChange={(e) => {
-                          setFieldValue(
-                            "lineOALink",
-                            e.target.value
-                          );
+                          setFieldValue("lineOALink", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },

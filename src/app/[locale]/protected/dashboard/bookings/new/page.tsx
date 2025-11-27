@@ -13,10 +13,8 @@ import {
 import PageContainer from "@/components/container/PageContainer";
 import { useLocale, useTranslations } from "next-intl";
 import BaseCard from "@/components/shared/BaseCard";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import BookingTabs from "@/components/forms/booking/BookingTabs";
-import FloatingButton from "@/components/shared/used/FloatingButton";
 import { useRouter } from "next/navigation";
 import NewBooking from "@/components/forms/booking/NewBooking";
 
@@ -26,7 +24,6 @@ const Booking = () => {
   const router = useRouter();
 
   const { setBreadcrumbs } = useBreadcrumbContext();
-
 
     useEffect(() => {
     setBreadcrumbs([

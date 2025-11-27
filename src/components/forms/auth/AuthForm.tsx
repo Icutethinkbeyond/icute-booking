@@ -77,6 +77,8 @@ const AuthForm: React.FC<loginType> = ({
         callbackUrl: "/",
       });
 
+      console.log(result)
+
       if (result?.error) {
         setNotify({
           ...notify,

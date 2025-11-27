@@ -34,6 +34,28 @@ class ApiService {
     }
   }
 
+
+  // GET method
+  async get1only<T>(
+    endpoint: string,
+    setLoading?: React.Dispatch<React.SetStateAction<boolean>>,
+    params?: Record<string, any>,
+    signal?: AbortSignal
+  ): Promise<T | void> {
+    try {
+      if (setLoading) setLoading(true);
+      const { data } = await this.api.get(endpoint, { params, signal });
+
+      return data;
+
+    } catch (error: any) {
+      console.error("GET Error:", error.message);
+      throw error;
+    } finally {
+      if (setLoading) setLoading(false);
+    }
+  }
+
   // POST method
   async post<T>(endpoint: string, body: any, config?: AxiosRequestConfig): Promise<T> {
     try {

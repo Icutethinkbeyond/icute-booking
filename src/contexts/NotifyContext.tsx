@@ -40,9 +40,9 @@ export const NotifyProvider = ({ children }: { children: ReactNode }) => {
   const [notify, setNotify] = useState<NotifyState>(initialNotify);
   const [openBackdrop, setOpenBackdrop] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log(notify);
-  }, [notify]);
+  // useEffect(() => {
+  //   console.log(notify);
+  // }, [notify]);
 
   return (
     <NotifyContext.Provider

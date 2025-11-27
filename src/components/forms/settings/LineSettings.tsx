@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { Box, Typography, Grid2, TextField, Avatar } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as Yup from "yup";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
 import Autocomplete from "@mui/material/Autocomplete";
 import { uniqueId } from "lodash";
 
@@ -32,8 +32,7 @@ interface StoreProps {
 }
 
 const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
-  const { setStoreForm, StoreEdit, setStoreEdit, setStores, Stores } =
-    useStoreContext();
+  const { setStoreForm, StoreForm } = useStoreContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
 
@@ -57,136 +56,56 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
     // }),
   });
 
-  const handleFormSubmit = (value: Store, { resetForm, validateForm }: any) => {
+  const handleFormSubmit = async (
+    values: Store,
+    { setSubmitting, setErrors, resetForm, validateForm }: FormikHelpers<Store> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
+  ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    setIsLoading(true);
-    console.log(value);
-    if (StoreEdit) {
-      handleUpdateStore(value);
-    } else {
-      handleCreateStore(value);
-    }
-    resetForm(); // รีเซ็ตค่าฟอร์ม
-  };
+    setSubmitting(true); // เริ่มสถานะ Loading/Submitting
 
-  // const handleUpdateStore = async (Store: Store) => {
-  //   setOpenBackdrop(true);
-  //   const result = await storeService.updateStore(Store);
-  //   setOpenBackdrop(false);
-  //   setNotify({
-  //     open: true,
-  //     message: result.message,
-  //     color: result.success ? "success" : "error",
-  //   });
-  //   if (result.success) {
-  //     router.push(`/${localActive}/protected/inventory`);
-  //   }
-  // };
+    // 2. เรียกใช้ API
+    let result;
 
-  // const handleCreateStore = async (Store: Store) => {
-  //   setOpenBackdrop(true);
-  //   const result = await storeService.createStore(Store);
-  //   setOpenBackdrop(false);
-  //   setNotify({
-  //     open: true,
-  //     message: result.message,
-  //     color: result.success ? "success" : "error",
-  //   });
-  //   if (result.success) {
-  //     router.push(`/${localActive}/protected/inventory`);
-  //   }
-  // };
-
-  const handleGetSelectCategory = async () => {
-    // const result = await categoryStore.getSelectCategory();
-    // if (result.success) {
-    //   setCategorySelectState(result.data);
+    // if (serviceEdit) {
+    result = await storeService.updateLineSettingStore(values);
     // } else {
-    //   setNotify({
-    //     open: true,
-    //     message: result.message,
-    //     color: result.success ? "success" : "error",
-    //   });
+    //   result = await serviceService.updateService(values);
     // }
+
+    // // // 3. จัดการเมื่อสำเร็จ
+    setNotify({
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
   };
 
-  const getDataStore = () => {
-    const StoreId = params.get("StoreId");
-    axios
-      .get(`/api/Store?StoreId=${StoreId}`)
-      .then(({ data }) => {
-        // const modifiedData: Store = {
-        //   ...data,
-        //   aboutStore: {
-        //     ...data.aboutStore,
-        //     purchaseDate: dayjs(data.aboutStore.purchaseDate),
-        //   },
-        // };
-        // setStores(modifiedData);
-      })
-      .catch((error) => {
-        if (error.name === "AbortError") {
-          console.log("Request cancelled");
-        } else {
-          console.error("Fetch error:", error);
-        }
-      })
-      .finally(() => {});
+  const getStore = async () => {
+    let result = await storeService.getStore();
+
+    if (result.success) {
+      setStoreForm(result.data);
+    } else {
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
+      });
+    }
   };
-
-  // const getTypeData = () => {
-  //   axios
-  //     .get(`/api/Store/type?getbycharacter=true`)
-  //     .then(({ data }) => {
-  //       setTypeSelectState(data.data);
-  //     })
-  //     .catch((error) => {
-  //       if (error.name === "AbortError") {
-  //         console.log("Request cancelled");
-  //       } else {
-  //         console.error("Fetch error:", error);
-  //       }
-  //     })
-  //     .finally(() => {});
-  // };
-
-  // useEffect(() => {
-  //   if (
-  //     Store.aboutStore?.stockStatus ===
-  //       StoreStatus.CurrentlyRenting ||
-  //     Store.aboutStore?.stockStatus === StoreStatus.InActive ||
-  //     Store.aboutStore?.stockStatus === StoreStatus.Damaged
-  //   ) {
-  //     setDisabledForm(true);
-  //   }
-  // }, [Store]);
 
   useEffect(() => {
-    setIsLoading(true);
-
-    if (pathname.includes("new")) {
-      setStoreForm(initialStore);
-      setStoreEdit(false);
-      setDisabledForm(false);
-    } else {
-      setStoreEdit(true);
-      getDataStore();
-    }
-
-    // getTypeData();
-    handleGetSelectCategory();
-
+    // setIsLoading(true);
+    getStore();
     return () => {
       setStoreForm(initialStore);
-      setStoreEdit(false);
-      setDisabledForm(false);
     };
   }, []);
 
   return (
     <>
       <Formik<Store>
-        initialValues={initialStore} // ใช้ state เป็น initialValues
+        initialValues={StoreForm} // ใช้ state เป็น initialValues
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -303,17 +222,17 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
+                  <Field name="newBooking">
                     {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="description"
+                        name="newBooking"
                         label="เเจ้งเตือนเมื่อได้รับการจองใหม่ (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
+                        value={values.newBooking ? values.newBooking : ""}
                         multiline
                         rows={4}
                         onChange={(e) => {
-                          setFieldValue("description", e.target.value);
+                          setFieldValue("newBooking", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -329,17 +248,19 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
+                  <Field name="successBooking">
                     {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="description"
+                        name="successBooking"
                         label="เเจ้งเตือนลูกค้าเมื่อจองสำเร็จ (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
+                        value={
+                          values.successBooking ? values.successBooking : ""
+                        }
                         multiline
                         rows={4}
                         onChange={(e) => {
-                          setFieldValue("description", e.target.value);
+                          setFieldValue("successBooking", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -355,17 +276,17 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
+                  <Field name="cancelBooking">
                     {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="description"
+                        name="cancelBooking"
                         label="ข้อความเเจ้งเตือนลูกค้าเมื่อถูกยกเลิกการจอง (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
+                        value={values.cancelBooking ? values.cancelBooking : ""}
                         multiline
                         rows={4}
                         onChange={(e) => {
-                          setFieldValue("description", e.target.value);
+                          setFieldValue("cancelBooking", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -381,17 +302,17 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
+                  <Field name="before24H">
                     {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="description"
+                        name="before24H"
                         label="ข้อความเเจ้งเตือนลูกค้าเมื่อใกล้ถึงเวลานัด 24 ชั่วโมง (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
+                        value={values.before24H ? values.before24H : ""}
                         multiline
                         rows={4}
                         onChange={(e) => {
-                          setFieldValue("description", e.target.value);
+                          setFieldValue("before24H", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -407,17 +328,17 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="description">
+                  <Field name="reSchedule">
                     {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="description"
+                        name="reSchedule"
                         label="ข้อความเเจ้งเตือนลูกค้าเมื่อถูกเลื่อนการจอง (ถ้ามี)"
-                        // value={values.description ? values.description : ""}
+                        value={values.reSchedule ? values.reSchedule : ""}
                         multiline
                         rows={4}
                         onChange={(e) => {
-                          setFieldValue("description", e.target.value);
+                          setFieldValue("reSchedule", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
