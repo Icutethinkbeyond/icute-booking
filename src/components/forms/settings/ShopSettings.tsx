@@ -76,34 +76,12 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     { setSubmitting, setErrors, resetForm, validateForm }: FormikHelpers<Store> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    // ล้างสถานะข้อความก่อนเริ่ม
-    // setGlobalError(null);
-    // setSuccessMessage(null);
-    setSubmitting(true); // เริ่มสถานะ Loading/Submitting
-
-    if (!session?.user?.storeId) {
-      setNotify({
-        open: true,
-        message: "ไม่พบร้านค้าของคุณ โปรดออกจากระบบ",
-        color: "error",
-      });
-      return null;
-    }
-
-    values = {
-      ...values,
-      id: session?.user?.storeId,
-      userId: session?.user?.id,
-    };
+    setSubmitting(true); // เริ่มสถานะ Loading/Submittings
 
     // 2. เรียกใช้ API
     let result;
 
-    // if (serviceEdit) {
     result = await storeService.updateStore(values);
-    // } else {
-    //   result = await serviceService.updateService(values);
-    // }
 
     // // // 3. จัดการเมื่อสำเร็จ
     setNotify({
@@ -197,6 +175,33 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 12 }}>
+                  <Field name="storeUsername">
+                    {({ field }: FieldProps) => (
+                      <TextField
+                        {...field}
+                        name="storeUsername"
+                        label="Id ร้านค้า (จำเป็น)"
+                        // sx={{ textTransform: "uppercase" }}
+                        value={values.storeUsername ? values.storeUsername : ""}
+                        onChange={(e) => {
+                          setFieldValue("storeUsername", e.target.value);
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                          input: {
+                            readOnly: viewOnly ? true : false,
+                          },
+                        }}
+                        error={touched.storeUsername && Boolean(errors.storeUsername)}
+                        helperText={touched.storeUsername && errors.storeUsername}
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+
+                <Grid2 size={{ xs: 12 }}>
                   <Field name="lineOALink">
                     {({ field }: FieldProps) => (
                       <TextField
@@ -277,13 +282,13 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                 >
                   บันทึก
                 </LoadingButton>
-                <ConfirmDelete
+                {/* <ConfirmDelete
                   itemId={uniqueId()}
                   onDisable={openBackdrop || isSubmitting}
                   onDelete={() => resetForm()}
                   massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
                   buttonType={ButtonType.Button}
-                />
+                /> */}
               </Grid2>
             </Box>
           </Form>

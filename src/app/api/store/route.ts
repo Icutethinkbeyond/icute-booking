@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 
 // ฟังก์ชัน Helper เพื่อค้นหา Store ID และป้องกันการเข้าถึงที่ไม่ได้รับอนุญาต
-async function getStoreByCurrentUserId(userId: string, storeId: string) {
+export async function getStoreByCurrentUserId(userId: string, storeId: string) {
 
     if (!storeId || storeId.trim() === '') {
         // API นี้ต้องรู้ว่าบริการนี้เป็นของร้านไหน

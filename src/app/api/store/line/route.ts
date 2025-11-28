@@ -2,49 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
+import { getStoreByCurrentUserId } from '../route';
 
 const prisma = new PrismaClient();
-
-
-// ฟังก์ชัน Helper เพื่อค้นหา Store ID และป้องกันการเข้าถึงที่ไม่ได้รับอนุญาต
-async function getStoreByCurrentUserId(userId: string, storeId: string) {
-
-    if (!storeId || storeId.trim() === '') {
-        // API นี้ต้องรู้ว่าบริการนี้เป็นของร้านไหน
-        return new NextResponse(
-            JSON.stringify({
-                message: 'ไม่พบ Store ID ที่จำเป็นในการสร้างบริการ',
-            }),
-            { status: 400 })
-    }
-
-    const store = await prisma.store.findUnique({
-        where: { id: storeId },
-        select: {
-            id: true,
-            storeName: true,
-            storeUsername: true,
-            lineOALink: true,
-            lineNotifyToken: true,
-            lineChannelId: true,
-            lineChannelSecret: true,
-            newBooking: true,
-            successBooking: true,
-            cancelBooking: true,
-            before24H: true,
-            reSchedule: true,
-            userId: true, // เพื่อยืนยัน
-            createdAt: true,
-            updatedAt: true,
-        }
-    });
-
-    if (!store) {
-        throw new Error('Store Not Found or Unauthorized');
-    }
-    return store;
-}
-
 
 // --------------------------------------------------------------------------
 // GET METHOD: ดึงข้อมูลร้านค้าปัจจุบัน
@@ -53,48 +13,48 @@ async function getStoreByCurrentUserId(userId: string, storeId: string) {
  * GET /api/store
  * สำหรับดึงข้อมูลรายละเอียดร้านค้าปัจจุบัน
  */
-export async function GET(request: NextRequest) {
-    try {
+// export async function GET(request: NextRequest) {
+//     try {
 
-        // const store = await getStoreByCurrentUserId(request);
+//         // const store = await getStoreByCurrentUserId(request);
 
-        const { userId, storeId } = await getCurrentUserAndStoreIdsByToken(request);
+//         const { userId, storeId } = await getCurrentUserAndStoreIdsByToken(request);
 
-        const store = await getStoreByCurrentUserId(userId, storeId);
+//         const store = await getStoreByCurrentUserId(userId, storeId);
 
-        return new NextResponse(
-            JSON.stringify({
-                message: 'ดึงข้อมูลร้านค้าสำเร็จ',
-                data: store
-            }),
-            {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            }
-        );
+//         return new NextResponse(
+//             JSON.stringify({
+//                 message: 'ดึงข้อมูลร้านค้าสำเร็จ',
+//                 data: store
+//             }),
+//             {
+//                 status: 200,
+//                 headers: { 'Content-Type': 'application/json' }
+//             }
+//         );
 
-    } catch (error) {
-        console.error('Error fetching store details:', error);
+//     } catch (error) {
+//         console.error('Error fetching store details:', error);
 
-        if (error instanceof Error && error.message === 'Unauthorized') {
-            return new NextResponse(
-                JSON.stringify({ message: 'ไม่ได้รับอนุญาต กรุณาเข้าสู่ระบบ' }),
-                { status: 401 }
-            );
-        }
-        if (error instanceof Error && error.message === 'Store Not Found or Unauthorized') {
-            return new NextResponse(
-                JSON.stringify({ message: 'ไม่พบร้านค้าที่ผูกกับบัญชีผู้ใช้งานนี้' }),
-                { status: 403 }
-            );
-        }
+//         if (error instanceof Error && error.message === 'Unauthorized') {
+//             return new NextResponse(
+//                 JSON.stringify({ message: 'ไม่ได้รับอนุญาต กรุณาเข้าสู่ระบบ' }),
+//                 { status: 401 }
+//             );
+//         }
+//         if (error instanceof Error && error.message === 'Store Not Found or Unauthorized') {
+//             return new NextResponse(
+//                 JSON.stringify({ message: 'ไม่พบร้านค้าที่ผูกกับบัญชีผู้ใช้งานนี้' }),
+//                 { status: 403 }
+//             );
+//         }
 
-        return new NextResponse(
-            JSON.stringify({ message: 'เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการดึงข้อมูลร้านค้า' }),
-            { status: 500 }
-        );
-    }
-}
+//         return new NextResponse(
+//             JSON.stringify({ message: 'เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการดึงข้อมูลร้านค้า' }),
+//             { status: 500 }
+//         );
+//     }
+// }
 
 
 // --------------------------------------------------------------------------

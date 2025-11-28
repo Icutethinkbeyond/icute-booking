@@ -1,136 +1,3 @@
-// "use client";
-
-// import { useState } from "react";
-// import { useSearchParams } from "next/navigation";
-// import {
-//   Grid,
-//   TextField,
-//   Button,
-//   CircularProgress,
-//   Typography,
-//   Grid2,
-// } from "@mui/material";
-// import { Field, FieldProps, Form, Formik } from "formik";
-// import * as Yup from "yup";
-// // import { useSnackbarContext } from "@/contexts/SnackbarContext";
-
-// const validationSchema = Yup.object().shape({
-//   newPassword: Yup.string()
-//     .min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร")
-//     .required("กรุณากรอกรหัสผ่านใหม่"),
-// });
-
-// const ResetPasswordForm = () => {
-//   const searchParams = useSearchParams();
-//   const token = searchParams.get("token"); // ดึง token จาก URL
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   // const { setSnackbar } = useSnackbarContext();
-
-//   const handleSubmit = async (values: any, { setSubmitting }: any) => {
-//     setIsSubmitting(true);
-//     // try {
-//     //   const response = await fetch("/api/reset-password", {
-//     //     method: "POST",
-//     //     headers: { "Content-Type": "application/json" },
-//     //     body: JSON.stringify({ token, newPassword: values.newPassword }),
-//     //   });
-
-//     //   const data = await response.json();
-
-//     //   if (response.ok) {
-//     //     setSnackbar({
-//     //       message: "เปลี่ยนรหัสผ่านสำเร็จ!",
-//     //       notiColor: "success",
-//     //     });
-//     //   } else {
-//     //     setSnackbar({
-//     //       message: data.message || "เกิดข้อผิดพลาด",
-//     //       notiColor: "error",
-//     //     });
-//     //   }
-//     // } catch (error) {
-//     //   setSnackbar({
-//     //     message: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
-//     //     notiColor: "error",
-//     //   });
-//     // } finally {
-//     //   setIsSubmitting(false);
-//     //   setSubmitting(false);
-//     // }
-//   };
-
-//   return (
-//     <Formik
-//       initialValues={{ newPassword: "", rePassword: "" }}
-//       validationSchema={validationSchema}
-//       onSubmit={handleSubmit}
-//     >
-//       {({
-//         values,
-//         setFieldValue,
-//         errors,
-//         touched,
-//         isSubmitting,
-//         resetForm,
-//       }) => (
-//         <Form>
-//           <Grid2 container spacing={2}>
-//             <Grid2 size={{ xs: 6 }}>
-//               {/* <Field name="newPassword">
-//                 {({ field }: any) => (
-//                   <TextField
-//                     {...field}
-//                     label="รหัสผ่านใหม่"
-//                     type="password"
-//                     fullWidth
-//                     error={touched.newPassword && Boolean(errors.newPassword)}
-//                     helperText={touched.newPassword && errors.newPassword}
-//                   />
-//                 )}
-//               </Field> */}
-//               <Field name="newPassword">
-//                 {({ field }: FieldProps) => (
-//                   <TextField
-//                     {...field}
-//                     name="newPassword"
-//                     label="Channel ID  (จำเป็น)"
-//                     // sx={{ textTransform: "uppercase" }}
-//                     value={values.newPassword ? values.newPassword : ""}
-//                     onChange={(e) => {
-//                       setFieldValue("newPassword", e.target.value);
-//                     }}
-//                     slotProps={{
-//                       inputLabel: { shrink: true },
-//                       // input: {
-//                       //   readOnly: viewOnly ? true : false,
-//                       // },
-//                     }}
-//                     // placeholder="EXAMPLE: SN-00001"
-//                     error={touched.newPassword && Boolean(errors.newPassword)}
-//                     helperText={touched.newPassword && errors.newPassword}
-//                     fullWidth
-//                     // disabled={openBackdrop || isSubmitting || disabledForm}
-//                   />
-//                 )}
-//               </Field>
-//             </Grid2>
-//             <Grid2 size={{ xs: 6 }}>
-//               {isSubmitting ? (
-//                 <CircularProgress />
-//               ) : (
-//                 <Button type="submit" variant="contained" fullWidth>
-//                   เปลี่ยนรหัสผ่าน
-//                 </Button>
-//               )}
-//             </Grid2>
-//           </Grid2>
-//         </Form>
-//       )}
-//     </Formik>
-//   );
-// };
-
-// export default ResetPasswordForm;
 
 "use client";
 
@@ -359,13 +226,13 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
                 >
                   บันทึก
                 </LoadingButton>
-                <ConfirmDelete
+                {/* <ConfirmDelete
                   itemId={uniqueId()}
                   onDisable={openBackdrop || isSubmitting}
                   onDelete={() => resetForm()}
                   massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
                   buttonType={ButtonType.Button}
-                />
+                /> */}
               </Grid2>
             </Box>
           </Form>

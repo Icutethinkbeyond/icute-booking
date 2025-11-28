@@ -954,13 +954,13 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                 >
                   บันทึก
                 </LoadingButton>
-                <ConfirmDelete
+                {/* <ConfirmDelete
                   itemId={uniqueId()}
                   onDisable={openBackdrop || isSubmitting}
                   onDelete={() => resetForm()}
                   massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
                   buttonType={ButtonType.Button}
-                />
+                /> */}
               </Grid2>
             </Box>
           </Form>
