@@ -1,21 +1,10 @@
 import { DefaultOperatingHour, Store } from "@/interfaces/Store";
 import APIServices from "../APIServices";
+import { initialChangePassword, ChangePassword } from "@/interfaces/User";
 
 export const STORE_API_BASE_URL = "/api/store";
 
 export const storeService = {
-
-    // async getStore(storeId: string) {
-    //     try {
-    //         let data: any = await APIServices.get(`${STORE_API_BASE_URL}?storeId=${storeId}`);
-    //         return { success: true, message: data.message };
-    //     } catch (error: any) {
-    //         if (error.name === "AbortError") {
-    //             console.log("Request cancelled");
-    //         }
-    //         return { success: false, message: error.response?.data.message || "เกิดข้อผิดพลาด" };
-    //     }
-    // },
 
     async getStore() {
         try {
@@ -41,9 +30,21 @@ export const storeService = {
         }
     },
 
-    async getSelectStore() {
+    // async getSelectStore() {
+    //     try {
+    //         let data: any = await APIServices.get(`${STORE_API_BASE_URL}?selectStore=true`);
+    //         return { success: true, message: data.message };
+    //     } catch (error: any) {
+    //         if (error.name === "AbortError") {
+    //             console.log("Request cancelled");
+    //         }
+    //         return { success: false, message: error.response?.data.message || "เกิดข้อผิดพลาด" };
+    //     }
+    // },
+
+    async updatePassword(password: ChangePassword) {
         try {
-            let data: any = await APIServices.get(`${STORE_API_BASE_URL}?selectStore=true`);
+            let data: any = await APIServices.patch(`${STORE_API_BASE_URL}/change-password`, password);
             return { success: true, message: data.message };
         } catch (error: any) {
             if (error.name === "AbortError") {

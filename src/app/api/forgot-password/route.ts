@@ -7,7 +7,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
 /**
  * POST /api/forgot-password
  * สำหรับจัดการคำขอส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลผู้ใช้
@@ -68,16 +67,16 @@ export async function POST(request: Request) {
     });
 
     // --- 4. ส่งอีเมล ---
-    try {
-        await sendResetPasswordEmail(user.email, resetToken);
-    } catch (emailError) {
-        console.error('Failed to send reset password email:', emailError);
-        // หากส่งอีเมลล้มเหลว แจ้งผู้ใช้ แต่ยังคงตอบ 200 เพื่อไม่ให้เผยข้อมูล
-        return NextResponse.json(
-            { message: 'เกิดข้อผิดพลาดในการส่งอีเมล กรุณาลองใหม่ในภายหลัง' },
-            { status: 500 }
-        );
-    }
+    // try {
+    //     await sendResetPasswordEmail(user.email, resetToken);
+    // } catch (emailError) {
+    //     console.error('Failed to send reset password email:', emailError);
+    //     // หากส่งอีเมลล้มเหลว แจ้งผู้ใช้ แต่ยังคงตอบ 200 เพื่อไม่ให้เผยข้อมูล
+    //     return NextResponse.json(
+    //         { message: 'เกิดข้อผิดพลาดในการส่งอีเมล กรุณาลองใหม่ในภายหลัง' },
+    //         { status: 500 }
+    //     );
+    // }
 
     // --- 5. ตอบกลับสำเร็จ ---
     return NextResponse.json(

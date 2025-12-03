@@ -1,19 +1,12 @@
-
 "use client";
 
 import React, { FC, useEffect, useState } from "react";
 import { Box, Typography, Grid2, TextField, Avatar } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as Yup from "yup";
-import { Field, FieldProps, Form, Formik } from "formik";
-import Autocomplete from "@mui/material/Autocomplete";
-import { uniqueId } from "lodash";
+import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
 
 import { LoadingButton } from "@mui/lab";
-import ConfirmDelete from "@/components/shared/used/ConfirmDelete";
-import { ButtonType } from "@/interfaces/ShredType";
 import { useNotifyContext } from "@/contexts/NotifyContext";
-import axios from "axios";
 import {
   useParams,
   usePathname,
@@ -21,20 +14,10 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { useLocale } from "next-intl";
-import StatusStore from "@/components/shared/used/Status";
-import dayjs from "dayjs";
-import {
-  Bath,
-  KeyRound,
-  MessageSquareMore,
-  MonitorCog,
-  Save,
-} from "lucide-react";
-import { AutoFixHigh, Category, Handyman, More } from "@mui/icons-material";
-import { IconCurrencyBaht } from "@tabler/icons-react";
-import { storeService } from "@/utils/services/api-services/StoreAPI";
+import { KeyRound, Save } from "lucide-react";
 import { useStoreContext } from "@/contexts/StoreContext";
-import { Store, initialStore } from "@/interfaces/Store";
+import { storeService } from "@/utils/services/api-services/StoreAPI";
+import { initialChangePassword, ChangePassword } from "@/interfaces/User";
 
 interface StoreProps {
   viewOnly?: boolean;
@@ -61,41 +44,35 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
       .oneOf([Yup.ref("password")], "รหัสผ่านไม่ตรงกัน"),
   });
 
-  const handleFormSubmit = async (values: any, { setSubmitting }: any) => {
-    // setIsSubmitting(true);
-    // try {
-    //   const response = await fetch("/api/reset-password", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ token, newPassword: values.newPassword }),
-    //   });
-    //   const data = await response.json();
-    //   if (response.ok) {
-    //     setSnackbar({
-    //       message: "เปลี่ยนรหัสผ่านสำเร็จ!",
-    //       notiColor: "success",
-    //     });
-    //   } else {
-    //     setSnackbar({
-    //       message: data.message || "เกิดข้อผิดพลาด",
-    //       notiColor: "error",
-    //     });
-    //   }
-    // } catch (error) {
-    //   setSnackbar({
-    //     message: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์",
-    //     notiColor: "error",
-    //   });
-    // } finally {
-    //   setIsSubmitting(false);
-    //   setSubmitting(false);
-    // }
+  const handleFormSubmit = async (
+    values: ChangePassword,
+    {
+      setSubmitting,
+      setErrors,
+      resetForm,
+      validateForm,
+    }: FormikHelpers<ChangePassword> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
+  ) => {
+    validateForm(); // บังคับ validate หลังจากรีเซ็ต
+    setSubmitting(true); // เริ่มสถานะ Loading/Submitting
+
+    // 2. เรียกใช้ API
+    let result;
+
+    result = await storeService.updatePassword(values);
+
+    // 3. จัดการเมื่อสำเร็จ
+    setNotify({
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
   };
 
   return (
     <>
       <Formik
-        initialValues={{ oldPassword: "", newPassword: "", confirmPassword: "" }}
+        initialValues={initialChangePassword}
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -190,7 +167,9 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
                         {...field}
                         name="confirmPassword"
                         label="ยืนยันรหัสผ่าน (จำเป็น)"
-                        value={values.confirmPassword ? values.confirmPassword : ""}
+                        value={
+                          values.confirmPassword ? values.confirmPassword : ""
+                        }
                         onChange={(e) => {
                           setFieldValue("confirmPassword", e.target.value);
                         }}
@@ -200,8 +179,13 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
                             readOnly: viewOnly ? true : false,
                           },
                         }}
-                        error={touched.confirmPassword && Boolean(errors.confirmPassword)}
-                        helperText={touched.confirmPassword && errors.confirmPassword}
+                        error={
+                          touched.confirmPassword &&
+                          Boolean(errors.confirmPassword)
+                        }
+                        helperText={
+                          touched.confirmPassword && errors.confirmPassword
+                        }
                         fullWidth
                         disabled={openBackdrop || isSubmitting || disabledForm}
                       />

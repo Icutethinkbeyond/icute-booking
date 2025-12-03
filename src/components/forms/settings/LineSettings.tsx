@@ -1,28 +1,18 @@
 import React, { FC, useEffect, useState } from "react";
 import { Box, Typography, Grid2, TextField, Avatar } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as Yup from "yup";
 import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
-import Autocomplete from "@mui/material/Autocomplete";
-import { uniqueId } from "lodash";
 
 import { LoadingButton } from "@mui/lab";
-import ConfirmDelete from "@/components/shared/used/ConfirmDelete";
-import { ButtonType } from "@/interfaces/ShredType";
 import { useNotifyContext } from "@/contexts/NotifyContext";
-import axios from "axios";
 import {
-  useParams,
   usePathname,
   useRouter,
   useSearchParams,
 } from "next/navigation";
 import { useLocale } from "next-intl";
-import StatusStore from "@/components/shared/used/Status";
-import dayjs from "dayjs";
-import { Bath, MessageSquareMore, MonitorCog, Save } from "lucide-react";
-import { AutoFixHigh, Category, Handyman, More } from "@mui/icons-material";
-import { IconCurrencyBaht } from "@tabler/icons-react";
+import {  MessageSquareMore, Save } from "lucide-react";
+import { More } from "@mui/icons-material";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { Store, initialStore } from "@/interfaces/Store";
@@ -64,15 +54,9 @@ const StoreForm: FC<StoreProps> = ({ viewOnly = false }) => {
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
 
     // 2. เรียกใช้ API
-    let result;
+    let result = await storeService.updateLineSettingStore(values);
 
-    // if (serviceEdit) {
-    result = await storeService.updateLineSettingStore(values);
-    // } else {
-    //   result = await serviceService.updateService(values);
-    // }
-
-    // // // 3. จัดการเมื่อสำเร็จ
+    // 3. จัดการเมื่อสำเร็จ
     setNotify({
       open: true,
       message: result.message,

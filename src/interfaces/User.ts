@@ -18,6 +18,13 @@ export interface User {
   updatedAt: string;
 }
 
+// Type สำหรับ Request Body
+export interface ChangePassword {
+    oldPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+}
+
 export interface Role {
   roleId: string;
   name: RoleName;
@@ -82,6 +89,12 @@ export const initialLogin: Login = {
   email: "",
   password: ""
 };
+
+export const initialChangePassword: ChangePassword = {
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+}
 
 export const initialResetPasswordToken: ResetPasswordToken = {
   id: '',
