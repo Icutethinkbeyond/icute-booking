@@ -68,19 +68,7 @@ const EmployeeForm: FC<EmployeeProps> = ({ viewOnly = false }) => {
     }: FormikHelpers<Employee> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    // ล้างสถานะข้อความก่อนเริ่ม
-    // setGlobalError(null);
-    // setSuccessMessage(null);
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
-
-    if (!session?.user?.storeId) {
-      setNotify({
-        open: true,
-        message: "ไม่พบร้านค้าของคุณ โปรดออกจากระบบ",
-        color: "error",
-      });
-      return null;
-    }
 
     // 2. เรียกใช้ API
     let result;

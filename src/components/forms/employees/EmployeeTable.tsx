@@ -125,33 +125,6 @@ const EmployeeTable: React.FC<EmployeeProps> = ({ recall }) => {
       message: result.message,
       color: result.success ? "success" : "error",
     });
-    // axios
-    //   .delete(`/api/equipment?equipmentId=${equipmentId}`)
-    //   .then((data) => {
-    //     setNotify({
-    //       ...notify,
-    //       open: true,
-    //       message: "การดำเนินการสำเร็จ",
-    //       color: "success",
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     if (error.name === "AbortError") {
-    //       console.log("Request cancelled");
-    //     } else {
-    //       console.error("Fetch error:", error);
-    //       setNotify({
-    //         ...notify,
-    //         open: true,
-    //         message: "พบปัญหาบางอย่างโปรดติดต่อผู้พัฒนา",
-    //         color: "error",
-    //       });
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //     getData();
-    //   });
   };
 
   const handleEdit = (employeeId: string) => {
@@ -173,7 +146,7 @@ const EmployeeTable: React.FC<EmployeeProps> = ({ recall }) => {
     } catch (error: any) {
       setNotify({
         open: true,
-        message: error,
+        message: error.code,
         color: "error",
       });
     }
@@ -185,7 +158,7 @@ const EmployeeTable: React.FC<EmployeeProps> = ({ recall }) => {
     return () => {
       setEmployees([]);
     };
-  }, [paginationModel, recall]);
+  }, [paginationModel]);
 
   return (
     <>

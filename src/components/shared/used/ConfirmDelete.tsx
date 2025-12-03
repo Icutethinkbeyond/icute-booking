@@ -66,7 +66,7 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({
       return;
     }
 
-    // onDelete(itemId, documentStatus);
+    onDelete(itemId);
     handleClose();
   };
 

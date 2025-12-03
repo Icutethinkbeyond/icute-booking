@@ -38,6 +38,8 @@ import FloatingButton from "@/components/shared/used/FloatingButton";
 import { CustomToolbar } from "@/components/shared/used/CustomToolbar";
 import { Service } from "@/interfaces/Store";
 import { useServiceContext } from "@/contexts/ServiceContext";
+import APIServices from "@/utils/services/APIServices";
+import { serviceService } from "@/utils/services/api-services/ServiceAPI";
 
 interface ServiceProps {
   data?: Service | null;
@@ -103,71 +105,55 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
             //     EmployeeStatus.InActive ||
             //   params.row.aboutEmployee?.stockStatus === EmployeeStatus.Damaged
             // }
-            // massage={`คุณต้องการลบอุปกรณ์ ${params.row.equipmentName} ใช่หรือไม่?`}
+            massage={`คุณต้องการลบอุปกรณ์ ${params.row.name} ใช่หรือไม่?`}
           />
         </>
       ),
     },
-    { field: "serialNo", headerName: "บริการ", width: 400 },
+    { field: "name", headerName: "บริการ", width: 400 },
     {
-      field: "equipmentName",
-      headerName: "ระยะเวลาให้บริการ",
+      field: "durationMinutes",
+      headerName: "ระยะเวลาให้บริการ/นาที",
       width: 300,
       // renderCell: (params) => <b> {params.row.equipmentName} </b>,
     },
     {
-      field: "stockStatus",
-      headerName: "ราคา",
+      field: "price",
+      headerName: "ราคา/บาท",
       width: 150,
       // valueGetter: (value, row) => row.aboutEmployee?.stockStatus,
-      renderCell: (params) => (
-        <>
-          {/* <StatusEmployee status={params.row.aboutEmployee?.stockStatus} /> */}
-        </>
-      ),
+      // renderCell: (params) => (
+      //   <>
+      //     <StatusEmployee status={params.row.aboutEmployee?.stockStatus} />
+      //   </>
+      // ),
     },
   ];
 
-  const handleDeleteItem = (equipmentId: string) => {
-    axios
-      .delete(`/api/equipment?equipmentId=${equipmentId}`)
-      .then((data) => {
-        setNotify({
-          ...notify,
-          open: true,
-          message: "การดำเนินการสำเร็จ",
-          color: "success",
-        });
-      })
-      .catch((error) => {
-        if (error.name === "AbortError") {
-          console.log("Request cancelled");
-        } else {
-          console.error("Fetch error:", error);
-          setNotify({
-            ...notify,
-            open: true,
-            message: "พบปัญหาบางอย่างโปรดติดต่อผู้พัฒนา",
-            color: "error",
-          });
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-        getData();
+    const handleDeleteItem = async (serviceId: string) => {
+      let result = await serviceService.deleteService(serviceId);
+  
+      if (result.success) {
+        getServices();
+      }
+  
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
       });
-  };
+    };
 
-  const handleEdit = (equipmentId: string) => {
+  const handleEdit = (serviceId: string) => {
     router.push(
-      `/${localActive}/protected/inventory/edit/?equipmentId=${equipmentId}`
+      `/${localActive}/protected/services/edit/?serviceId=${serviceId}`
     );
   };
 
-  const getData = async () => {
+  const getServices = async () => {
     try {
-      await fetchData(
-        `/api/equipment?page=${paginationModel.page + 1}&pageSize=${
+      await APIServices.get(
+        `/api/services?page=${paginationModel.page + 1}&pageSize=${
           paginationModel.pageSize
         }`,
         setServices,
@@ -175,14 +161,16 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
         setLoading
       );
     } catch (error: any) {
-      if (error.message !== "Request was canceled") {
-        console.error("Unhandled error:", error);
-      }
+      setNotify({
+        open: true,
+        message: error.code,
+        color: "error",
+      });
     }
   };
 
   useEffect(() => {
-    getData();
+    getServices();
     return () => {
       setServices([]);
     };
@@ -190,38 +178,38 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
 
   return (
     <>
-          <DataGrid
-            getRowId={(row) => row.id}
-            initialState={{
-              density: "comfortable",
-              pagination: { paginationModel },
-              columns: {
-                columnVisibilityModel: {
-                  // Hide columns status and traderName, the other columns will remain visible
-                  equipmentRemark: false,
-                  brand: false,
-                  description: false,
-                  remark: false,
-                  categoryName: false,
-                  equipmentType: false,
-                  purchaseDate: false,
-                  unitName: false,
-                },
-              },
-            }}
-            pageSizeOptions={[5, 10, 20, 50, 100]}
-            sx={{ border: 0, "--DataGrid-overlayHeight": "300px" }}
-            rows={services}
-            columns={columns}
-            paginationMode="server"
-            rowCount={rowCount}
-            onPaginationModelChange={setPaginationModel}
-            loading={loading}
-            slots={{
-              noRowsOverlay: CustomNoRowsOverlay,
-              toolbar: CustomToolbar,
-            }}
-          />
+      <DataGrid
+        getRowId={(row) => row.id}
+        initialState={{
+          density: "comfortable",
+          pagination: { paginationModel },
+          columns: {
+            columnVisibilityModel: {
+              // Hide columns status and traderName, the other columns will remain visible
+              equipmentRemark: false,
+              brand: false,
+              description: false,
+              remark: false,
+              categoryName: false,
+              equipmentType: false,
+              purchaseDate: false,
+              unitName: false,
+            },
+          },
+        }}
+        pageSizeOptions={[5, 10, 20, 50, 100]}
+        sx={{ border: 0, "--DataGrid-overlayHeight": "300px" }}
+        rows={services}
+        columns={columns}
+        paginationMode="server"
+        rowCount={rowCount}
+        onPaginationModelChange={setPaginationModel}
+        loading={loading}
+        slots={{
+          noRowsOverlay: CustomNoRowsOverlay,
+          toolbar: CustomToolbar,
+        }}
+      />
     </>
   );
 };

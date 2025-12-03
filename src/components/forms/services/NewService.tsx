@@ -34,8 +34,14 @@ interface ServiceProps {
 }
 
 const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
-  const { setServiceForm, serviceEdit, setServiceEdit, setServices, services } =
-    useServiceContext();
+  const {
+    setServiceForm,
+    serviceForm,
+    serviceEdit,
+    setServiceEdit,
+    setServices,
+    services,
+  } = useServiceContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
 
@@ -64,73 +70,63 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     }: FormikHelpers<Service> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    // ล้างสถานะข้อความก่อนเริ่ม
-    // setGlobalError(null);
-    // setSuccessMessage(null);
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
-
-    if (!session?.user?.storeId) {
-      setNotify({
-        open: true,
-        message: "ไม่พบร้านค้าของคุณ โปรดออกจากระบบ",
-        color: "error",
-      });
-      return null;
-    }
-
-    values = {
-      ...values,
-      storeId: session?.user?.storeId,
-    };
 
     // 2. เรียกใช้ API
     let result;
 
-    // if (serviceEdit) {
+    if (!serviceEdit) {
       result = await serviceService.createService(values);
-    // } else {
-    //   result = await serviceService.updateService(values);
-    // }
+    } else {
+      result = await serviceService.updateService(values);
+    }
 
+    // สำเร็จจะ redirect ไปที่ table
     if (result.success) {
       resetForm();
+
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
+      });
 
       setTimeout(() => {
         router.push(`/${localActive}/protected/services`);
       }, 1000);
+    } else {
+      // // // 3. จัดการเมื่อสำเร็จ
+      setNotify({
+        open: true,
+        message: result.message,
+        color: "error",
+      });
     }
-
-    // // // 3. จัดการเมื่อสำเร็จ
-    setNotify({
-      open: true,
-      message: result.message,
-      color: result.success ? "success" : "error",
-    });
   };
 
-  // const handleGetSelectCategory = async () => {
-  //   // const result = await categoryService.getSelectCategory();
-  //   // if (result.success) {
-  //   //   setCategorySelectState(result.data);
-  //   // } else {
-  //   //   setNotify({
-  //   //     open: true,
-  //   //     message: result.message,
-  //   //     color: result.success ? "success" : "error",
-  //   //   });
-  //   // }
-  // };
+  const getService = async () => {
+    const serviceId = params.get("serviceId");
 
-  // useEffect(() => {
-  //   if (
-  //     Service.aboutService?.stockStatus ===
-  //       ServiceStatus.CurrentlyRenting ||
-  //     Service.aboutService?.stockStatus === ServiceStatus.InActive ||
-  //     Service.aboutService?.stockStatus === ServiceStatus.Damaged
-  //   ) {
-  //     setDisabledForm(true);
-  //   }
-  // }, [Service]);
+    if (serviceId) {
+      let result = await serviceService.getService(serviceId);
+
+      if (result.success) {
+        setServiceForm(result.data);
+      } else {
+        setNotify({
+          open: true,
+          message: result.message,
+          color: result.success ? "success" : "error",
+        });
+      }
+    } else {
+      setNotify({
+        open: true,
+        message: "ไม่พบ Id",
+        color: "error",
+      });
+    }
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -140,6 +136,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
       setServiceEdit(false);
       setDisabledForm(false);
     } else {
+      getService();
       setServiceEdit(true);
     }
 
@@ -153,7 +150,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   return (
     <>
       <Formik<Service>
-        initialValues={initialService} // ใช้ state เป็น initialValues
+        initialValues={serviceForm} // ใช้ state เป็น initialValues
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -176,7 +173,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         <Plus size={20} />
                       </Avatar>
                       <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
-                        เพิ่มบริการ
+                        {serviceEdit ? "แก้ไขบริการ" : "เพิ่มบริการ"}
                       </Typography>
                     </Grid2>
                   </Grid2>
@@ -297,7 +294,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   loading={openBackdrop || isSubmitting}
                   startIcon={<Save />}
                 >
-                  เพิ่มบริการ
+                  {serviceEdit ? "แก้ไขบริการ" : "เพิ่มบริการ"}
                 </LoadingButton>
                 <ConfirmDelete
                   itemId={uniqueId()}
