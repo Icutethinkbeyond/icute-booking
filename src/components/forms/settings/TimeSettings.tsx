@@ -101,7 +101,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     { setSubmitting, setErrors, resetForm, validateForm }: FormikHelpers<DefaultOperatingHour> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
 
-    console.log(values)
+    // console.log(values)
     
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
     setSubmitting(true); // เริ่มสถานะ Loading/Submittings
@@ -129,6 +129,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
       });
     }
   };
+
 
   useEffect(() => {
     // setIsLoading(true);
@@ -184,6 +185,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.MON_isOpen && values.MON_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("MON_openTime", null);
+                          setFieldValue("MON_closeTime", null);
+                        }
                         setFieldValue("MON_isOpen", e.target.value);
                       }}
                     >
@@ -197,7 +202,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="MON_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.MON_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -234,7 +239,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="MON_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.MON_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -281,6 +286,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.TUE_isOpen && values.TUE_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("TUE_openTime", null);
+                          setFieldValue("TUE_closeTime", null);
+                        }
                         setFieldValue("TUE_isOpen", e.target.value);
                       }}
                     >
@@ -294,7 +303,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="TUE_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.TUE_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -331,7 +340,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="TUE_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.TUE_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -378,6 +387,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.WED_isOpen && values.WED_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("WED_openTime", null);
+                          setFieldValue("WED_closeTime", null);
+                        }
                         setFieldValue("WED_isOpen", e.target.value);
                       }}
                     >
@@ -391,7 +404,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="WED_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.WED_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -428,7 +441,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="WED_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.WED_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -475,6 +488,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.THU_isOpen && values.THU_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("THU_openTime", null);
+                          setFieldValue("FTHU_closeTime", null);
+                        }
                         setFieldValue("THU_isOpen", e.target.value);
                       }}
                     >
@@ -488,7 +505,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="THU_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.THU_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -525,7 +542,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="THU_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.THU_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -572,6 +589,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.FRI_isOpen && values.FRI_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("FRI_openTime", null);
+                          setFieldValue("FRI_closeTime", null);
+                        }
                         setFieldValue("FRI_isOpen", e.target.value);
                       }}
                     >
@@ -585,7 +606,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="FRI_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.FRI_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -622,7 +643,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="FRI_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.FRI_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -669,6 +690,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.SAT_isOpen && values.SAT_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("SAT_openTime", null);
+                          setFieldValue("SAT_closeTime", null);
+                        }
                         setFieldValue("SAT_isOpen", e.target.value);
                       }}
                     >
@@ -682,7 +707,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="SAT_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.SAT_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -719,7 +744,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="SAT_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.SAT_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -766,6 +791,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       label="สถานะ (จำเป็น)"
                       value={values.SUN_isOpen && values.SUN_isOpen.toString()}
                       onChange={(e) => {
+                        if(e.target.value === 'false'){
+                          setFieldValue("SUN_openTime", null);
+                          setFieldValue("SUN_closeTime", null);
+                        }
                         setFieldValue("SUN_isOpen", e.target.value);
                       }}
                     >
@@ -779,7 +808,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="SUN_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.SUN_isOpen.toString() === 'false'}
                         label="เวลาเปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
@@ -816,7 +845,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                   <Field name="SUN_closeTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
-                        disabled={openBackdrop || isSubmitting || disabledForm}
+                        disabled={openBackdrop || isSubmitting || disabledForm || values.SUN_isOpen.toString() === 'false'}
                         label="เวลาปิด"
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null

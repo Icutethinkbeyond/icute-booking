@@ -25,6 +25,16 @@ export function getTimeAsDateTime(timeString: string | null | undefined | Dayjs)
   return safeDate;
 }
 
+export function checkBooleanValue(value: string | boolean): boolean {
+  if (typeof value === "undefined") {
+    return false;
+  }
+
+  value = value === 'true' || value === true ? true : false
+
+  return value;
+}
+
 // ฟังก์ชันแปลง Request Body เป็นโครงสร้างที่ Flatten สำหรับ Prisma
 // export function mapRequestToPrismaData(requestData: DefaultOperatingHour) {
 //   // 1. กำหนดชื่อวันในสัปดาห์

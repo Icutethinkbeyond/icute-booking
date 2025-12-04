@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { DefaultOperatingHour, Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-import { getTimeAsDateTime } from "@/utils/utils"
+import { checkBooleanValue, getTimeAsDateTime } from "@/utils/utils"
 import { OperatingHourRequest } from "@/interfaces/Store"
 
 const prisma = new PrismaClient();
@@ -93,25 +93,25 @@ export async function PATCH(request: NextRequest) {
         // const dataToUpdate = mapRequestToPrismaData(requestData);
 
         const dataToUpdate = {
-            MON_isOpen: Boolean(MON_isOpen),
+            MON_isOpen: checkBooleanValue(MON_isOpen),
             MON_openTime: getTimeAsDateTime(MON_openTime),
             MON_closeTime: getTimeAsDateTime(MON_closeTime),
-            TUE_isOpen: Boolean(TUE_isOpen),
+            TUE_isOpen: checkBooleanValue(TUE_isOpen),
             TUE_openTime: getTimeAsDateTime(TUE_openTime),
             TUE_closeTime: getTimeAsDateTime(TUE_closeTime),
-            WED_isOpen: Boolean(WED_isOpen),
+            WED_isOpen: checkBooleanValue(WED_isOpen),
             WED_openTime: getTimeAsDateTime(WED_openTime),
             WED_closeTime: getTimeAsDateTime(WED_closeTime),
-            THU_isOpen: Boolean(THU_isOpen),
+            THU_isOpen: checkBooleanValue(THU_isOpen),
             THU_openTime: getTimeAsDateTime(THU_openTime),
             THU_closeTime: getTimeAsDateTime(THU_closeTime),
-            FRI_isOpen: Boolean(FRI_isOpen),
+            FRI_isOpen: checkBooleanValue(FRI_isOpen),
             FRI_openTime: getTimeAsDateTime(FRI_openTime),
             FRI_closeTime: getTimeAsDateTime(FRI_closeTime),
-            SAT_isOpen: Boolean(SAT_isOpen),
+            SAT_isOpen: checkBooleanValue(SAT_isOpen),
             SAT_openTime: getTimeAsDateTime(SAT_openTime),
             SAT_closeTime: getTimeAsDateTime(SAT_closeTime),
-            SUN_isOpen: Boolean(SUN_isOpen),
+            SUN_isOpen: checkBooleanValue(SUN_isOpen),
             SUN_openTime: getTimeAsDateTime(SUN_openTime),
             SUN_closeTime: getTimeAsDateTime(SUN_closeTime),
         }
