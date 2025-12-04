@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
-import { Store } from '@/interfaces/Store';
+import { DefaultOperatingHour, Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-import { mapRequestToPrismaData } from "@/utils/utils"
+import { getTimeAsDateTime } from "@/utils/utils"
 import { OperatingHourRequest } from "@/interfaces/Store"
 
 const prisma = new PrismaClient();
@@ -65,16 +65,65 @@ export async function PATCH(request: NextRequest) {
         // 1. ตรวจสอบสิทธิ์และดึง Store ID
         const { storeId } = await getCurrentUserAndStoreIdsByToken(request);
 
-        // 2. ดึงข้อมูลและแปลงให้เป็นโครงสร้างของ Prisma
-        const requestData: OperatingHourRequest = await request.json();
-        const dataToUpdate = mapRequestToPrismaData(requestData);
+        // 2. ดึงข้อมูลจาก request
+        const {
+            MON_isOpen,
+            MON_openTime,
+            MON_closeTime,
+            TUE_isOpen,
+            TUE_openTime,
+            TUE_closeTime,
+            WED_isOpen,
+            WED_openTime,
+            WED_closeTime,
+            THU_isOpen,
+            THU_openTime,
+            THU_closeTime,
+            FRI_isOpen,
+            FRI_openTime,
+            FRI_closeTime,
+            SAT_isOpen,
+            SAT_openTime,
+            SAT_closeTime,
+            SUN_isOpen,
+            SUN_openTime,
+            SUN_closeTime
+        }: DefaultOperatingHour = await request.json();
 
-        if (Object.keys(dataToUpdate).length === 0) {
-            return new NextResponse(
-                JSON.stringify({ message: 'ไม่พบข้อมูลที่ถูกต้องสำหรับอัปเดต' }),
-                { status: 400 }
-            );
+        // const dataToUpdate = mapRequestToPrismaData(requestData);
+
+        const dataToUpdate = {
+            MON_isOpen: Boolean(MON_isOpen),
+            MON_openTime: getTimeAsDateTime(MON_openTime),
+            MON_closeTime: getTimeAsDateTime(MON_closeTime),
+            TUE_isOpen: Boolean(TUE_isOpen),
+            TUE_openTime: getTimeAsDateTime(TUE_openTime),
+            TUE_closeTime: getTimeAsDateTime(TUE_closeTime),
+            WED_isOpen: Boolean(WED_isOpen),
+            WED_openTime: getTimeAsDateTime(WED_openTime),
+            WED_closeTime: getTimeAsDateTime(WED_closeTime),
+            THU_isOpen: Boolean(THU_isOpen),
+            THU_openTime: getTimeAsDateTime(THU_openTime),
+            THU_closeTime: getTimeAsDateTime(THU_closeTime),
+            FRI_isOpen: Boolean(FRI_isOpen),
+            FRI_openTime: getTimeAsDateTime(FRI_openTime),
+            FRI_closeTime: getTimeAsDateTime(FRI_closeTime),
+            SAT_isOpen: Boolean(SAT_isOpen),
+            SAT_openTime: getTimeAsDateTime(SAT_openTime),
+            SAT_closeTime: getTimeAsDateTime(SAT_closeTime),
+            SUN_isOpen: Boolean(SUN_isOpen),
+            SUN_openTime: getTimeAsDateTime(SUN_openTime),
+            SUN_closeTime: getTimeAsDateTime(SUN_closeTime),
         }
+
+        // console.log(dataToUpdate)
+
+        // if (Object.keys(dataToUpdate).length === 0) {
+        //     return new NextResponse(
+        //         JSON.stringify({ message: 'ไม่พบข้อมูลที่ถูกต้องสำหรับอัปเดต' }),
+        //         { status: 400 }
+        //     );
+        // }
 
         // 3. ใช้ Upsert: ค้นหาด้วย storeId หากไม่พบให้สร้าง, หากพบให้อัปเดต
         const updatedOperatingHour = await prisma.defaultOperatingHour.upsert({

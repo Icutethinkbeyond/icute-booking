@@ -20,7 +20,7 @@ export const serviceService = {
     // async getService(serviceId: string) {
     //     try {
     //         let data: any = await APIServices.get(`${API_BASE_URL}?serviceId=${serviceId}`);
-    //         return { success: true, message: data.message };
+    //         return { success: true, message: data.message, data: data.data };
     //     } catch (error: any) {
     //         if (error.name === "AbortError") {
     //             console.log("Request cancelled");
@@ -32,7 +32,7 @@ export const serviceService = {
     async getSelectService() {
         try {
             let data: any = await APIServices.get(`${API_BASE_URL}?selectService=true`);
-            return { success: true, message: data.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             if (error.name === "AbortError") {
                 console.log("Request cancelled");
@@ -44,7 +44,7 @@ export const serviceService = {
     async updateService(service: Service) {
         try {
             let data: any = await APIServices.patch(API_BASE_URL, service);
-            return { success: true, message: data.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             if (error.name === "AbortError") {
                 console.log("Request cancelled");
@@ -56,7 +56,7 @@ export const serviceService = {
     async createService(service: Service) {
         try {
             let data: any = await APIServices.post(`${API_BASE_URL}`, service);
-            return { success: true, message: data?.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             console.log(error.response.data)
             if (error.name === "AbortError") {

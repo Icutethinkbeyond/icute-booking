@@ -202,36 +202,36 @@ model DefaultOperatingHour {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   
   // 2. สถานะและเวลาทำการปกติ
-  MON_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  MON_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   MON_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   MON_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  TUE_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  TUE_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   TUE_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   TUE_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  WED_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  WED_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   WED_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   WED_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  THU_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  THU_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   THU_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   THU_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  FRI_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  FRI_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   FRI_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   FRI_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  SAT_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  SAT_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   SAT_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   SAT_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
-  SUN_isOpen    Boolean   @default(true) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+  SUN_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
   SUN_openTime  DateTime? // "09:00" รูปแบบ HH:MM
   SUN_closeTime DateTime? // "18:00" รูปแบบ HH:MM
 
   // 3. ความสัมพันธ์กับร้านค้า
-  storeId String @db.ObjectId
+  storeId String @db.ObjectId @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -239,7 +239,6 @@ model DefaultOperatingHour {
 
   // 4. Index และ Constraint
   // บังคับว่า storeId หนึ่งต้องมีข้อมูลของ DayOfWeek หนึ่งได้เพียงครั้งเดียว (เช่น จันทร์เดียว)
-  @@unique([storeId])
   @@map("defaultOperatingHours")
 }
 

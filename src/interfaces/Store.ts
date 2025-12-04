@@ -82,31 +82,31 @@ export interface DefaultOperatingHour {
   id: string;
 
   // 2. สถานะและเวลาทำการปกติ
-  MON_isOpen: string;
+  MON_isOpen: string | boolean;
   MON_openTime?: Dayjs | null | string;
   MON_closeTime?: Dayjs | null | string;
 
-  TUE_isOpen: boolean;
+  TUE_isOpen: string | boolean;
   TUE_openTime?: Dayjs | null | string;
   TUE_closeTime?: Dayjs | null | string;
 
-  WED_isOpen: boolean;
+  WED_isOpen: string | boolean;
   WED_openTime?: Dayjs | null | string;
   WED_closeTime?: Dayjs | null | string;
 
-  THU_isOpen: boolean;
+  THU_isOpen: string | boolean;
   THU_openTime?: Dayjs | null | string;
   THU_closeTime?: Dayjs | null | string;
 
-  FRI_isOpen: boolean;
+  FRI_isOpen: string | boolean;
   FRI_openTime?: Dayjs | null | string;
   FRI_closeTime?: Dayjs | null | string;
 
-  SAT_isOpen: boolean;
+  SAT_isOpen: string | boolean;
   SAT_openTime?: Dayjs | null | string;
   SAT_closeTime?: Dayjs | null | string;
 
-  SUN_isOpen: boolean;
+  SUN_isOpen: string | boolean;
   SUN_openTime?: Dayjs | null | string;
   SUN_closeTime?: Dayjs | null | string;
 

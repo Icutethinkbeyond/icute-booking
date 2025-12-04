@@ -103,17 +103,17 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
 
     console.log(values)
     
-    // validateForm(); // บังคับ validate หลังจากรีเซ็ต
-    // setSubmitting(true); // เริ่มสถานะ Loading/Submittings
+    validateForm(); // บังคับ validate หลังจากรีเซ็ต
+    setSubmitting(true); // เริ่มสถานะ Loading/Submittings
 
-    // const result = await storeService.updateTimeSettingStore(values);
+    const result = await storeService.updateTimeSettingStore(values);
 
     // // // // // 3. จัดการเมื่อสำเร็จ
-    // setNotify({
-    //   open: true,
-    //   message: result.message,
-    //   color: result.success ? "success" : "error",
-    // });
+    setNotify({
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
   };
 
   const getTimeSetting = async () => {
@@ -291,7 +291,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 3 }}>
-                  <Field name="THU_openTime">
+                  <Field name="TUE_openTime">
                     {({ field, form }: FieldProps) => (
                       <TimePicker
                         disabled={openBackdrop || isSubmitting || disabledForm}
@@ -299,14 +299,14 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         sx={{ minWidth: "100%" }}
                         // ✔ เวลา (dayjs) หรือ null
                         value={
-                          values.THU_openTime
-                            ? dayjs(values.THU_openTime)
+                          values.TUE_openTime
+                            ? dayjs(values.TUE_openTime)
                             : null
                         }
                         // ✔ อัปเดตค่าเวลาใน Formik อย่างถูกต้อง
                         onChange={(newValue) => {
                           form.setFieldValue(
-                            "THU_openTime",
+                            "TUE_openTime",
                             newValue ? newValue.toISOString() : null
                           );
                         }}
@@ -314,11 +314,11 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                           textField: {
                             fullWidth: true,
                             error: Boolean(
-                              touched.THU_openTime && errors.THU_openTime
+                              touched.TUE_openTime && errors.TUE_openTime
                             ),
                             helperText:
-                              touched.THU_openTime && errors.THU_openTime
-                                ? String(errors.THU_openTime)
+                              touched.TUE_openTime && errors.TUE_openTime
+                                ? String(errors.TUE_openTime)
                                 : "",
                           },
                         }}

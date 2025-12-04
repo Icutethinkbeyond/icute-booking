@@ -8,7 +8,7 @@ export const employeeService = {
     // async getEmployees() {
     //     try {
     //         let data: any = await APIServices.get(`${EMPLOYEE_API_BASE_URL}`);
-    //         return { success: true, message: data.message };
+    //         return { success: true, message: data.message, data: data.data };
     //     } catch (error: any) {
     //         if (error.name === "AbortError") {
     //             console.log("Request cancelled");
@@ -32,7 +32,7 @@ export const employeeService = {
     async getSelectEmployee() {
         try {
             let data: any = await APIServices.get(`${EMPLOYEE_API_BASE_URL}?selectEmployee=true`);
-            return { success: true, message: data.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             if (error.name === "AbortError") {
                 console.log("Request cancelled");
@@ -44,7 +44,7 @@ export const employeeService = {
     async updateEmployee(employee: Employee) {
         try {
             let data: any = await APIServices.patch(EMPLOYEE_API_BASE_URL, employee);
-            return { success: true, message: data.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             if (error.name === "AbortError") {
                 console.log("Request cancelled");
@@ -57,7 +57,7 @@ export const employeeService = {
     async createEmployee(employee: Employee) {
         try {
             let data: any = await APIServices.post(EMPLOYEE_API_BASE_URL, employee);
-            return { success: true, message: data.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             console.log('error')
             if (error.name === "AbortError") {

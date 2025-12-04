@@ -8,7 +8,7 @@ export const authService = {
     async registerStore(store: StoreRegister) {
         try {
             let data: any = await APIServices.post(`${AUTH_API_BASE_URL}/shop`, store);
-            return { success: true, message: data?.message };
+            return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             console.log(error.response.data)
             if (error.name === "AbortError") {

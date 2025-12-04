@@ -8,7 +8,7 @@
 //     async getCategory(categoryId: string) {
 //         try {
 //             let data: any = await APIServices.get(`${CATEGORY_API_BASE_URL}?categoryId=${categoryId}`);
-//             return { success: true, message: data.message };
+//             return { success: true, message: data.message, data: data.data };
 //         } catch (error: any) {
 //             if (error.name === "AbortError") {
 //                 console.log("Request cancelled");
@@ -20,7 +20,7 @@
 //     async getSelectCategory() {
 //         try {
 //             let data: any = await APIServices.get(`${CATEGORY_API_BASE_URL}?selectCategory=true`);
-//             return { success: true, message: data.message };
+//             return { success: true, message: data.message, data: data.data };
 //         } catch (error: any) {
 //             if (error.name === "AbortError") {
 //                 console.log("Request cancelled");
@@ -32,7 +32,7 @@
 //     async updateCategory(category: Category) {
 //         try {
 //             let data: any = await APIServices.patch(CATEGORY_API_BASE_URL, category);
-//             return { success: true, message: data.message };
+//             return { success: true, message: data.message, data: data.data };
 //         } catch (error: any) {
 //             if (error.name === "AbortError") {
 //                 console.log("Request cancelled");
@@ -44,7 +44,7 @@
 //     async createCategory(category: Category) {
 //         try {
 //             let data: any = await APIServices.post(CATEGORY_API_BASE_URL, category);
-//             return { success: true, message: data.message };
+//             return { success: true, message: data.message, data: data.data };
 //         } catch (error: any) {
 //             console.log('error')
 //             if (error.name === "AbortError") {
