@@ -14,7 +14,7 @@ import { useNotifyContext } from "@/contexts/NotifyContext";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 
 export default function ServiceTabs() {
-  const [value, setValue] = React.useState(1);
+  const [value, setValue] = React.useState(0);
   const { setStoreForm, StoreForm } = useStoreContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
