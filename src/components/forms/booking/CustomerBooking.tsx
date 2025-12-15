@@ -15,6 +15,8 @@ import {
   Autocomplete,
   useTheme,
   useMediaQuery,
+  Container,
+  Paper,
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { LoadingButton } from "@mui/lab";
@@ -24,11 +26,8 @@ import dayjs from "dayjs";
 import { Plus, Timer, Phone, Save, RotateCcw, Smartphone } from "lucide-react";
 import { useBookingContext } from "@/contexts/BookingContext";
 import { Booking } from "@/interfaces/Booking";
-
-enum CustomerType {
-  WALK_IN = "WALK_IN",
-  OTHER_CONTACT = "OTHER_CONTACT",
-}
+import APIServices from "@/utils/services/APIServices";
+import { useNotifyContext } from "@/contexts/NotifyContext";
 
 interface ServiceSelect {
   id: string;
@@ -90,7 +89,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
   onSubmit,
   viewOnly = false,
 }) => {
-  const [openBackdrop, setOpenBackdrop] = useState(false);
+  // const [openBackdrop, setOpenBackdrop] = useState(false);
+  const { setNotify, notify, setOpenBackdrop, openBackdrop } =
+    useNotifyContext();
   const { bookingForm } = useBookingContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -121,6 +122,25 @@ const BookingForm: React.FC<BookingFormProps> = ({
     //   setOpenBackdrop(false)
     // }
   };
+
+  // const getStore = async () => {
+  //   try {
+  //     await APIServices.get(
+  //       `/api/employees?page=${paginationModel.page + 1}&pageSize=${
+  //         paginationModel.pageSize
+  //       }`,
+  //       setEmployees,
+  //       setRowCount,
+  //       setLoading
+  //     );
+  //   } catch (error: any) {
+  //     setNotify({
+  //       open: true,
+  //       message: error.code,
+  //       color: "error",
+  //     });
+  //   }
+  // };
 
   // if (!isMobile) {
   //   return (
