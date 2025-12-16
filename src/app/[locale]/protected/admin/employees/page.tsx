@@ -41,7 +41,7 @@ const Employees = () => {
       <FloatingButton
         onClick={() => router.push(`/${localActive}/protected/admin/employees/new`)}
       />
-      <Typography variant="h1" mt={2} color="#fff">
+      <Typography variant="h1" mt={2} >
         การจัดการพนักงาน
       </Typography>
       <BaseCard title="">

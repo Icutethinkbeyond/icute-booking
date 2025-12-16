@@ -44,7 +44,7 @@ const Services = () => {
       <FloatingButton
         onClick={() => router.push(`/${localActive}/protected/admin/services/new`)}
       />
-      <Typography variant="h1" mt={2} color="#fff">
+      <Typography variant="h1" mt={2} >
         จัดการบริการ
       </Typography>
       <BaseCard title="">

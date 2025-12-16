@@ -10,7 +10,6 @@ const AuthRegister = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f9f9f9",
         padding: 4,
       }}
     >
@@ -28,10 +27,7 @@ const AuthRegister = () => {
         {/* Left Section */}
         <Box
           sx={{
-            // backgroundColor: "#3f51b5",
-            background:
-              "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)",
-
+            bgcolor: "primary.main",
             color: "#fff",
             display: "flex",
             justifyContent: "center",

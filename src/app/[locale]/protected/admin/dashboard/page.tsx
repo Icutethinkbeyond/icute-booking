@@ -44,7 +44,7 @@ const Booking = () => {
 
   return (
     <PageContainer title="" description="">
-      <Typography variant="h1" mt={2} color="#fff">
+      <Typography variant="h1" mt={2} >
         แผงควบคุมระบบ
       </Typography>
 

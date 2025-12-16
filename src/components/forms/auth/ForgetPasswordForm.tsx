@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
   Typography,
+  Grid2,
 } from "@mui/material";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -63,8 +64,8 @@ const ForgetPasswordForm = () => {
     >
       {({ errors, touched }) => (
         <Form>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
+          <Grid2 container spacing={2}>
+            <Grid2 size={{ xs: 12 }} >
               <Field name="email">
                 {({ field }: any) => (
                   <TextField
@@ -77,8 +78,8 @@ const ForgetPasswordForm = () => {
                   />
                 )}
               </Field>
-            </Grid>
-            <Grid item xs={12}>
+            </Grid2>
+            <Grid2 size={{ xs: 12 }} >
               {isSubmitting ? (
                 <CircularProgress />
               ) : (
@@ -86,8 +87,8 @@ const ForgetPasswordForm = () => {
                   ส่งลิงก์รีเซ็ตรหัสผ่าน
                 </Button>
               )}
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
         </Form>
       )}
     </Formik>

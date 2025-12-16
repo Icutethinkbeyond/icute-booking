@@ -10,7 +10,6 @@ const ForgetPassword = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f9f9f9",
         padding: 4,
       }}
     >
@@ -28,11 +27,7 @@ const ForgetPassword = () => {
         {/* Left Section */}
         <Box
           sx={{
-            // backgroundColor: "#3f51b5",
-            background:
-              "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)",
-
-            color: "#fff",
+            bgcolor: "primary.main",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",

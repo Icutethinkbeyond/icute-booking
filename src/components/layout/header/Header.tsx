@@ -23,7 +23,7 @@ const Header = ({toggleMobileSidebar}: ItemType) => {
   
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     // boxShadow: 'none',
-     background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)",
+    //  background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)",
     // boxShadow: '10px 0.1px 10px #ff9e75',
     // background: '#ffffff',
     justifyContent: 'center',

@@ -43,7 +43,7 @@ const Booking = () => {
       <FloatingButton
         onClick={() => router.push(`/${localActive}/protected/admin/dashboard/bookings/new`)}
       />
-      <Typography variant="h1" mt={2} color="#fff">
+      <Typography variant="h1" mt={2} >
         การจองทั้งหมด
       </Typography>
       <BaseCard title="">

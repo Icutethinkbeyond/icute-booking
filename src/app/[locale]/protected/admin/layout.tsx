@@ -45,7 +45,7 @@ export default function RootLayout({
         onSidebarClose={() => setMobileSidebarOpen(false)}
       />
       <PageWrapper className="page-wrapper" sx={{
-            background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)"
+            // background: "linear-gradient(90deg, rgba(42, 72, 160, 1) 0%, rgba(69, 189, 187, 1) 100%)"
           }}>
         <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
         <Container

@@ -68,8 +68,10 @@ const baselightTheme = createTheme({
     },
     divider: "#D3C3B3",
     background: {
-      default: "#EDD5B9", // Warm Cream background
-      paper: "#FFFFFF", // White for cards
+      // default: "#EDD5B9", // Warm Cream background
+      default: "#fef6e9",
+      // paper: "#fef6e9", // White for cards
+      paper: "#ffffff", // White for cards
     },
   },
 

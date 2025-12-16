@@ -10,6 +10,7 @@ import {
   ListItemButton,
   List,
   ListItemText,
+  Avatar,
 } from "@mui/material";
 
 import { Stack } from "@mui/system";
@@ -72,14 +73,14 @@ const Profile = () => {
         }}
         onClick={handleClick2}
       >
-        {/* <Avatar
+        <Avatar
           src={"/images/users/user2.jpg"}
           alt={"ProfileImg"}
           sx={{
             width: 30,
             height: 30,
           }}
-        /> */}
+        />
         <Box
           sx={{
             display: {
@@ -90,8 +91,9 @@ const Profile = () => {
           }}
         >
           <Typography
-            color="#fff"
+            // color="#fff"
             variant="h5"
+            color="primary"
             fontWeight="400"
             sx={{ ml: 1 }}
           >
@@ -99,7 +101,8 @@ const Profile = () => {
           </Typography>
           <Typography
             variant="h5"
-            color="#fff"
+            // color="#fff"
+            color="primary"
             fontWeight="700"
             sx={{
               ml: 1,
@@ -107,7 +110,9 @@ const Profile = () => {
           >
             {session?.user?.storeName || 'Developer'}
           </Typography>
-          <IconChevronDown width="20" height="20" color="#fff" />
+          <IconChevronDown width="20" height="20" 
+          // color="#fff" 
+          />
         </Box>
       </IconButton>
       {/* ------------------------------------------- */}
