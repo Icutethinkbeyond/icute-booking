@@ -27,7 +27,7 @@ import ConfirmDelete from "@/components/shared/ConfirmDelete";
 import { Barcode, Baseline, CirclePlus, Edit, Search } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { CustomNoRowsOverlay } from "@/components/shared/NoData";
-import { fetchData, formatNumber } from "@/utils/utils";
+import { fetchData, formatNumber } from "@/utils/lib/utils";
 import StatusEmployee from "@/components/shared/Status";
 import { Clear } from "@mui/icons-material";
 import { useNotifyContext } from "@/contexts/NotifyContext";

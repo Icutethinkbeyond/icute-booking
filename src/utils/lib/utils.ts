@@ -6,6 +6,18 @@ import { DefaultOperatingHour, OperatingHourRequest } from "@/interfaces/Store"
 // import { ReportType, SelectType } from "@/contexts/ReportContext";
 // import { DocumentCategory, DocumentStep, MaintenanceType } from "@prisma/client";
 
+/**
+ * ฟังก์ชันสำหรับแทนที่ตัวแปรในข้อความที่ดึงมาจาก DB
+ */
+export function formatTemplate(template: string, data: Record<string, string>) {
+  let message = template;
+  Object.keys(data).forEach((key) => {
+    // แทนที่ {key} ด้วย data[key]
+    message = message.replace(new RegExp(`{${key}}`, 'g'), data[key]);
+  });
+  return message;
+}
+
 // --------------------------------------------------------------------------
 // Helper Functions & Types
 // --------------------------------------------------------------------------

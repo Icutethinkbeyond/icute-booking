@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { CustomNoRowsOverlay } from "@/components/shared/NoData";
-import { fetchData, formatNumber } from "@/utils/utils";
+import { fetchData, formatNumber } from "@/utils/lib/utils";
 import StatusBooking from "@/components/shared/Status";
 import { Brush } from "lucide-react";
 import { useNotifyContext } from "@/contexts/NotifyContext";

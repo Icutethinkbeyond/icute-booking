@@ -175,6 +175,14 @@ model Service {
   durationMinutes Int // ระยะเวลาเป็นนาที เช่น 30, 60
   price           Float? // ราคา (ถ้ามี)
 
+  discount       Float?
+  bufferTime     Int?
+  detail         String?
+  displayNumber  String?
+  image          String?
+  colorOfService String?
+  active         Boolean
+
   // ความสัมพันธ์
   storeId     String     @db.ObjectId
   store       Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)

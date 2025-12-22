@@ -18,6 +18,7 @@ import {
   MenuItem,
   Theme,
   SelectChangeEvent,
+  FormHelperText,
 } from "@mui/material";
 import * as Yup from "yup";
 import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
@@ -65,16 +66,16 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
 }
 
 const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
+  "Oliver Hansen",
+  "Van Henry",
+  "April Tucker",
+  "Ralph Hubbard",
+  "Omar Alexander",
+  "Carlos Abbott",
+  "Miriam Wagner",
+  "Bradley Wilkerson",
+  "Virginia Andrews",
+  "Kelly Snyder",
 ];
 
 interface ServiceProps {
@@ -256,21 +257,42 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                             {serviceEdit ? "แก้ไขบริการ" : "เพิ่มบริการ"}
                           </Typography>
                         </Box>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={true}
-                              // onChange={handleSwitchChange("isActive")}
-                            />
-                          }
-                          label={
-                            <Typography
-                              sx={{ color: theme.palette.text.secondary }}
-                            >
-                              เปิดใช้งาน
-                            </Typography>
-                          }
-                        />
+                        <Box>
+                          <FormControl
+                            fullWidth
+                            disabled={
+                              openBackdrop || isSubmitting || disabledForm
+                            }
+                          >
+                            <Field name="active">
+                              {({ field, form }: any) => (
+                                <FormControlLabel
+                                  control={
+                                    <Switch
+                                      checked={Boolean(field.value)}
+                                      onChange={(e) => {
+                                        form.setFieldValue(
+                                          field.name,
+                                          e.target.checked
+                                        );
+                                      }}
+                                      color="primary"
+                                    />
+                                  }
+                                  label={
+                                    <Typography
+                                      sx={{
+                                        color: theme.palette.text.secondary,
+                                      }}
+                                    >
+                                      เปิดใช้งาน
+                                    </Typography>
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </FormControl>
+                        </Box>
                       </Box>
                     </Grid2>
 
@@ -348,45 +370,6 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       </Field>
                     </Grid2>
 
-                    {/* Cost Price */}
-                    <Grid2 size={{ xs: 6 }}>
-                      <Field name="price">
-                        {({ field }: any) => (
-                          <TextField
-                            {...field}
-                            disabled={
-                              openBackdrop || isSubmitting || disabledForm
-                            }
-                            name="price"
-                            label="ราคาปกติ (จำเป็น)"
-                            value={values.price ?? ""}
-                            slotProps={{
-                              inputLabel: { shrink: true },
-                              input: {
-                                readOnly: viewOnly ? true : false,
-                                endAdornment: (
-                                  <InputAdornment position="start">
-                                    บาท
-                                  </InputAdornment>
-                                ),
-                              },
-                            }}
-                            type="number"
-                            onChange={(e) => {
-                              const newValue = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              ); // กรองเฉพาะตัวเลข
-                              setFieldValue("price", newValue || ""); // ป้องกัน NaN
-                            }}
-                            error={touched.price && Boolean(errors.price)}
-                            helperText={touched.price && errors.price}
-                            fullWidth
-                          />
-                        )}
-                      </Field>
-                    </Grid2>
-
                     <Grid2 size={{ xs: 6 }}>
                       <Field name="price">
                         {({ field }: any) => (
@@ -425,103 +408,107 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       </Field>
                     </Grid2>
 
-                    <Grid2 container size={{ xs: 6 }} spacing={3}>
-                      <Grid2 size={{ xs: 12 }}>
-                        <Field name="name">
-                          {({ field }: FieldProps) => (
-                            <TextField
-                              {...field}
-                              name="name"
-                              label="เวลาเตรียมอุปกรณ์ (ถ้ามี)"
-                              value={values.name}
-                              onChange={(e) => {
-                                setFieldValue("name", e.target.value);
-                              }}
-                              placeholder=""
-                              slotProps={{
-                                inputLabel: { shrink: true },
-                                input: {
-                                  readOnly: viewOnly ? true : false,
-                                },
-                              }}
-                              error={touched.name && Boolean(errors.name)}
-                              helperText={touched.name && errors.name}
-                              fullWidth
-                              disabled={
-                                openBackdrop || isSubmitting || disabledForm
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid2>
-
-                      <Grid2 size={{ xs: 12 }}>
-                        <Field name="name">
-                          {({ field }: FieldProps) => (
-                            <TextField
-                              {...field}
-                              name="name"
-                              label="รายละเอียด (ถ้ามี)"
-                              value={values.name}
-                              rows={4}
-                              multiline={true}
-                              onChange={(e) => {
-                                setFieldValue("name", e.target.value);
-                              }}
-                              placeholder=""
-                              slotProps={{
-                                inputLabel: { shrink: true },
-                                input: {
-                                  readOnly: viewOnly ? true : false,
-                                },
-                              }}
-                              error={touched.name && Boolean(errors.name)}
-                              helperText={touched.name && errors.name}
-                              fullWidth
-                              disabled={
-                                openBackdrop || isSubmitting || disabledForm
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid2>
-
-                      <Grid2 size={{ xs: 12 }}>
-                        <Field name="name">
-                          {({ field }: FieldProps) => (
-                            <TextField
-                              {...field}
-                              name="name"
-                              label="ลำดับการแสดงผล (ถ้ามี)"
-                              value={values.name}
-                              onChange={(e) => {
-                                setFieldValue("name", e.target.value);
-                              }}
-                              placeholder=""
-                              slotProps={{
-                                inputLabel: { shrink: true },
-                                input: {
-                                  readOnly: viewOnly ? true : false,
-                                },
-                              }}
-                              error={touched.name && Boolean(errors.name)}
-                              helperText={touched.name && errors.name}
-                              fullWidth
-                              disabled={
-                                openBackdrop || isSubmitting || disabledForm
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid2>
+                    {/* Cost discount */}
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field name="discount">
+                        {({ field }: any) => (
+                          <TextField
+                            {...field}
+                            disabled={
+                              openBackdrop || isSubmitting || disabledForm
+                            }
+                            name="discount"
+                            label="ราคาปกติ (จำเป็น)"
+                            value={values.discount ?? ""}
+                            slotProps={{
+                              inputLabel: { shrink: true },
+                              input: {
+                                readOnly: viewOnly ? true : false,
+                                endAdornment: (
+                                  <InputAdornment position="start">
+                                    บาท
+                                  </InputAdornment>
+                                ),
+                              },
+                            }}
+                            type="number"
+                            onChange={(e) => {
+                              const newValue = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              ); // กรองเฉพาะตัวเลข
+                              setFieldValue("discount", newValue || ""); // ป้องกัน NaN
+                            }}
+                            error={touched.discount && Boolean(errors.discount)}
+                            helperText={touched.discount && errors.discount}
+                            fullWidth
+                          />
+                        )}
+                      </Field>
                     </Grid2>
 
+                    {/* Buffer Time */}
                     <Grid2 size={{ xs: 6 }}>
-                      <Field
-                        name="color"
-                        component={ColorPickerCustom}
-                        setFieldValue={setFieldValue}
-                      />
+                      <Field name="bufferTime">
+                        {({ field }: FieldProps) => (
+                          <TextField
+                            {...field}
+                            name="bufferTime"
+                            label="เวลาเตรียมอุปกรณ์ (ถ้ามี)"
+                            value={values.bufferTime}
+                            onChange={(e) => {
+                              setFieldValue("bufferTime", e.target.value);
+                            }}
+                            placeholder=""
+                            slotProps={{
+                              inputLabel: { shrink: true },
+                              input: {
+                                readOnly: viewOnly ? true : false,
+                              },
+                            }}
+                            error={
+                              touched.bufferTime && Boolean(errors.bufferTime)
+                            }
+                            helperText={touched.bufferTime && errors.bufferTime}
+                            fullWidth
+                            disabled={
+                              openBackdrop || isSubmitting || disabledForm
+                            }
+                          />
+                        )}
+                      </Field>
+                    </Grid2>
+
+                    {/* Detail */}
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field name="detail">
+                        {({ field }: FieldProps) => (
+                          <TextField
+                            {...field}
+                            name="detail"
+                            label="รายละเอียด (ถ้ามี)"
+                            value={values.detail}
+                            rows={4}
+                            multiline={true}
+                            onChange={(e) => {
+                              setFieldValue("detail", e.target.value);
+                            }}
+                            placeholder=""
+                            slotProps={{
+                              inputLabel: { shrink: true },
+                              input: {
+                                readOnly: viewOnly ? true : false,
+                              },
+                            }}
+                            error={touched.detail && Boolean(errors.detail)}
+                            helperText={touched.detail && errors.detail}
+                            fullWidth
+                            disabled={
+                              openBackdrop || isSubmitting || disabledForm
+                            }
+                          />
+                        )}
+                      </Field>
                     </Grid2>
 
                     <Grid2 size={{ xs: 6 }}>
@@ -567,6 +554,44 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                           ))}
                         </Select>
                       </FormControl>
+                    </Grid2>
+
+                    {/* Display Number */}
+                    {/* <Grid2 size={{ xs: 12 }}>
+                        <Field name="name">
+                          {({ field }: FieldProps) => (
+                            <TextField
+                              {...field}
+                              name="name"
+                              label="ลำดับการแสดงผล (ถ้ามี)"
+                              value={values.name}
+                              onChange={(e) => {
+                                setFieldValue("name", e.target.value);
+                              }}
+                              placeholder=""
+                              slotProps={{
+                                inputLabel: { shrink: true },
+                                input: {
+                                  readOnly: viewOnly ? true : false,
+                                },
+                              }}
+                              error={touched.name && Boolean(errors.name)}
+                              helperText={touched.name && errors.name}
+                              fullWidth
+                              disabled={
+                                openBackdrop || isSubmitting || disabledForm
+                              }
+                            />
+                          )}
+                        </Field>
+                      </Grid2> */}
+
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field
+                        name="color"
+                        component={ColorPickerCustom}
+                        setFieldValue={setFieldValue}
+                      />
                     </Grid2>
 
                     <Grid2 size={{ xs: 6 }}>

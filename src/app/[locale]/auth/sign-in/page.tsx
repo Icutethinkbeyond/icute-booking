@@ -5,7 +5,7 @@ import LineLogin from "@/components/forms/auth/LineLogin";
 import {
   checkShopLoginCallbackUrl,
   parseShopFromCallbackUrl,
-} from "@/utils/utils";
+} from "@/utils/lib/utils";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const LoginPage = () => {

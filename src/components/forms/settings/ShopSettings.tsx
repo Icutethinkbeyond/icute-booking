@@ -35,7 +35,7 @@ import {
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 import { useSession } from "next-auth/react";
 import { useStoreContext } from "@/contexts/StoreContext";
-import { getBaseUrl } from "@/utils/utils";
+import { getBaseUrl } from "@/utils/lib/utils";
 
 interface ServiceProps {
   viewOnly?: boolean;
