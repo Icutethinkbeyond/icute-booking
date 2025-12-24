@@ -479,6 +479,8 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       </Field>
                     </Grid2>
 
+                    <Grid2 size={{ xs: 6 }}></Grid2>
+
                     {/* Detail */}
                     <Grid2 size={{ xs: 6 }}>
                       <Field name="detail">
@@ -512,11 +514,12 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                     </Grid2>
 
                     <Grid2 size={{ xs: 6 }}>
-                      <FormControl>
+                      <FormControl fullWidth>
                         <InputLabel id="demo-multiple-chip-label">
                           Chip
                         </InputLabel>
                         <Select
+                        fullWidth
                           labelId="demo-multiple-chip-label"
                           id="demo-multiple-chip"
                           multiple
@@ -586,12 +589,27 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         </Field>
                       </Grid2> */}
 
-                    <Grid2 size={{ xs: 6 }}>
-                      <Field
-                        name="color"
-                        component={ColorPickerCustom}
-                        setFieldValue={setFieldValue}
-                      />
+                    <Grid2 size={{ xs: 12 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          mb: 3,
+                          mt: 3,
+                        }}
+                      >
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Avatar sx={{ bgcolor: "primary.main" }}>
+                            <Plus size={20} />
+                          </Avatar>
+                          <Typography variant="h4" gutterBottom ml={2} mt={0.5}>
+                            เพิ่มเติม
+                          </Typography>
+                        </Box>
+                      </Box>
                     </Grid2>
 
                     <Grid2 size={{ xs: 6 }}>
@@ -601,13 +619,21 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                         setFieldValue={setFieldValue}
                       />
                     </Grid2>
+
+                    <Grid2 size={{ xs: 6 }}>
+                      <Field
+                        name="color"
+                        component={ColorPickerCustom}
+                        setFieldValue={setFieldValue}
+                      />
+                    </Grid2>
                   </Grid2>
 
                   <Grid2
                     sx={{
-                      mt: 5,
+                      mt: 10,
                       display: "flex",
-                      justifyContent: "flex-start",
+                      justifyContent: "flex-end",
                     }}
                   >
                     <LoadingButton
