@@ -38,13 +38,15 @@ import { useLocale } from "next-intl";
 import { Bath, MonitorCog, Plus, Save } from "lucide-react";
 import { serviceService } from "@/utils/services/api-services/ServiceAPI";
 import { useServiceContext } from "@/contexts/ServiceContext";
-import { Service, initialService } from "@/interfaces/Store";
+import { EmployeeList, Service, initialService } from "@/interfaces/Store";
 import { useSession } from "next-auth/react";
-import { useTheme } from "@emotion/react";
 import { baselightTheme } from "@/utils/theme/DefaultColors";
 import DragDropImage from "@/components/shared/DragDropImage";
 import ColorPickerCustom from "@/components/shared/ColorPicker";
 import { ColorPicker, useColor } from "react-color-palette";
+import APIServices from "@/utils/services/APIServices";
+import { employeeService } from "@/utils/services/api-services/EmployeeAPI";
+import { useEmployeeContext } from "@/contexts/EmployeeContext";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -57,27 +59,6 @@ const MenuProps = {
   },
 };
 
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
-  return {
-    fontWeight: personName.includes(name)
-      ? theme.typography.fontWeightMedium
-      : theme.typography.fontWeightRegular,
-  };
-}
-
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
-];
-
 interface ServiceProps {
   viewOnly?: boolean;
 }
@@ -88,9 +69,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     serviceForm,
     serviceEdit,
     setServiceEdit,
-    setServices,
-    services,
+    setServiceList,
+    serviceList,
   } = useServiceContext();
+  const { employeeList, setEmployeeList } = useEmployeeContext();
   const theme = baselightTheme;
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
@@ -111,17 +93,13 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     // price: Yup.number().required("กรุณาใส่ราคาของคอร์ส"),
   });
 
-  const [personName, setPersonName] = React.useState<string[]>([]);
-
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
+  function getStyles(name: string, employeeList: string[], theme: Theme) {
+    return {
+      fontWeight: employeeList.includes(name)
+        ? theme.typography.fontWeightMedium
+        : theme.typography.fontWeightRegular,
+    };
+  }
 
   const handleFormSubmit = async (
     values: Service,
@@ -134,6 +112,10 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
+
+    console.log(values);
+
+    return;
 
     // 2. เรียกใช้ API
     let result;
@@ -191,8 +173,24 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     }
   };
 
+  const getServiceList = async () => {
+    try {
+      let result = await employeeService.getEmployeeList();
+
+      setEmployeeList(result?.data);
+    } catch (error: any) {
+      setNotify({
+        open: true,
+        message: error.code,
+        color: "error",
+      });
+    }
+  };
+
   useEffect(() => {
     setIsLoading(true);
+
+    getServiceList();
 
     if (pathname.includes("new")) {
       setServiceForm(initialService);
@@ -515,47 +513,70 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
 
                     <Grid2 size={{ xs: 6 }}>
                       <FormControl fullWidth>
-                        <InputLabel id="demo-multiple-chip-label">
-                          Chip
+                        <InputLabel id="select-employee-label">
+                          พนักงานให้บริการ (เลือกได้หลายรายการ)
                         </InputLabel>
-                        <Select
-                        fullWidth
-                          labelId="demo-multiple-chip-label"
-                          id="demo-multiple-chip"
-                          multiple
-                          value={personName}
-                          onChange={handleChange}
-                          input={
-                            <OutlinedInput
-                              id="select-multiple-chip"
-                              label="Chip"
-                            />
-                          }
-                          renderValue={(selected) => (
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 0.5,
+                        <Field name="employeeIds">
+                          {({ field }: FieldProps) => (
+                            <Select
+                              {...field}
+                              fullWidth
+                              labelId="select-employee-label"
+                              id="select-employee-label"
+                              multiple
+                              value={values.employeeIds}
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                setFieldValue(
+                                  "employeeIds",
+                                  // On autofill we get a stringified value.
+                                  typeof value === "string"
+                                    ? value.split(",")
+                                    : value
+                                );
                               }}
+                              input={
+                                <OutlinedInput
+                                  id="select-employee-label"
+                                  label="พนักงานให้บริการ (เลือกได้หลายรายการ)"
+                                />
+                              }
+                              renderValue={(selected) => (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  {selected.map((value) => {
+                                    const employee = employeeList.find(
+                                      (emp) => emp.id === value
+                                    );
+
+                                    return (
+                                      <Chip
+                                        key={value}
+                                        label={employee ? employee.name : value}
+                                      />
+                                    );
+                                  })}
+                                </Box>
+                              )}
+                              MenuProps={MenuProps}
                             >
-                              {selected.map((value) => (
-                                <Chip key={value} label={value} />
+                              {employeeList.map(({ name, id }) => (
+                                <MenuItem
+                                  key={id}
+                                  value={id}
+                                  style={getStyles(id, values.employeeIds, theme)}
+                                >
+                                  {name}
+                                </MenuItem>
                               ))}
-                            </Box>
+                            </Select>
                           )}
-                          MenuProps={MenuProps}
-                        >
-                          {names.map((name) => (
-                            <MenuItem
-                              key={name}
-                              value={name}
-                              style={getStyles(name, personName, theme)}
-                            >
-                              {name}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                        </Field>
                       </FormControl>
                     </Grid2>
 

@@ -29,9 +29,9 @@ export const serviceService = {
     //     }
     // },
 
-    async getSelectService() {
+    async getServiceList() {
         try {
-            let data: any = await APIServices.get(`${API_BASE_URL}?selectService=true`);
+            let data: any = await APIServices.get(`${API_BASE_URL}/`);
             return { success: true, message: data.message, data: data.data };
         } catch (error: any) {
             if (error.name === "AbortError") {

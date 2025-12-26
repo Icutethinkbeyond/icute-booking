@@ -6,7 +6,7 @@ import {
   Service,
   initialService,
   // initialservice,
-  // serviceSelect,
+  ServiceList,
 } from "@/interfaces/Store";
 import { faker } from "@faker-js/faker";
 import React, {
@@ -26,9 +26,9 @@ interface ServiceContextProps {
   setServiceForm: Dispatch<React.SetStateAction<Service>>;
   serviceEdit: boolean;
   setServiceEdit: Dispatch<React.SetStateAction<boolean>>;
-  // setTypeForm: Dispatch<React.SetStateAction<Service>>;
-  // setserviceSelectState: Dispatch<React.SetStateAction<serviceSelect[]>>;
-  // serviceSelectState: serviceSelect[];
+  // setTypeForm: Dispatch<React.SetStateAction<ServiceList>>;
+  setServiceList: Dispatch<React.SetStateAction<ServiceList[]>>;
+  serviceList: ServiceList[];
 }
 
 // สร้าง Context
@@ -38,10 +38,8 @@ const ServiceContext = createContext<ServiceContextProps | undefined>(
 
 export const ServiceProvider = ({ children }: { children: ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
-  // const [serviceSelectState, setserviceSelectState] = useState<
-  //   serviceSelect[]
-  // >([]);
-  const [serviceForm, setServiceForm] = useState<Service>(initialService)
+  const [serviceList, setServiceList] = useState<ServiceList[]>([]);
+  const [serviceForm, setServiceForm] = useState<Service>(initialService);
   const [serviceEdit, setServiceEdit] = useState<boolean>(false);
 
   useEffect(() => {
@@ -70,8 +68,8 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
         setServiceForm,
         serviceEdit,
         setServiceEdit,
-        // serviceSelectState,
-        // setserviceSelectState,
+        serviceList,
+        setServiceList,
       }}
     >
       {children}

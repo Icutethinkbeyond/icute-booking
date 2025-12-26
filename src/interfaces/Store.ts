@@ -3,6 +3,7 @@ import { User } from "./User";
 import { Booking } from "./Booking";
 import { Dayjs } from "dayjs";
 
+
 export interface StoreRegister {
   storeName: string;
   storeUsername: string;
@@ -117,12 +118,12 @@ export interface DefaultOperatingHour {
   updatedAt: string;
 }
 
-export interface ServiceSelect {
+export interface ServiceList {
   id: string;
   name: string; // เช่น "ตัดผม 30 นาที"
 }
 
-export interface EmployeeSelect {
+export interface EmployeeList {
   id: string;
   name: string; // เช่น "ตัดผม 30 นาที"
 }
