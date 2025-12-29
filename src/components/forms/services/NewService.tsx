@@ -151,6 +151,8 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     if (serviceId) {
       let result = await serviceService.getService(serviceId);
 
+      console.log(result)
+
       if (result.success) {
         setServiceForm(result.data);
       } else {
@@ -639,7 +641,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
 
                     <Grid2 size={{ xs: 6 }}>
                       <Field
-                        name="color"
+                        name="colorOfService"
                         component={ColorPickerCustom}
                         setFieldValue={setFieldValue}
                       />

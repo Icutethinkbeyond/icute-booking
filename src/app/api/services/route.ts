@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { Service } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
+import { deleteImage, handleImageUpload } from '@/utils/services/cloudinary.service';
 
 const prisma = new PrismaClient();
 
@@ -12,6 +13,12 @@ const prisma = new PrismaClient();
  * สำหรับเพิ่มบริการใหม่
  */
 export async function POST(request: NextRequest) {
+
+  let _image: {
+    publicId?: string | null;
+    url?: string | null;
+  } | null = null;
+
   try {
 
     const { userId } = await getCurrentUserAndStoreIdsByToken(request);
@@ -29,7 +36,14 @@ export async function POST(request: NextRequest) {
       image,
       colorOfService,
       active,
+      imageId,
+      imageURL,
+
     } = data;
+
+    console.log(data)
+
+    return
 
     //  ค้นหา Store ID ที่ผูกกับ User ID นี้
     const store = await prisma.store.findUnique({
@@ -87,6 +101,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Store ID ไม่ถูกต้องหรือไม่พบร้านค้านี้' }, { status: 404 });
     }
 
+    _image = await handleImageUpload({
+      file: image,          // undefined ถ้าไม่เปลี่ยน
+      publicId: imageId,  // จาก DB
+      folder: "service",
+    });
+
 
     // --- 2. การสร้าง Service ในฐานข้อมูล ---
 
@@ -114,17 +134,16 @@ export async function POST(request: NextRequest) {
 
     const newService = await prisma.service.create({
       data: {
-
         name: name,
         durationMinutes: typeof durationMinutes === 'string' ? parseInt(durationMinutes) : durationMinutes,
         price: typeof price === 'string' ? parseFloat(price) : null, // ถ้า price เป็น undefined ให้ใส่ null
         storeId: storeId,
-        discount,
-        bufferTime,
+        discount: typeof price === 'string' ? parseFloat(price) : null,
+        bufferTime: typeof bufferTime === 'string' ? parseFloat(bufferTime) : null,
         detail,
         displayNumber: typeof nextDisplayNumber === 'string' ? parseInt(nextDisplayNumber) : nextDisplayNumber,
-        imageURL: null,
-        imageId: null,
+        imageUrl: _image.publicId ?? imageURL,
+        imageId: _image.url ?? imageId,
         colorOfService,
         active: typeof active === 'string' ? Boolean(active) : active,
 
@@ -157,6 +176,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error creating new service:', error);
+
+    if (_image?.publicId) {
+      await deleteImage(_image.publicId);
+    }
 
     // 4. ตอบกลับเมื่อเกิดข้อผิดพลาด
     return new NextResponse(JSON.stringify({ message: 'เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการเพิ่มบริการ', }), { status: 500 });
