@@ -123,7 +123,8 @@ export async function POST(request: NextRequest) {
         bufferTime,
         detail,
         displayNumber: typeof nextDisplayNumber === 'string' ? parseInt(nextDisplayNumber) : nextDisplayNumber,
-        image,
+        imageURL: null,
+        imageId: null,
         colorOfService,
         active: typeof active === 'string' ? Boolean(active) : active,
 
