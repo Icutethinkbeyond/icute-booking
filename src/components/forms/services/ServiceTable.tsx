@@ -68,33 +68,56 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
 
   const columns: GridColDef<Service>[] = [
     { field: "rowIndex", headerName: "ลำดับ", width: 70 },
-    {
-      field: "edit",
+    // {
+    //   field: "edit",
+    //   headerName: "",
+    //   width: 50,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <>
+    //       <IconButton
+    //         size="small"
+    //         color="secondary"
+    //         onClick={() => handleEdit(params.row.id)}
+    //       >
+    //         <Avatar sx={{ bgcolor: "primary.main", width: 30, height: 30 }}>
+    //           <Edit size={15} />
+    //         </Avatar>
+    //       </IconButton>
+    //     </>
+    //   ),
+    // },
+    // {
+    //   field: "remove",
+    //   headerName: "",
+    //   width: 50,
+    //   sortable: false,
+    //   renderCell: (params) => (
+    //     <>
+    //       <ConfirmDelete
+    //         dialogTitle="ยืนยันการลบ?"
+    //         itemId={params.row.id}
+    //         onDelete={handleDeleteItem}
+    //         // onDisable={
+    //         //   params.row.aboutEmployee?.stockStatus ===
+    //         //     EmployeeStatus.CurrentlyRenting ||
+    //         //   params.row.aboutEmployee?.stockStatus ===
+    //         //     EmployeeStatus.InActive ||
+    //         //   params.row.aboutEmployee?.stockStatus === EmployeeStatus.Damaged
+    //         // }
+    //         massage={`คุณต้องการลบอุปกรณ์ ${params.row.name} ใช่หรือไม่?`}
+    //       />
+    //     </>
+    //   ),
+    // },
+        {
+      field: "open",
       headerName: "",
       width: 50,
       sortable: false,
       renderCell: (params) => (
         <>
-          <IconButton
-            size="small"
-            color="secondary"
-            onClick={() => handleEdit(params.row.id)}
-          >
-            <Avatar sx={{ bgcolor: "primary.main", width: 30, height: 30 }}>
-              <Edit size={15} />
-            </Avatar>
-          </IconButton>
-        </>
-      ),
-    },
-    {
-      field: "remove",
-      headerName: "",
-      width: 50,
-      sortable: false,
-      renderCell: (params) => (
-        <>
-          <ConfirmDelete
+          {/* <ConfirmDelete
             dialogTitle="ยืนยันการลบ?"
             itemId={params.row.id}
             onDelete={handleDeleteItem}
@@ -104,9 +127,9 @@ const ServiceTable: React.FC<ServiceProps> = ({ recall }) => {
             //   params.row.aboutEmployee?.stockStatus ===
             //     EmployeeStatus.InActive ||
             //   params.row.aboutEmployee?.stockStatus === EmployeeStatus.Damaged
-            // }
+            // }ﬁ
             massage={`คุณต้องการลบอุปกรณ์ ${params.row.name} ใช่หรือไม่?`}
-          />
+          /> */}
         </>
       ),
     },

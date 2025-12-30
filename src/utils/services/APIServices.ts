@@ -21,7 +21,7 @@ class ApiService {
       if (setLoading) setLoading(true);
       const { data } = await this.api.get(endpoint, { params, signal });
 
-      // console.log(data)
+      console.log(data)
 
       if (setData) setData(data.data);
       if (setRowCount && data.pagination) {
