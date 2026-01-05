@@ -72,7 +72,33 @@ export const useMenuItems = () => {
       id: uniqueId(),
       title: "ตั้งค่าร้านค้า",
       icon: Settings,
-      href: `/${localActive}/protected/admin/settings`,
+      // href: `/${localActive}/protected/admin/settings`,
+      children: [
+        {
+          id: uniqueId(),
+          title: "ข้อมูลร้านค้า",
+          icon: Settings,
+          href: `/${localActive}/protected/admin/settings`,
+        },
+        {
+          id: uniqueId(),
+          title: "วันหยุด",
+          icon: Settings,
+          href: `/${localActive}/protected/admin/holidays-settings`,
+        },
+        {
+          id: uniqueId(),
+          title: "ตั้งค่าการจอง",
+          icon: Settings,
+          href: `/${localActive}/protected/admin/booking-settings`,
+        },
+        {
+          id: uniqueId(),
+          title: "ตั้งค่าไลน์",
+          icon: Settings,
+          href: `/${localActive}/protected/admin/line-settings`,
+        },
+      ],
     },
   ];
 };

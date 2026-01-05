@@ -375,7 +375,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                               openBackdrop || isSubmitting || disabledForm
                             }
                             name="price"
-                            label="ราคาโปรโมชั่น (ถ้ามี)"
+                            label="ราคา (จำเป็น)"
                             value={values.price ?? ""}
                             slotProps={{
                               inputLabel: { shrink: true },
@@ -414,7 +414,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                               openBackdrop || isSubmitting || disabledForm
                             }
                             name="discount"
-                            label="ราคาปกติ (จำเป็น)"
+                            label="ราคาโปรโมชั่น (ถ้ามี)"
                             value={values.discount ?? ""}
                             slotProps={{
                               inputLabel: { shrink: true },

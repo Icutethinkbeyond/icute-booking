@@ -13,6 +13,15 @@ import { initialStore } from "@/interfaces/Store";
 import { useNotifyContext } from "@/contexts/NotifyContext";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 
+import {
+  EventBusy as EventBusyIcon,
+  Block as BlockIcon,
+  Rule as RuleIcon,
+  Store as StoreIcon,
+  Link as LinkIcon,
+  People as PeopleIcon,
+} from "@mui/icons-material"
+
 export default function ServiceTabs() {
   const [value, setValue] = React.useState(0);
   const { setStoreForm, StoreForm } = useStoreContext();
@@ -23,38 +32,19 @@ export default function ServiceTabs() {
     setValue(newValue);
   };
 
-  // const getStore = async () => {
-  //   let result = await storeService.getStore();
-
-  //   if (result.success) {
-  //     setStoreForm(result.data);
-  //   } else {
-  //     setNotify({
-  //       open: true,
-  //       message: result.message,
-  //       color: result.success ? "success" : "error",
-  //     });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   // setIsLoading(true);
-  //   getStore();
-  //   return () => {
-  //     setStoreForm(initialStore);
-  //   };
-  // }, []);
-
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="">
-          <Tab label="ตั้งค่าข้อมูลร้าน" {...a11yProps(0)} />
-          <Tab label="กำหนดเวลาเปิด-ปิดร้าน" {...a11yProps(1)} />
-          <Tab label="กำหนดวัดหยุดพิเศษ" {...a11yProps(2)} />
-          <Tab label="ตั้งค่า Line Token" {...a11yProps(3)} />
-          <Tab label="ตั้งค่าข้อความแจ้งเตือน" {...a11yProps(4)} />
-          <Tab label="เปลี่ยนรหัสผ่าน" {...a11yProps(5)} />
+          <Tab icon={<EventBusyIcon />} label="ข้อมูลร้าน"  {...a11yProps(0)} />
+          <Tab icon={<EventBusyIcon />} label="กำหนดเวลาเปิด-ปิดร้าน" {...a11yProps(1)} />
+          <Tab icon={<EventBusyIcon />} label="กำหนดวัดหยุดพิเศษ" {...a11yProps(2)} />
+          <Tab icon={<EventBusyIcon />} label="ตั้งค่า Line Token" {...a11yProps(3)} />
+          <Tab icon={<EventBusyIcon />} label="ตั้งค่าข้อความแจ้งเตือน" {...a11yProps(4)} />
+          <Tab icon={<EventBusyIcon />} label="ช่วงไม่รับจอง" {...a11yProps(5)} />
+          <Tab icon={<EventBusyIcon />} label="กฎการจอง" {...a11yProps(6)} />
+          <Tab icon={<PeopleIcon />} label="ตั้งค่าพนักงาน" {...a11yProps(7)} />
+          <Tab icon={<EventBusyIcon />} label="เปลี่ยนรหัสผ่าน" {...a11yProps(8)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>

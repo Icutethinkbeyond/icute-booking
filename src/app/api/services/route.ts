@@ -39,8 +39,6 @@ export async function POST(request: NextRequest) {
       imageUrl,
     } = data;
 
-  
-
     //  ค้นหา Store ID ที่ผูกกับ User ID นี้
     const store = await prisma.store.findUnique({
       where: {
@@ -133,7 +131,7 @@ export async function POST(request: NextRequest) {
         name: name,
         durationMinutes: typeof durationMinutes === 'string' ? parseInt(durationMinutes) : durationMinutes,
         price: typeof price === 'string' ? parseFloat(price) : 0, // ถ้า price เป็น undefined ให้ใส่ null
-        storeId: storeId,
+        // storeId: storeId,
         discount: typeof discount === 'string' ? parseFloat(discount) : 0,
         bufferTime: typeof bufferTime === 'string' ? parseFloat(bufferTime) : 0,
         detail,
@@ -146,6 +144,10 @@ export async function POST(request: NextRequest) {
         // เชื่อมโยงพนักงานที่เกี่ยวข้องทันที
         employees: {
           connect: employeeConnects,
+        },
+
+        store: {
+          connect:{ id: storeId },
         },
 
         // fields อื่นๆ จะถูกกำหนดโดย @default(now()) และ @updatedAt โดย Prisma
@@ -370,7 +372,7 @@ export async function PATCH(request: NextRequest) {
     // - ถ้า imageUrl เป็น URL เดิม -> จะส่งค่าเดิมกลับมา (action: NONE)
     _image = await handleImageUpload({
       file: imageUrl,
-      publicId: imageId, 
+      publicId: imageId,
       folder: "service",
     });
 
@@ -390,7 +392,7 @@ export async function PATCH(request: NextRequest) {
         displayNumber: typeof displayNumber === 'string' ? parseInt(displayNumber) : displayNumber,
         colorOfService,
         active: typeof active === 'boolean' ? active : (active === 'true'),
-        
+
         // ใช้ข้อมูลรูปจาก handleImageUpload
         imageUrl: _image?.url ?? existingService.imageUrl,
         imageId: _image?.publicId ?? existingService.imageId,
@@ -415,7 +417,7 @@ export async function PATCH(request: NextRequest) {
 
     // ถ้าเกิด Error และมีการอัปโหลดรูปใหม่ไปแล้ว (ได้ publicId ใหม่มา) ให้ลบออกเพื่อไม่ให้รูปค้างใน Cloudinary
     if (_image?.action === "UPDATE" || _image?.action === "CREATE") {
-        if(_image.publicId) await deleteImage(_image.publicId);
+      if (_image.publicId) await deleteImage(_image.publicId);
     }
 
     return NextResponse.json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }, { status: 500 });
@@ -431,69 +433,64 @@ export async function PATCH(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    // 1. ตรวจสอบสิทธิ์และดึง Store ID จาก Token
-    // 🔑 การตรวจสอบนี้สำคัญมากสำหรับการยืนยันสิทธิ์
-    const { storeId } = await getCurrentUserAndStoreIdsByToken(request);
+    // 1. ตรวจสอบสิทธิ์ผู้ใช้งาน
+    const { userId } = await getCurrentUserAndStoreIdsByToken(request);
 
-    // 2. ดึง serviceId จาก Query Parameter
-    const { searchParams } = request.nextUrl;
-    const serviceId = searchParams.get('serviceId');
+    // 2. รับ ID ของบริการที่จะลบ (รับจาก Query Parameters หรือ Body ก็ได้)
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
 
-    // 3. Validation: ตรวจสอบ ID
-    if (!serviceId) {
-      return new NextResponse(
-        JSON.stringify({ message: 'กรุณาระบุ ID ของบริการที่ต้องการลบ' }),
-        { status: 400 } // Bad Request
-      );
+    if (!id) {
+      return NextResponse.json({ message: "ต้องระบุ Service ID" }, { status: 400 });
     }
 
-    // 4. ดำเนินการลบบริการพร้อมตรวจสอบขอบเขต (Scope Check)
-    // 💡 เราใช้ findUnique แทน findFirst เพื่อให้มั่นใจว่าการลบนั้นตรงเป๊ะ
-    const deletedService = await prisma.service.delete({
-      where: {
-        id: serviceId,
-        storeId: storeId, // <--- **Scope Check:** ต้องเป็นของร้านนี้เท่านั้น!
-      },
-      select: { id: true, name: true } // ดึง ID และชื่อมาเพื่อใช้ในการตอบกลับ
+    // 3. ค้นหา Store ของผู้ใช้
+    const store = await prisma.store.findUnique({
+      where: { userId: userId },
+      select: { id: true }
     });
 
-    // 5. ตอบกลับสำเร็จ (200 OK)
-    return new NextResponse(
-      JSON.stringify({
-        message: `ลบบริการชื่อ "${deletedService.name}" สำเร็จแล้ว`,
-        serviceId: deletedService.id,
-      }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    }
-    );
-
-  } catch (error) {
-    console.error(`Error deleting service (ID: ${request.nextUrl.searchParams.get('serviceId')}):`, error);
-
-    // จัดการ Unauthorized Error จาก Token
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return new NextResponse(
-        JSON.stringify({ message: 'ไม่ได้รับอนุญาต กรุณาเข้าสู่ระบบ' }),
-        { status: 401 }
-      );
+    if (!store) {
+      return NextResponse.json({ message: "ไม่พบร้านค้าที่ผูกกับบัญชีนี้" }, { status: 403 });
     }
 
-    // จัดการ Error กรณีไม่พบ Record (Record to delete does not exist)
-    if (error instanceof Error && error.message.includes('Record to delete not found')) {
-      return new NextResponse(
-        JSON.stringify({ message: 'ไม่พบบริการที่มี ID นี้ในร้านค้าของคุณ' }),
-        { status: 404 } // Not Found
-      );
+    // 4. ค้นหาข้อมูลบริการที่จะลบ เพื่อเอา imageId มาลบรูปใน Cloudinary
+    const service = await prisma.service.findFirst({
+      where: {
+        id: id,
+        storeId: store.id, // ตรวจสอบว่าเป็นของร้านนี้จริง
+      },
+      select: {
+        imageId: true
+      }
+    });
+
+    if (!service) {
+      return NextResponse.json({ message: "ไม่พบข้อมูลบริการ หรือคุณไม่มีสิทธิ์ลบ" }, { status: 404 });
     }
 
-    // 6. ตอบกลับเมื่อเกิดข้อผิดพลาดอื่น (500 Internal Server Error)
-    return new NextResponse(
-      JSON.stringify({
-        message: 'เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการลบข้อมูลบริการ'
-      }), {
-      status: 500
+    // 5. ลบรูปภาพใน Cloudinary (ถ้ามี)
+    if (service.imageId) {
+      await deleteImage(service.imageId);
     }
-    );
+
+    // 6. ลบบริการออกจากฐานข้อมูล (Hard Delete)
+    await prisma.service.delete({
+      where: { id: id }
+    });
+
+    return NextResponse.json({ message: "ลบบริการเรียบร้อยแล้ว" }, { status: 200 });
+
+  } catch (error: any) {
+    console.error("Error deleting service:", error);
+
+    // จัดการกรณีลบไม่ได้เพราะติด Foreign Key (เช่น มีข้อมูลการจองค้างอยู่)
+    if (error.code === 'P2003') {
+      return NextResponse.json({
+        message: "ไม่สามารถลบได้ เนื่องจากมีข้อมูลการจองที่เกี่ยวข้องกับบริการนี้อยู่ แนะนำให้ใช้วิธีปิดการใช้งาน (Active: false) แทน"
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: "เกิดข้อผิดพลาดในการลบข้อมูล" }, { status: 500 });
   }
 }

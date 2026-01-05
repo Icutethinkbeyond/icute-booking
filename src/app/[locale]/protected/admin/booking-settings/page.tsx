@@ -75,14 +75,59 @@ const Services = () => {
               />
               <Tab
                 icon={<EventBusyIcon />}
-                label="เปลี่ยนรหัสผ่าน"
+                label="กำหนดเวลาเปิด-ปิดร้าน"
                 {...a11yProps(1)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="กำหนดวัดหยุดพิเศษ"
+                {...a11yProps(2)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="ตั้งค่า Line Token"
+                {...a11yProps(3)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="ตั้งค่าข้อความแจ้งเตือน"
+                {...a11yProps(4)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="ช่วงไม่รับจอง"
+                {...a11yProps(5)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="กฎการจอง"
+                {...a11yProps(6)}
+              />
+              <Tab
+                icon={<PeopleIcon />}
+                label="ตั้งค่าพนักงาน"
+                {...a11yProps(7)}
+              />
+              <Tab
+                icon={<EventBusyIcon />}
+                label="เปลี่ยนรหัสผ่าน"
+                {...a11yProps(8)}
               />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
             <Grid2 container justifyContent="center">
               <ShopSettings />
+            </Grid2>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <Grid2 container justifyContent="center">
+              <TimeSettings />
+            </Grid2>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={2}>
+            <Grid2 container justifyContent="center">
+              <LineSettings />
             </Grid2>
           </CustomTabPanel>
           <CustomTabPanel value={value} index={3}>

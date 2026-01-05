@@ -43,19 +43,12 @@ const Services = () => {
   const getServices = async () => {
     try {
       setLoading(true);
-      // await APIServices.get(
-      //   `/api/services?page=${pagination.currentPage + 1}&pageSize=${
-      //     pagination.pageSize
-      //   }`,
-      //   setServices,
-      //   setPagination,
-      //   setLoading
-      // );
       let data: any = await APIServices.get1only(
         `/api/services?page=${pagination.currentPage + 1}&pageSize=${
           pagination.pageSize
         }`
       );
+      console.log(data);
       setPagination((prev) => ({ ...prev, totalItems: data.totalItems }));
       setServices(data.data);
     } catch (error: any) {
@@ -65,7 +58,7 @@ const Services = () => {
         color: "error",
       });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -89,15 +82,27 @@ const Services = () => {
     );
   };
 
-  const handleToggleStatus = (serviceId: string, active: boolean) => {
+  const handleToggleStatus = async (serviceId: string, active: boolean) => {
     console.log("[v0] Toggle service status:", serviceId, active);
     // TODO: API call to update service status
-    // setServices((prev) => prev.map((service) => (service.id === serviceId ? { ...service, active } : service)))
-    // setSnackbar({
-    //   open: true,
-    //   message: active ? "เปิดใช้งานบริการแล้ว" : "ปิดใช้งานบริการแล้ว",
-    //   severity: "success",
-    // })
+    try {
+      // setLoading(true);
+      await APIServices.patch(`/api/services/toggle-active`, {
+        id: serviceId,
+        active: active, // ส่งค่าที่ต้องการเปลี่ยนไป
+      });
+      // setPagination((prev) => ({ ...prev, totalItems: data.totalItems }));
+      // setServices(data.data);
+    } catch (error: any) {
+      setNotify({
+        open: true,
+        message: error.code,
+        color: "error",
+      });
+    } finally {
+      getServices()
+      // setLoading(false);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -113,13 +118,12 @@ const Services = () => {
   //   };
   // }, [pagination]);
 
-    useEffect(() => {
+  useEffect(() => {
     getServices();
     return () => {
       setServices([]);
     };
   }, []);
-
 
   useEffect(() => {
     setBreadcrumbs([

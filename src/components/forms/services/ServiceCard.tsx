@@ -266,8 +266,8 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
             {hasDiscount ? (
               <>
                 <OfferIcon sx={{ fontSize: 18, color: theme.palette.error.main }} />
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                     <Typography
                       variant="h6"
                       sx={{
@@ -288,15 +288,14 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
                     </Typography>
                   </Box>
                   <Chip
-                    label="ราคาโปรโมชั่น"
+                    label={`ลด ${discountPercent}%`}
                     size="small"
                     sx={{
-                      height: 20,
+                      height: 22,
                       fontSize: "0.7rem",
-                      backgroundColor: `${theme.palette.error.main}15`,
-                      color: theme.palette.error.main,
+                      backgroundColor: theme.palette.error.main,
+                      color: theme.palette.error.contrastText,
                       fontWeight: 600,
-                      alignSelf: "flex-start",
                     }}
                   />
                 </Box>
