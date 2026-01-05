@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       imageUrl,
     } = data;
 
-    console.log(data)
+  
 
     //  ค้นหา Store ID ที่ผูกกับ User ID นี้
     const store = await prisma.store.findUnique({
@@ -153,10 +153,10 @@ export async function POST(request: NextRequest) {
       // สามารถรวม Employee และ Store ที่เกี่ยวข้องในการตอบกลับได้
       include: {
         employees: {
-          select: { id: true, name: true } // เลือกเฉพาะ ID และชื่อพนักงาน
+          select: { id: true } // เลือกเฉพาะ ID และชื่อพนักงาน
         },
         store: {
-          select: { id: true, storeName: true }
+          select: { id: true }
         }
       }
     });

@@ -2,11 +2,14 @@
 
 import type React from "react"
 
-import { Box, Grid, Typography, Pagination, CircularProgress, Grid2 } from "@mui/material"
+import { Box, Button, Typography, Pagination, CircularProgress, Grid2 } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { ServiceCard } from "./ServiceCard"
 import { Service } from "@/interfaces/Store"
 import { PaginationMeta } from "@/interfaces/Types"
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { Add } from "@mui/icons-material";
 
 
 interface ServiceListProps {
@@ -29,6 +32,8 @@ export function ServiceList({
   loading,
 }: ServiceListProps) {
   const theme = useTheme()
+    const router = useRouter();
+    const localActive = useLocale();
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     onPageChange(page)
@@ -63,6 +68,24 @@ export function ServiceList({
         <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 1 }}>
           คลิกปุ่ม "เพิ่มบริการใหม่" เพื่อเริ่มต้น
         </Typography>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() =>
+          router.push(`/${localActive}/protected/admin/services/new`)
+        }
+              style={{
+                // background: '#fff',
+                // color: 'palette.primary.main',
+                borderRadius: "50%",
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
+                padding: "16px",
+                minWidth: "56px",
+                minHeight: "56px",
+              }}
+            >
+              <Add />
+            </Button>
       </Box>
     )
   }

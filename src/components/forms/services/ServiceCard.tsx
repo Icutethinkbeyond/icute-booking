@@ -13,6 +13,7 @@ import {
   AvatarGroup,
   Tooltip,
   Switch,
+  Chip,
 } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import {
@@ -22,6 +23,7 @@ import {
   AttachMoney as MoneyIcon,
   LocalOffer as OfferIcon,
 } from "@mui/icons-material"
+
 import { Service } from "@/interfaces/Store"
 
 interface ServiceCardProps {
@@ -36,6 +38,7 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
 
   const hasDiscount = service.discount > 0 && service.discount < service.price
   const finalPrice = hasDiscount ? service.discount : service.price
+  const discountPercent = hasDiscount ? Math.round(((service.price - service.discount) / service.price) * 100) : 0
 
   const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (onToggleStatus) {
@@ -55,7 +58,7 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
         border: `1px solid ${theme.palette.divider}`,
         transition: "all 0.3s ease",
         position: "relative",
-        opacity: service.active ? 1 : 0.6,
+        opacity: service.active ? 1 : 0.65,
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: `0 8px 24px ${theme.palette.primary.main}20`,
@@ -76,45 +79,6 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
           }}
         />
 
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            backgroundColor: "rgba(255, 255, 255, 0.95)",
-            borderRadius: 10,
-            padding: "4px 8px",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 600,
-              color: service.active ? theme.palette.success.main : theme.palette.text.secondary,
-            }}
-          >
-            {service.active ? "เปิด" : "ปิด"}
-          </Typography>
-          <Switch
-            checked={typeof service.active === 'string' && Boolean(service.active)}
-            onChange={handleToggleChange}
-            size="small"
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: theme.palette.success.main,
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: theme.palette.success.main,
-              },
-            }}
-          />
-        </Box>
-
-        {/* Display Number Badge */}
         {/* {service.displayNumber > 0 && (
           <Box
             sx={{
@@ -123,21 +87,39 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
               left: 12,
               backgroundColor: theme.palette.primary.main,
               color: theme.palette.primary.contrastText,
-              width: 32,
-              height: 32,
+              width: 36,
+              height: 36,
               borderRadius: "50%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontWeight: 700,
-              fontSize: "0.875rem",
+              fontSize: "1rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
             {service.displayNumber}
           </Box>
         )} */}
 
-        {/* Service Color Indicator */}
+        {hasDiscount && (
+          <Chip
+            label={`-${discountPercent}%`}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              backgroundColor: theme.palette.error.main,
+              color: theme.palette.error.contrastText,
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              height: 28,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            }}
+          />
+        )}
+
         {service.colorOfService && (
           <Box
             sx={{
@@ -145,8 +127,9 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
               bottom: 0,
               left: 0,
               right: 0,
-              height: 6,
-              backgroundColor: service.colorOfService || theme.palette.primary.main,
+              height: 8,
+              backgroundColor: service.colorOfService,
+              boxShadow: `0 -2px 8px ${service.colorOfService}40`,
             }}
           />
         )}
@@ -161,23 +144,90 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
           p: 2.5,
         }}
       >
-        {/* Service Name */}
-        <Typography
-          variant="h6"
+        <Box
           sx={{
-            fontWeight: 600,
-            color: theme.palette.text.primary,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 2,
             mb: 1,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            minHeight: 56,
           }}
         >
-          {service.name}
-        </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              color: theme.palette.text.primary,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              flexGrow: 1,
+            }}
+          >
+            {service.name}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+              flexShrink: 0,
+            }}
+          >
+            <Switch
+              checked={typeof service.active === 'string' ? Boolean(service.active) : service.active}
+              onChange={handleToggleChange}
+              size="small"
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: theme.palette.success.main,
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: theme.palette.success.main,
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                fontSize: "0.65rem",
+                color: service.active ? theme.palette.success.main : theme.palette.text.secondary,
+              }}
+            >
+              {service.active ? "เปิด" : "ปิด"}
+            </Typography>
+          </Box>
+        </Box>
+
+        {service.colorOfService && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 1.5,
+            }}
+          >
+            <Box
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                backgroundColor: service.colorOfService,
+                border: `2px solid ${theme.palette.background.paper}`,
+                boxShadow: `0 0 0 1px ${theme.palette.divider}`,
+              }}
+            />
+            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+              สีประจำบริการ
+            </Typography>
+          </Box>
+        )}
 
         {/* Service Description */}
         <Typography
@@ -212,30 +262,43 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
             </Typography>
           </Box>
 
-          {/* Price */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {hasDiscount ? (
               <>
                 <OfferIcon sx={{ fontSize: 18, color: theme.palette.error.main }} />
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography
-                    variant="body2"
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: theme.palette.error.main,
+                        fontWeight: 700,
+                      }}
+                    >
+                      ฿{finalPrice.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        textDecoration: "line-through",
+                        color: theme.palette.text.disabled,
+                      }}
+                    >
+                      ฿{service.price.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label="ราคาโปรโมชั่น"
+                    size="small"
                     sx={{
-                      textDecoration: "line-through",
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    ฿{service.price.toLocaleString()}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
+                      height: 20,
+                      fontSize: "0.7rem",
+                      backgroundColor: `${theme.palette.error.main}15`,
                       color: theme.palette.error.main,
-                      fontWeight: 700,
+                      fontWeight: 600,
+                      alignSelf: "flex-start",
                     }}
-                  >
-                    ฿{finalPrice.toLocaleString()}
-                  </Typography>
+                  />
                 </Box>
               </>
             ) : (
@@ -272,7 +335,7 @@ export function ServiceCard({ service, onEdit, onDelete, onToggleStatus }: Servi
                 },
               }}
             >
-              {service.employees.map((employee, index) => (
+              {service.employees.map((employee) => (
                 <Tooltip key={employee.userId} title={employee.name} arrow>
                   <Avatar
                     sx={{
