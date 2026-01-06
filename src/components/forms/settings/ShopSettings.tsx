@@ -199,7 +199,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       </Box>
                     </Box>
                     <Field
-                      name="imageUrl"
+                      name="logoUrl"
                       component={DragDropImage}
                       setFieldValue={setFieldValue}
                     />
@@ -221,7 +221,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                       </Box>
                     </Box>
                     <Field
-                      name="imageUrl"
+                      name="coverUrl"
                       component={DragDropImage}
                       setFieldValue={setFieldValue}
                     />

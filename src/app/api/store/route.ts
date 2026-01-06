@@ -74,7 +74,9 @@ export async function PATCH(request: NextRequest) {
 
     try {
         const { userId, storeId: tokenStoreId } = await getCurrentUserAndStoreIdsByToken(request);
-        const data = await request.json();
+        const data: Store = await request.json();
+
+        console.log(data)
 
         // 1. ดึงข้อมูลและกำหนด ID ที่จะอัปเดต
         const id = data.id || tokenStoreId;

@@ -296,7 +296,7 @@ model Store {
   tel           String?
   addressCustom String?
   mapUrl        String?
-  detail     String?
+  detail        String?
 
   logoUrl  String?
   logoId   String?

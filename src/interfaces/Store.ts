@@ -66,6 +66,12 @@ export interface Store {
     latitude?: number | null
     longitude?: number | null
   }
+
+  logoUrl?: string;
+  logoId?: string;
+  coverUrl?: string;
+  coverId?: string;
+
   addressCustom?: string;
 
   lineNotifyToken?: string;
