@@ -1,17 +1,12 @@
 import * as React from "react";
 import { Tabs, Box, Tab, Grid2 } from "@mui/material";
-// import ReportSettingForm from "../shared/ReportSettingForm";
-// import { ReportType } from "@/contexts/ReportContext";
 import { a11yProps, CustomTabPanel } from "../../shared/TabSetting";
 import ShopSettings from "./ShopSettings";
 import TimeSettings from "./TimeSettings";
 import LineSettings from "./LineSettings";
 import ResetPasswordForm from "./ResetPasswordForm";
-import { useEffect } from "react";
 import { useStoreContext } from "@/contexts/StoreContext";
-import { initialStore } from "@/interfaces/Store";
 import { useNotifyContext } from "@/contexts/NotifyContext";
-import { storeService } from "@/utils/services/api-services/StoreAPI";
 
 import {
   EventBusy as EventBusyIcon,

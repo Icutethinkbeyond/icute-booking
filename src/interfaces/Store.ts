@@ -1,4 +1,4 @@
-import { RoleName } from "@prisma/client";
+import { HolidayType, RoleName } from "@prisma/client";
 import { User } from "./User";
 import { Booking } from "./Booking";
 import { Dayjs } from "dayjs";
@@ -52,6 +52,22 @@ export interface Employee {
   updatedAt: string; // ISO Date
 }
 
+export interface Holiday {
+  id: string;
+  date: string; // "พี่แอน"
+  startTime?: Dayjs | null | string; // "ช่างทำผม"
+  fullDay: boolean; // สถานะพร้อมให้บริการ
+  endTime?: Dayjs | null | string;
+  holidayName: string
+  holidayType: HolidayType
+
+  storeId: string;
+  store?: Store;
+
+  createdAt: string; // ISO Date
+  updatedAt: string; // ISO Date
+}
+
 export interface Store {
   id: string;
   storeName: string;
@@ -92,6 +108,7 @@ export interface Store {
   bookings?: Booking[];
   operatingHours?: DefaultOperatingHour;
   notifications?: Notification[];
+  Holiday?: Holiday[]
 
   createdAt: string;
   updatedAt: string;

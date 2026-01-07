@@ -78,6 +78,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     a.download = "store-qrcode.png";
     a.click();
   };
+  
 
   const handleFormSubmit = async (
     values: Store,

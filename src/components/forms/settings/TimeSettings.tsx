@@ -12,15 +12,10 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as Yup from "yup";
 import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
-import Autocomplete from "@mui/material/Autocomplete";
-import { uniqueId } from "lodash";
 
 import { LoadingButton } from "@mui/lab";
-import ConfirmDelete from "@/components/shared/ConfirmDelete";
-import { ButtonType } from "@/interfaces/ShredType";
 import { useNotifyContext } from "@/contexts/NotifyContext";
 import axios from "axios";
 import {
@@ -880,7 +875,7 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
               </Grid2>
 
               <Grid2
-                sx={{ mt: 5, display: "flex", justifyContent: "flex-start" }}
+                sx={{ mt: 5, display: "flex", justifyContent: "flex-end" }}
               >
                 <LoadingButton
                   variant="contained"
@@ -893,13 +888,6 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                 >
                   บันทึก
                 </LoadingButton>
-                {/* <ConfirmDelete
-                  itemId={uniqueId()}
-                  onDisable={openBackdrop || isSubmitting}
-                  onDelete={() => resetForm()}
-                  massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
-                  buttonType={ButtonType.Button}
-                /> */}
               </Grid2>
             </Box>
           </Form>

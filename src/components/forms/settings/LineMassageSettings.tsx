@@ -24,7 +24,7 @@ interface StoreProps {
   viewOnly?: boolean;
 }
 
-const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
+const LineMassageSettings: FC<StoreProps> = ({ viewOnly = false }) => {
   const theme = useTheme();
   const { setStoreForm, StoreForm } = useStoreContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
@@ -32,6 +32,11 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabledForm, setDisabledForm] = useState<boolean>(false);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const localActive = useLocale();
 
   const validationSchema = Yup.object().shape({
     // serialNo: Yup.string().required("กรุณากรอกรหัสอุปกรณ์"),
@@ -104,6 +109,7 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
           <Form>
             <Box p={3} border="1px solid #ccc" borderRadius="8px">
               <Grid2 container spacing={3}>
+                
                 <Grid2 size={{ xs: 12 }}>
                   <Box sx={{ mb: 3 }}>
                     <Box
@@ -115,7 +121,7 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                         mb: 0.5,
                       }}
                     >
-                      ตั้งค่า LINE Messaging
+                      ข้อความเเจ้งเตือนผ่านไลน์
                     </Box>
                     <Box
                       component="p"
@@ -129,21 +135,18 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                   </Box>
                 </Grid2>
 
-                {/* Store ID */}
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="lineChannelId">
-                    {({ field }: FieldProps) => (
+                  <Field name="newBooking">
+                    {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="lineChannelId"
-                        label="Channel ID  (จำเป็น)"
-                        // sx={{ textTransform: "uppercase" }}
-                        value={values.lineChannelId ? values.lineChannelId : ""}
+                        name="newBooking"
+                        label="เเจ้งเตือนเมื่อได้รับการจองใหม่ (ถ้ามี)"
+                        value={values.newBooking ? values.newBooking : ""}
+                        multiline
+                        rows={4}
                         onChange={(e) => {
-                          setFieldValue(
-                            "lineChannelId",
-                            e.target.value.toUpperCase()
-                          );
+                          setFieldValue("newBooking", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -151,13 +154,6 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                             readOnly: viewOnly ? true : false,
                           },
                         }}
-                        // placeholder="EXAMPLE: SN-00001"
-                        error={
-                          touched.lineChannelId && Boolean(errors.lineChannelId)
-                        }
-                        helperText={
-                          touched.lineChannelId && errors.lineChannelId
-                        }
                         fullWidth
                         disabled={openBackdrop || isSubmitting || disabledForm}
                       />
@@ -165,21 +161,20 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                   </Field>
                 </Grid2>
 
-                {/* Store Name */}
                 <Grid2 size={{ xs: 6 }}>
-                  <Field name="lineChannelSecret">
-                    {({ field }: FieldProps) => (
+                  <Field name="successBooking">
+                    {({ field }: any) => (
                       <TextField
                         {...field}
-                        name="lineChannelSecret"
-                        label="Channel Secret (จำเป็น)"
+                        name="successBooking"
+                        label="เเจ้งเตือนลูกค้าเมื่อจองสำเร็จ (ถ้ามี)"
                         value={
-                          values.lineChannelSecret
-                            ? values.lineChannelSecret
-                            : ""
+                          values.successBooking ? values.successBooking : ""
                         }
+                        multiline
+                        rows={4}
                         onChange={(e) => {
-                          setFieldValue("lineChannelSecret", e.target.value);
+                          setFieldValue("successBooking", e.target.value);
                         }}
                         slotProps={{
                           inputLabel: { shrink: true },
@@ -187,13 +182,84 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                             readOnly: viewOnly ? true : false,
                           },
                         }}
-                        error={
-                          touched.lineChannelSecret &&
-                          Boolean(errors.lineChannelSecret)
-                        }
-                        helperText={
-                          touched.lineChannelSecret && errors.lineChannelSecret
-                        }
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+
+                <Grid2 size={{ xs: 6 }}>
+                  <Field name="cancelBooking">
+                    {({ field }: any) => (
+                      <TextField
+                        {...field}
+                        name="cancelBooking"
+                        label="ข้อความเเจ้งเตือนลูกค้าเมื่อถูกยกเลิกการจอง (ถ้ามี)"
+                        value={values.cancelBooking ? values.cancelBooking : ""}
+                        multiline
+                        rows={4}
+                        onChange={(e) => {
+                          setFieldValue("cancelBooking", e.target.value);
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                          input: {
+                            readOnly: viewOnly ? true : false,
+                          },
+                        }}
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+
+                <Grid2 size={{ xs: 6 }}>
+                  <Field name="before24H">
+                    {({ field }: any) => (
+                      <TextField
+                        {...field}
+                        name="before24H"
+                        label="ข้อความเเจ้งเตือนลูกค้าเมื่อใกล้ถึงเวลานัด 24 ชั่วโมง (ถ้ามี)"
+                        value={values.before24H ? values.before24H : ""}
+                        multiline
+                        rows={4}
+                        onChange={(e) => {
+                          setFieldValue("before24H", e.target.value);
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                          input: {
+                            readOnly: viewOnly ? true : false,
+                          },
+                        }}
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
+                </Grid2>
+
+                <Grid2 size={{ xs: 6 }}>
+                  <Field name="reSchedule">
+                    {({ field }: any) => (
+                      <TextField
+                        {...field}
+                        name="reSchedule"
+                        label="ข้อความเเจ้งเตือนลูกค้าเมื่อถูกเลื่อนการจอง (ถ้ามี)"
+                        value={values.reSchedule ? values.reSchedule : ""}
+                        multiline
+                        rows={4}
+                        onChange={(e) => {
+                          setFieldValue("reSchedule", e.target.value);
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                          input: {
+                            readOnly: viewOnly ? true : false,
+                          },
+                        }}
                         fullWidth
                         disabled={openBackdrop || isSubmitting || disabledForm}
                       />
@@ -201,7 +267,6 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                   </Field>
                 </Grid2>
               </Grid2>
-
               <Grid2
                 sx={{ mt: 5, display: "flex", justifyContent: "flex-end" }}
               >
@@ -216,6 +281,13 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
                 >
                   บันทึก
                 </LoadingButton>
+                {/* <ConfirmDelete
+                  itemId={uniqueId()}
+                  onDisable={openBackdrop || isSubmitting}
+                  onDelete={() => resetForm()}
+                  massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
+                  buttonType={ButtonType.Button}
+                /> */}
               </Grid2>
             </Box>
           </Form>
@@ -225,4 +297,4 @@ const LineSettings: FC<StoreProps> = ({ viewOnly = false }) => {
   );
 };
 
-export default LineSettings;
+export default LineMassageSettings;

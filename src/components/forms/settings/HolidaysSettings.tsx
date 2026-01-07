@@ -23,6 +23,7 @@ import {
   useTheme,
   Snackbar,
   Alert,
+  Grid2,
 } from "@mui/material"
 import {
   Add as AddIcon,
@@ -31,8 +32,8 @@ import {
   CalendarMonth as CalendarIcon,
 } from "@mui/icons-material"
 import { DatePicker, LocalizationProvider, TimePicker } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import type { Holiday } from "@/types/settings"
+import dayjs from "dayjs";
 
 export default function HolidaysSettings() {
   const theme = useTheme()
@@ -51,20 +52,20 @@ export default function HolidaysSettings() {
   })
 
   const handleOpenDialog = (holiday?: Holiday) => {
-    if (holiday) {
-      setEditingHoliday(holiday)
-      setFormData(holiday)
-    } else {
-      setEditingHoliday(null)
-      setFormData({
-        date: new Date(),
-        name: "",
-        type: "annual",
-        fullDay: true,
-        startTime: "09:00",
-        endTime: "18:00",
-      })
-    }
+    // if (holiday) {
+    //   setEditingHoliday(holiday)
+    //   setFormData(holiday)
+    // } else {
+    //   setEditingHoliday(null)
+    //   setFormData({
+    //     date: new Date(),
+    //     name: "",
+    //     type: "annual",
+    //     fullDay: true,
+    //     startTime: "09:00",
+    //     endTime: "18:00",
+    //   })
+    // }
     setOpenDialog(true)
   }
 
@@ -99,7 +100,6 @@ export default function HolidaysSettings() {
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box>
         <Box
           sx={{
@@ -140,6 +140,7 @@ export default function HolidaysSettings() {
               "&:hover": {
                 bgcolor: theme.palette.primary.dark,
               },
+              marginLeft: 5
             }}
           >
             เพิ่มวันหยุด
@@ -159,9 +160,9 @@ export default function HolidaysSettings() {
             <Box sx={{ color: theme.palette.text.secondary }}>ยังไม่มีวันหยุด คลิก &quot;เพิ่มวันหยุด&quot; เพื่อเริ่มต้น</Box>
           </Card>
         ) : (
-          <Grid container spacing={2}>
+          <Grid2 container spacing={2}>
             {holidays.map((holiday) => (
-              <Grid item xs={12} md={6} key={holiday.id}>
+              <Grid2 size={{ xs:12, md:6 }}  key={holiday.id}>
                 <Card
                   sx={{
                     border: `1px solid ${theme.palette.divider}`,
@@ -242,9 +243,9 @@ export default function HolidaysSettings() {
                     </Box>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Grid2>
             ))}
-          </Grid>
+          </Grid2>
         )}
 
         <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
@@ -252,11 +253,11 @@ export default function HolidaysSettings() {
             {editingHoliday ? "แก้ไขวันหยุด" : "เพิ่มวันหยุด"}
           </DialogTitle>
           <DialogContent sx={{ pt: 3 }}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }} mt={3}>
               <DatePicker
                 label="เลือกวันที่"
-                value={formData.date}
-                onChange={(newValue) => setFormData({ ...formData, date: newValue })}
+                // value={formData.date}
+                // onChange={(newValue) => setFormData({ ...formData, date: newValue ? newValue : new Date() })}
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -266,7 +267,7 @@ export default function HolidaysSettings() {
 
               <TextField
                 label="ชื่อวันหยุด"
-                value={formData.name}
+                // value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="เช่น วันปีใหม่, ปิดซ่อมร้าน"
                 fullWidth
@@ -275,7 +276,7 @@ export default function HolidaysSettings() {
               <FormControl fullWidth>
                 <InputLabel>ประเภทวันหยุด</InputLabel>
                 <Select
-                  value={formData.type}
+                  // value={formData.type}
                   label="ประเภทวันหยุด"
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as "annual" | "special" })}
                 >
@@ -287,7 +288,7 @@ export default function HolidaysSettings() {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={formData.fullDay}
+                    // checked={formData.fullDay}
                     onChange={(e) => setFormData({ ...formData, fullDay: e.target.checked })}
                   />
                 }
@@ -298,15 +299,15 @@ export default function HolidaysSettings() {
                 <Box sx={{ display: "flex", gap: 2 }}>
                   <TimePicker
                     label="เวลาเริ่มต้น"
-                    value={formData.startTime ? new Date(`2000-01-01T${formData.startTime}`) : null}
-                    onChange={(newValue) => {
-                      if (newValue) {
-                        setFormData({
-                          ...formData,
-                          startTime: newValue.toTimeString().slice(0, 5),
-                        })
-                      }
-                    }}
+                    // value={formData.startTime ? new Date(`2000-01-01T${formData.startTime}`) : null}
+                    // onChange={(newValue) => {
+                    //   if (newValue) {
+                    //     setFormData({
+                    //       ...formData,
+                    //       startTime: newValue.toTimeString().slice(0, 5),
+                    //     })
+                    //   }
+                    // }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -315,15 +316,15 @@ export default function HolidaysSettings() {
                   />
                   <TimePicker
                     label="เวลาสิ้นสุด"
-                    value={formData.endTime ? new Date(`2000-01-01T${formData.endTime}`) : null}
-                    onChange={(newValue) => {
-                      if (newValue) {
-                        setFormData({
-                          ...formData,
-                          endTime: newValue.toTimeString().slice(0, 5),
-                        })
-                      }
-                    }}
+                    // value={formData.endTime ? new Date(`2000-01-01T${formData.endTime}`) : null}
+                    // onChange={(newValue) => {
+                    //   if (newValue) {
+                    //     setFormData({
+                    //       ...formData,
+                    //       endTime: newValue.toTimeString().slice(0, 5),
+                    //     })
+                    //   }
+                    // }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -350,18 +351,6 @@ export default function HolidaysSettings() {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={3000}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert severity="success" sx={{ width: "100%" }}>
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
       </Box>
-    </LocalizationProvider>
   )
 }
