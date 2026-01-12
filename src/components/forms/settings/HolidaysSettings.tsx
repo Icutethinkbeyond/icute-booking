@@ -24,6 +24,7 @@ import {
   Typography,
   Autocomplete,
   TablePagination,
+  CircularProgress,
 } from "@mui/material";
 import { useFormikContext } from "formik";
 import {
@@ -38,11 +39,12 @@ import * as Yup from "yup";
 import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { HolidayType } from "@prisma/client";
-import { Holiday } from "@/interfaces/Store";
+import { Holiday, initialHoliday } from "@/interfaces/Store";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 import { useNotifyContext } from "@/contexts/NotifyContext";
 import { formatThaiDateTimeRange } from "@/utils/lib/utils";
+import ConfirmDelete from "@/components/shared/ConfirmDelete";
 
 const validationSchema = Yup.object({});
 
@@ -54,7 +56,8 @@ export default function HolidaysSettings() {
   const { holidays, setHolidays, setHolidaysList, holidaysList } =
     useStoreContext();
 
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [metadata, setMetadata] = useState({ total: 0, page: 1, lastPage: 1 });
@@ -73,10 +76,6 @@ export default function HolidaysSettings() {
     getHolidays(0, newLimit); // กลับไปหน้าแรกเสมอเมื่อเปลี่ยนจำนวนต่อหน้า
   };
 
-  useEffect(() => {
-    console.log(holidays);
-  }, [holidays]);
-
   const handleFormSubmit = async (
     values: Holiday,
     {
@@ -86,12 +85,14 @@ export default function HolidaysSettings() {
       validateForm,
     }: FormikHelpers<Holiday> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
-    console.log(values);
-
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
     setSubmitting(true); // เริ่มสถานะ Loading/Submittings
 
-    const result = await storeService.createHoliday(values);
+    let result;
+
+    if (editingHoliday)
+      result = await storeService.updateHoliday(values.id, values);
+    else result = await storeService.createHoliday(values);
 
     // // // // // // 3. จัดการเมื่อสำเร็จ
     setNotify({
@@ -100,24 +101,19 @@ export default function HolidaysSettings() {
       color: result.success ? "success" : "error",
     });
 
+    setHolidays(initialHoliday);
     handleCloseDialog();
+    getHolidays();
   };
 
   const handleOpenDialog = (holiday?: Holiday) => {
-    // if (holiday) {
-    //   setEditingHoliday(holiday)
-    //   setFormData(holiday)
-    // } else {
-    //   setEditingHoliday(null)
-    //   setFormData({
-    //     date: new Date(),
-    //     name: "",
-    //     type: "annual",
-    //     fullDay: true,
-    //     startTime: "09:00",
-    //     endTime: "18:00",
-    //   })
-    // }
+    if (holiday) {
+      setEditingHoliday(holiday);
+      setHolidays(holiday);
+    } else {
+      setEditingHoliday(null);
+      setHolidays(initialHoliday);
+    }
     setOpenDialog(true);
   };
 
@@ -126,34 +122,23 @@ export default function HolidaysSettings() {
     setEditingHoliday(null);
   };
 
-  const handleSave = () => {
-    // if (!formData.name || !formData.date) {
-    //   setSnackbar({ open: true, message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
-    //   return;
-    // }
-    // if (editingHoliday) {
-    //   setHolidays(
-    //     holidays.map((h) =>
-    //       h.id === editingHoliday.id
-    //         ? ({ ...formData, id: h.id } as Holiday)
-    //         : h
-    //     )
-    //   );
-    //   setSnackbar({ open: true, message: "แก้ไขวันหยุดสำเร็จ" });
-    // } else {
-    //   const newHoliday: Holiday = {
-    //     ...formData,
-    //     id: Date.now().toString(),
-    //   } as Holiday;
-    //   setHolidays([...holidays, newHoliday]);
-    //   setSnackbar({ open: true, message: "เพิ่มวันหยุดสำเร็จ" });
-    // }
-    // handleCloseDialog();
+  const handleDelete = async (id: string) => {
+    let result = await storeService.deleteHoliday(id);
+    // // // // // // 3. จัดการเมื่อสำเร็จ
+    setNotify({
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
+
+    handleCloseDialog();
+    getHolidays();
   };
 
   const getHolidays = async (page: number = 1, limit: number = 10) => {
+    setLoading(true);
     let result = await storeService.getHolidays(page, limit);
-    console.log(result);
+    // console.log(result);
 
     if (result.success) {
       setHolidaysList(result.data);
@@ -164,15 +149,30 @@ export default function HolidaysSettings() {
         color: result.success ? "success" : "error",
       });
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    // setIsLoading(true);
     getHolidays();
     return () => {
       setHolidaysList([]);
     };
   }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -246,7 +246,6 @@ export default function HolidaysSettings() {
         ) : (
           <Box>
             <Grid2 container spacing={2}>
-              เปลี่ยนจาก holidaysList เป็น paginatedHolidays
               {holidaysList.map((holiday) => (
                 <Grid2 size={{ xs: 12, md: 6 }} key={holiday.id}>
                   <Card
@@ -285,7 +284,7 @@ export default function HolidaysSettings() {
                               mb: 1,
                             }}
                           >
-                            {dayjs(holiday.startTime).format("DD MMMM YYYY")}
+                            {dayjs(holiday.date).format("DD MMMM YYYY")}
                           </Box>
                           <Box
                             sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}
@@ -304,33 +303,41 @@ export default function HolidaysSettings() {
                                     : theme.palette.warning.light,
                               }}
                             />
-                            {/* <Chip
+                            <Chip
                               label={
                                 holiday.fullDay
                                   ? "ปิดทั้งวัน"
                                   : formatThaiDateTimeRange(
-                                      holiday.startTime,
-                                      holiday.endTime
+                                      dayjs(holiday.startTime).format(),
+                                      dayjs(holiday.endTime).format()
                                     )
                               }
                               size="small"
                               sx={{ bgcolor: theme.palette.grey[200] }}
-                            /> */}
+                            />
                           </Box>
                         </Box>
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <IconButton
                             size="small"
                             sx={{ color: theme.palette.secondary.main }}
+                            onClick={() => handleOpenDialog(holiday)}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
-                          <IconButton
+                          {/* <IconButton
                             size="small"
                             sx={{ color: theme.palette.error.main }}
+                            onClick={() => handleDelete(holiday.id)}
                           >
                             <DeleteIcon fontSize="small" />
-                          </IconButton>
+                          </IconButton> */}
+                          <ConfirmDelete
+                            dialogTitle="ยืนยันการลบ?"
+                            itemId={holiday.id}
+                            onDelete={handleDelete}
+                            massage={`คุณต้องการลบอุปกรณ์ ${holiday.holidayName} ใช่หรือไม่?`}
+                          />
                         </Box>
                       </Box>
                     </CardContent>

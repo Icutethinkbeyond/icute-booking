@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
+import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
 
@@ -46,15 +47,17 @@ export async function PATCH(
 
     if (!existing) return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
 
+    console.log(dayjs(body.date).format())
+
     const updated = await prisma.holiday.update({
       where: { id: params.id },
       data: {
-        date: body.date ? new Date(body.date) : undefined,
+        date: dayjs(body.date).format(),
         holidayName: body.holidayName,
         holidayType: body.holidayType,
-        fullDay: body.fullDay,
-        startTime: body.startTime ? new Date(body.startTime) : (body.fullDay ? null : undefined),
-        endTime: body.endTime ? new Date(body.endTime) : (body.fullDay ? null : undefined),
+        fullDay: typeof body.fullDay === 'string' ? Boolean(body.fullDay) : body.fullDay,
+        startTime: body.startTime ? dayjs(body.startTime).format() : null,
+        endTime: body.endTime ? dayjs(body.endTime).format() : null,
       },
     });
 
