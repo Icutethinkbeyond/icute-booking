@@ -261,37 +261,6 @@ export function formatDateForFilename(date: Date = new Date()): string {
     .split(".")[0]; // เอาเฉพาะ YYYYMMDDHHmmss
 }
 
-export const calculateRentalDays = (startDate: string | Dayjs): number => {
-  const start = new Date(startDate.toString()); // แปลงวันที่เริ่มเช่าเป็น Date object
-  const today = new Date(); // วันที่ปัจจุบัน
-
-  // คำนวณความต่างของเวลาในหน่วยมิลลิวินาที
-  const diffInTime = today.getTime() - start.getTime();
-
-  // แปลงจากมิลลิวินาทีเป็นวัน
-  const diffInDays = Math.ceil(diffInTime / (1000 * 60 * 60 * 24));
-
-  return diffInDays; // จำนวนวันที่เช่ามา
-}
-
-export const calculateRentalYears = (startDate: string | Dayjs): number => {
-  const start = new Date(startDate.toString()); // แปลงวันที่เริ่มเช่าเป็น Date object
-  const today = new Date(); // วันที่ปัจจุบัน
-
-  // คำนวณความต่างของปี
-  let diffInYears = today.getFullYear() - start.getFullYear();
-
-  // ตรวจสอบว่าเดือนและวันของปีปัจจุบันน้อยกว่าปีเริ่มหรือไม่
-  if (
-    today.getMonth() < start.getMonth() ||
-    (today.getMonth() === start.getMonth() && today.getDate() < start.getDate())
-  ) {
-    diffInYears--; // ถ้ายังไม่ถึงวันครบรอบให้ลบออก 1 ปี
-  }
-
-  return diffInYears; // จำนวนปีที่เช่ามา
-}
-
 
 export function formatDateMonthDay(inputDate: string | Date | null | Dayjs): string {
 
@@ -310,14 +279,6 @@ export function formatDateMonthDay(inputDate: string | Date | null | Dayjs): str
 
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit" }).format(date).replace(" ", "/");
 }
-
-export const calculateRentalCost = (startDate: string, monthlyPrice: number): number => {
-  const rentalDays = calculateRentalDays(startDate); // จำนวนวันที่เช่า
-  const dailyPrice = monthlyPrice / 30; // คำนวณราคาเช่าต่อวัน (หาร 30 วัน)
-  const totalCost = rentalDays * dailyPrice; // ค่าเช่าทั้งหมดจนถึงปัจจุบัน
-
-  return parseFloat(totalCost.toFixed(2)); // คืนค่าโดยจำกัดทศนิยม 2 ตำแหน่ง
-};
 
 export function randomDate(start: Date, end: Date) {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
@@ -419,83 +380,37 @@ export const compareDates = (date1: Date | string, date2: Date | string): number
   return 0;               // date1 เท่ากับ date2
 };
 
-// export function checkDocumentType(type: MaintenanceType) {
-//   switch (type) {
-//     case MaintenanceType.IRP:
-//       return "Included In RentalPrice";
-//     case MaintenanceType.MQ:
-//       return "Make Quotation";
-//     case MaintenanceType.BCS:
-//       return "Back Charge To Site";
-//     default:
-//       return "";
-//   }
-// }
+export function formatThaiDateTimeRange(
+  startISO: string,
+  endISO: string
+): string {
+  const optionsDate: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Bangkok",
+  };
 
-// export const checkStep = (value: DocumentStep, setActiveStep: (number: number) => void, documentCategory: DocumentCategory) => {
-//   switch (value) {
-//     case DocumentStep.Equipment:
-//       setActiveStep && setActiveStep(2);
-//       // code block
-//       break;
-//     case DocumentStep.Location:
-//       setActiveStep && setActiveStep(1);
-//       // code block
-//       break;
-//     case DocumentStep.Part:
-//       setActiveStep && setActiveStep(3);
-//       // code block
-//       break;
-//     case DocumentStep.Repairman:
-//       setActiveStep && setActiveStep(4);
-//       // code block
-//       break;
-//     case DocumentStep.AdditionalFee:
-//       setActiveStep && setActiveStep(5);
-//       // code block
-//       break;
-//     case DocumentStep.WaitingApprove:
-//       if (documentCategory === DocumentCategory.Rental) {
-//         setActiveStep && setActiveStep(3);
-//       } else {
-//         setActiveStep && setActiveStep(6);
-//       }
-//       // code block
-//       break;
-//     default:
-//       setActiveStep && setActiveStep(0);
-//     // code block
-//   }
-// };
+  const optionsTime: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Bangkok",
+  };
 
-// export const showNameSelctReportSetting = (name: string) => {
-//   switch (name) {
-//     case SelectType.Category.toString():
-//       return "รายงานตามหมวดหมู่";
-//     case SelectType.EquipmentName.toString():
-//       return "รายงานตามชื่ออุปกรณ์";
-//     case SelectType.Location.toString():
-//       return "รายงานตามสถานที่";
-//     case ReportType.EquipmentPlan.toString():
-//       return "รายงานสถานะและแผนใช้งานเครื่องจักร";
-//     case ReportType.EquipmentPrice.toString():
-//       return "รายงานสรุปมูลค่าเครื่องจักร";
-//     case ReportType.InventoryStatus.toString():
-//       return "รายงานสถานะเครื่องจักร";
-//     case ReportType.MaintenanceCost.toString():
-//       return "รายงานสรุปค่าซ่อมรายเดือน";
-//     case ReportType.MaintenanceLog.toString():
-//       return "รายงานสถานะซ่อมเครื่องจักร";
-//     case ReportType.MaintenanceStatus.toString():
-//       return "สถานที่";
-//     case ReportType.RentalPrice.toString():
-//       return "รายงานสรุปค่าเช่ารวม";
-//     case ReportType.Tracker.toString():
-//       return "รายงานสรุปค่าเช่าประจำเดือน";
-//     case ReportType.WorkLoad.toString():
-//       return "รายงานภาระงานผู้ซ่อม";
-//     default:
-//       name;
-//       break;
-//   }
-// };
+  const startDate = new Date(startISO);
+  const endDate = new Date(endISO);
+
+  const thaiDate = new Intl.DateTimeFormat("th-TH", optionsDate).format(
+    startDate
+  );
+
+  const startTime = new Intl.DateTimeFormat("th-TH", optionsTime).format(
+    startDate
+  );
+
+  const endTime = new Intl.DateTimeFormat("th-TH", optionsTime).format(endDate);
+
+  return `${thaiDate} เวลา ${startTime} - ${endTime} น.`;
+}
+

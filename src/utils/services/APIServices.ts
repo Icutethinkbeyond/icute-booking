@@ -26,9 +26,10 @@ class ApiService {
       if (setData) setData(data.data);
       if (setRowCount && data.pagination) {
         setRowCount(data.pagination.totalItems);
-        
       }
-      return data.data;
+      // return data.data;
+      return data;
+
     } catch (error: any) {
       console.error("GET Error:", error.message);
       throw error;

@@ -23,6 +23,7 @@ import {
   Grid2,
   Typography,
   Autocomplete,
+  TablePagination,
 } from "@mui/material";
 import { useFormikContext } from "formik";
 import {
@@ -41,19 +42,36 @@ import { Holiday } from "@/interfaces/Store";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 import { useNotifyContext } from "@/contexts/NotifyContext";
+import { formatThaiDateTimeRange } from "@/utils/lib/utils";
 
 const validationSchema = Yup.object({});
 
 export default function HolidaysSettings() {
   const theme = useTheme();
   // const { submitForm, isSubmitting, isValid } = useFormikContext();
-    const { setNotify, notify, setOpenBackdrop, openBackdrop } =
-      useNotifyContext();
+  const { setNotify, notify, setOpenBackdrop, openBackdrop } =
+    useNotifyContext();
   const { holidays, setHolidays, setHolidaysList, holidaysList } =
     useStoreContext();
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [metadata, setMetadata] = useState({ total: 0, page: 1, lastPage: 1 });
+
+  useEffect(() => {
+    getHolidays(metadata.page - 1, rowsPerPage);
+  }, [rowsPerPage]);
+
+  const handleChangePage = (event: any, newPage: number) => {
+    getHolidays(newPage, rowsPerPage);
+  };
+
+  const handleChangeRowsPerPage = (event: any) => {
+    const newLimit = parseInt(event.target.value, 10);
+    setRowsPerPage(newLimit);
+    getHolidays(0, newLimit); // กลับไปหน้าแรกเสมอเมื่อเปลี่ยนจำนวนต่อหน้า
+  };
 
   useEffect(() => {
     console.log(holidays);
@@ -133,10 +151,28 @@ export default function HolidaysSettings() {
     // handleCloseDialog();
   };
 
-  const handleDelete = (id: string) => {
-    // setHolidays(holidays.filter((h) => h.id !== id));
-    // setSnackbar({ open: true, message: "ลบวันหยุดสำเร็จ" });
+  const getHolidays = async (page: number = 1, limit: number = 10) => {
+    let result = await storeService.getHolidays(page, limit);
+    console.log(result);
+
+    if (result.success) {
+      setHolidaysList(result.data);
+    } else {
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
+      });
+    }
   };
+
+  useEffect(() => {
+    // setIsLoading(true);
+    getHolidays();
+    return () => {
+      setHolidaysList([]);
+    };
+  }, []);
 
   return (
     <>
@@ -208,108 +244,116 @@ export default function HolidaysSettings() {
             </Box>
           </Card>
         ) : (
-          <Grid2 container spacing={2}>
-            {holidaysList.map((holiday) => (
-              <Grid2 size={{ xs: 12, md: 6 }} key={holiday.id}>
-                <Card
-                  sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    "&:hover": {
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        mb: 2,
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <Box
-                          sx={{
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: theme.palette.primary.main,
-                            mb: 1,
-                          }}
-                        >
-                          {holiday.holidayName}
-                        </Box>
-                        <Box
-                          sx={{
-                            fontSize: "0.875rem",
-                            color: theme.palette.text.secondary,
-                            mb: 1,
-                          }}
-                        >
-                          {/* {holiday.date.toLocaleDateString("th-TH", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })} */}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            gap: 1,
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <Chip
-                            label={
-                              holiday.holidayType === HolidayType.ANNUAL
-                                ? "วันหยุดประจำปี"
-                                : "วันหยุดพิเศษ"
-                            }
-                            size="small"
+          <Box>
+            <Grid2 container spacing={2}>
+              เปลี่ยนจาก holidaysList เป็น paginatedHolidays
+              {holidaysList.map((holiday) => (
+                <Grid2 size={{ xs: 12, md: 6 }} key={holiday.id}>
+                  <Card
+                    sx={{
+                      border: `1px solid ${theme.palette.divider}`,
+                      "&:hover": {
+                        boxShadow: theme.shadows[4],
+                      },
+                    }}
+                  >
+                    <CardContent>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          mb: 2,
+                        }}
+                      >
+                        <Box sx={{ flex: 1 }}>
+                          <Box
                             sx={{
-                              bgcolor:
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              color: theme.palette.primary.main,
+                              mb: 1,
+                            }}
+                          >
+                            {holiday.holidayName}
+                          </Box>
+                          {/* ส่วนแสดงวันที่ (ถ้ามี) */}
+                          <Box
+                            sx={{
+                              fontSize: "0.875rem",
+                              color: theme.palette.text.secondary,
+                              mb: 1,
+                            }}
+                          >
+                            {dayjs(holiday.startTime).format("DD MMMM YYYY")}
+                          </Box>
+                          <Box
+                            sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}
+                          >
+                            <Chip
+                              label={
                                 holiday.holidayType === HolidayType.ANNUAL
-                                  ? theme.palette.secondary.light
-                                  : theme.palette.warning.light,
-                              color: theme.palette.text.primary,
-                            }}
-                          />
-                          <Chip
-                            label={
-                              holiday.fullDay
-                                ? "ปิดทั้งวัน"
-                                : `${holiday.startTime} - ${holiday.endTime}`
-                            }
+                                  ? "วันหยุดประจำปี"
+                                  : "วันหยุดพิเศษ"
+                              }
+                              size="small"
+                              sx={{
+                                bgcolor:
+                                  holiday.holidayType === HolidayType.ANNUAL
+                                    ? theme.palette.secondary.light
+                                    : theme.palette.warning.light,
+                              }}
+                            />
+                            {/* <Chip
+                              label={
+                                holiday.fullDay
+                                  ? "ปิดทั้งวัน"
+                                  : formatThaiDateTimeRange(
+                                      holiday.startTime,
+                                      holiday.endTime
+                                    )
+                              }
+                              size="small"
+                              sx={{ bgcolor: theme.palette.grey[200] }}
+                            /> */}
+                          </Box>
+                        </Box>
+                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <IconButton
                             size="small"
-                            sx={{
-                              bgcolor: theme.palette.grey[200],
-                              color: theme.palette.text.primary,
-                            }}
-                          />
+                            sx={{ color: theme.palette.secondary.main }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            sx={{ color: theme.palette.error.main }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
                         </Box>
                       </Box>
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
-                        <IconButton
-                          size="small"
-                          // onClick={() => handleOpenDialog(holiday)}
-                          sx={{ color: theme.palette.secondary.main }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(holiday.id)}
-                          sx={{ color: theme.palette.error.main }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid2>
-            ))}
-          </Grid2>
+                    </CardContent>
+                  </Card>
+                </Grid2>
+              ))}
+            </Grid2>
+
+            {/* เพิ่มส่วน Pagination ด้านล่าง Grid */}
+            <TablePagination
+              component="div"
+              // ใช้ค่า total จาก metadata
+              count={metadata.total}
+              // MUI ใช้ 0-based index ดังนั้นต้อง -1 จากค่าที่ API ส่งมา (1-1 = 0)
+              page={metadata.page - 1}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+              labelRowsPerPage="รายการต่อหน้า:"
+              sx={{ mt: 2 }}
+            />
+          </Box>
         )}
 
         <Formik<Holiday>
@@ -407,11 +451,15 @@ export default function HolidaysSettings() {
                             value={values.holidayType}
                             label="ประเภทวันหยุด"
                             onChange={(e) =>
-                               setFieldValue("holidayType", e.target.value)
+                              setFieldValue("holidayType", e.target.value)
                             }
                           >
-                            <MenuItem value={HolidayType.ANNUAL}>วันหยุดประจำปี</MenuItem>
-                            <MenuItem value={HolidayType.SPECIAL}>วันหยุดพิเศษ</MenuItem>
+                            <MenuItem value={HolidayType.ANNUAL}>
+                              วันหยุดประจำปี
+                            </MenuItem>
+                            <MenuItem value={HolidayType.SPECIAL}>
+                              วันหยุดพิเศษ
+                            </MenuItem>
                           </Select>
                         </FormControl>
                       )}
