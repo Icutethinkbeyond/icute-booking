@@ -18,7 +18,7 @@ import {
 import { Save as SaveIcon } from "@mui/icons-material"
 import type { StaffSettings } from "@/types/settings"
 
-export default function StaffSettingsPage() {
+export default function StaffSettings() {
   const theme = useTheme()
   const [snackbar, setSnackbar] = useState({ open: false, message: "" })
   const [settings, setSettings] = useState<StaffSettings>({

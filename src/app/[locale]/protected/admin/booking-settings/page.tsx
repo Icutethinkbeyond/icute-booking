@@ -33,15 +33,11 @@ import {
   Link as LinkIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
+import BookingRulesSettings from "@/components/forms/settings/BookingRulesSettings";
+import StaffSettings from "@/components/forms/settings/StaffSettings";
 
-const Services = () => {
+const BookingSettingPage = () => {
   const [value, setValue] = React.useState(0);
-
-  const [issueDate, setIssueDate] = useState("");
-  const [repairLocation, setRepairLocation] = useState<string>("");
-  const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRepairLocation(event.target.value);
-  };
 
   const { setBreadcrumbs } = useBreadcrumbContext();
 
@@ -70,36 +66,6 @@ const Services = () => {
             <Tabs value={value} onChange={handleChange} aria-label="">
               <Tab
                 icon={<EventBusyIcon />}
-                label="ข้อมูลร้าน"
-                {...a11yProps(0)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="กำหนดเวลาเปิด-ปิดร้าน"
-                {...a11yProps(1)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="กำหนดวัดหยุดพิเศษ"
-                {...a11yProps(2)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="ตั้งค่า Line Token"
-                {...a11yProps(3)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="ตั้งค่าข้อความแจ้งเตือน"
-                {...a11yProps(4)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="ช่วงไม่รับจอง"
-                {...a11yProps(5)}
-              />
-              <Tab
-                icon={<EventBusyIcon />}
                 label="กฎการจอง"
                 {...a11yProps(6)}
               />
@@ -108,31 +74,16 @@ const Services = () => {
                 label="ตั้งค่าพนักงาน"
                 {...a11yProps(7)}
               />
-              <Tab
-                icon={<EventBusyIcon />}
-                label="เปลี่ยนรหัสผ่าน"
-                {...a11yProps(8)}
-              />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
             <Grid2 container justifyContent="center">
-              <ShopSettings />
+              <BookingRulesSettings />
             </Grid2>
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <Grid2 container justifyContent="center">
-              <TimeSettings />
-            </Grid2>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
-            <Grid2 container justifyContent="center">
-              <LineSettings />
-            </Grid2>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={3}>
-            <Grid2 container justifyContent="center">
-              <ResetPasswordForm />
+              <StaffSettings />
             </Grid2>
           </CustomTabPanel>
         </Box>
@@ -141,4 +92,4 @@ const Services = () => {
   );
 };
 
-export default Services;
+export default BookingSettingPage;
