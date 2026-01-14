@@ -10,13 +10,17 @@ const prisma = new PrismaClient();
  * สำหรับยืนยันอีเมลเมื่อผู้ใช้คลิกลิงก์
  */
 export async function GET(request: Request) {
+
   const url = new URL(request.url);
-  const token = url.searchParams.get('token');
+  const { searchParams } = url
+  const token = searchParams.get('token')
+
+  console.log("token ----> :", token)
 
   // 1. ตรวจสอบว่ามี Token ส่งมาหรือไม่
   if (!token) {
     // ส่งผู้ใช้ไปยังหน้าจอแสดงข้อผิดพลาด (หรือ redirect ไปที่หน้าหลัก)
-    return NextResponse.redirect(new URL('/verification-status?status=error&message=Token not found', url));
+    return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=Token not found', url));
   }
 
   try {
@@ -33,20 +37,20 @@ export async function GET(request: Request) {
 
     // 3. ตรวจสอบสถานะของ Token
     if (!verificationRecord) {
-      return NextResponse.redirect(new URL('/verification-status?status=error&message=Invalid token', url));
+      return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=Invalid token', url));
     }
 
     if (verificationRecord.used) {
-      return NextResponse.redirect(new URL('/verification-status?status=error&message=Token already used', url));
+      return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=Token already used', url));
     }
 
     if (verificationRecord.expiresAt < new Date()) {
-      return NextResponse.redirect(new URL('/verification-status?status=error&message=Token expired', url));
+      return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=Token expired', url));
     }
-    
+
     // ตรวจสอบว่า User มีอยู่จริง (เผื่อกรณีข้อมูลผิดพลาด)
     if (!verificationRecord.user) {
-        return NextResponse.redirect(new URL('/verification-status?status=error&message=User not found', url));
+      return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=User not found', url));
     }
 
     // 4. ทำ Transaction: อัปเดต User และ Token
@@ -54,21 +58,23 @@ export async function GET(request: Request) {
       // 4.1 อัปเดต User: ตั้งค่า isEmailVerified เป็น true
       await tx.user.update({
         where: { userId: verificationRecord.userId },
-        data: { 
-            isEmailVerified: true,
-            userStatus: 'ACTIVE', // อาจจะเปลี่ยนสถานะบัญชีเป็น ACTIVE ทันที
+        data: {
+          isEmailVerified: true,
+          userStatus: 'ACTIVE', // อาจจะเปลี่ยนสถานะบัญชีเป็น ACTIVE ทันที
         },
       });
 
-      // 4.2 อัปเดต Token: ตั้งค่า used เป็น true เพื่อป้องกันการใช้ซ้ำ
-      await tx.verificationToken.update({
-        where: { id: verificationRecord.id },
-        data: { used: true },
-      });
+      // // 4.2 อัปเดต Token: ตั้งค่า used เป็น true เพื่อป้องกันการใช้ซ้ำ
+      // await tx.verificationToken.update({
+      //   where: { id: verificationRecord.id },
+      //   data: { used: true },
+      // });
+      // 3. ลบ Token ที่ใช้แล้ว
+      await prisma.verificationToken.delete({ where: { token } });
     });
 
     // 5. สำเร็จ: Redirect ผู้ใช้ไปยังหน้าจอแสดงความสำเร็จ
-    return NextResponse.redirect(new URL('/verification-status?status=success&message=Email verified successfully! You can now log in.', url));
+    return NextResponse.redirect(new URL('/auth/verification-status?status=success&message=Email verified successfully! You can now log in.', url));
 
   } catch (error) {
     console.error('Email verification error:', error);

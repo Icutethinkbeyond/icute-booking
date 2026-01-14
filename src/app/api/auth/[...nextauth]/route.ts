@@ -181,7 +181,7 @@ const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, trigger, user, account, session }) {
       // เมื่อ Login ครั้งแรก user object จะมีค่า
       if (user) {
         token.id = user.id;
@@ -191,6 +191,20 @@ const authOptions: NextAuthOptions = {
         token.storeId = (user as any).storeId;
         token.provider = account?.provider;
         token.emailVerified = (user as any).emailVerified;
+      }
+      // เพิ่มส่วนนี้เพื่อให้การเรียก update() จาก useSession ทำงาน
+      if (trigger === "update" && session) {
+        const updatedUser = await prisma.user.findUnique({
+          where: { email: token.email as string }
+        });
+        console.log(updatedUser)
+        token.id = user.id;
+        token.roleId = (user as any).roleId;
+        token.roleName = (user as any).roleName;
+        token.storeName = (user as any).storeName;
+        token.storeId = (user as any).storeId;
+        token.provider = account?.provider;
+        token.emailVerified = updatedUser?.isEmailVerified;
       }
       return token;
     },

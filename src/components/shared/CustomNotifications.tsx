@@ -12,9 +12,6 @@ import {
 } from "@mui/material";
 import {
   Close as CloseIcon,
-  ThumbUp,
-  ThumbDown,
-  Undo,
 } from "@mui/icons-material";
 import { useNotifyContext } from "@/contexts/NotifyContext";
 

@@ -2,7 +2,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -10,8 +10,21 @@ import {
   Container,
   Paper,
   CircularProgress,
+  Alert,
+  Snackbar,
+  IconButton,
+  AlertTitle,
 } from "@mui/material";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
+import { authService } from "@/utils/services/api-services/AuthAPI";
+import {
+  initialNotify,
+  NotifyState,
+  useNotifyContext,
+} from "@/contexts/NotifyContext";
+import React, { useState } from "react";
+import { Close } from "@mui/icons-material";
+import { useLocale } from "next-intl";
 
 export default function EmailVerificationGuard({
   children,
@@ -20,8 +33,28 @@ export default function EmailVerificationGuard({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [notify, setNotify] = useState<NotifyState>(initialNotify);
 
-  console.log(session?.user.emailVerified);
+  const pathname = usePathname(); // ดึง Path ปัจจุบัน
+  const localActive = useLocale();
+
+  console.log(pathname)
+
+  // 1. กำหนดหน้าที่อนุญาตให้ผ่านได้ (White list)
+  const isVerificationPage = pathname.startsWith(`/${localActive}/auth/verification-status`);
+
+  // 2. ถ้าเป็นหน้า Verification ให้ปล่อยผ่านทันที 
+  // (เพื่อให้ Logic การ Verify ในหน้านั้นทำงานได้)
+  if (isVerificationPage) {
+    return <>{children}</>;
+  }
+
+  const onClose = () => {
+    setNotify({
+      ...notify,
+      open: false,
+    });
+  };
 
   if (status === "loading")
     return (
@@ -43,6 +76,18 @@ export default function EmailVerificationGuard({
   //     return null;
   //   }
 
+  const handleFormSubmit = async () => {
+    const result = await authService.resendVerifyEmail();
+
+    setNotify({
+      ...notify,
+      open: true,
+      message: result.message,
+      color: result.success ? "success" : "error",
+    });
+
+  };
+
   // 2. ถ้าล็อกอินแล้ว แต่ emailVerified เป็น null (ยังไม่ได้ยืนยัน)
   if (session?.user && !Boolean(session.user.emailVerified)) {
     return (
@@ -63,7 +108,12 @@ export default function EmailVerificationGuard({
           </Typography>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Button variant="contained" fullWidth size="large">
+            <Button
+              variant="contained"
+              fullWidth
+              size="large"
+              onClick={() => handleFormSubmit()}
+            >
               ส่งอีเมลยืนยันอีกครั้ง
             </Button>
             <Button variant="text" onClick={() => signOut()}>
@@ -71,6 +121,40 @@ export default function EmailVerificationGuard({
             </Button>
           </Box>
         </Paper>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={notify.open}
+          autoHideDuration={3000}
+          onClose={onClose}
+        >
+          <Alert
+            variant="filled"
+            severity={notify.color}
+            action={
+              <React.Fragment>
+                {/* {action} */}
+                <IconButton
+                  size="small"
+                  aria-label="close"
+                  color="inherit"
+                  // sx={{ fontFamily: "inherit", fontSize: '1em' }}
+                  onClick={onClose}
+                >
+                  <Close fontSize="small" />
+                  {/* รับทราบ */}
+                </IconButton>
+              </React.Fragment>
+            }
+          >
+            <AlertTitle>
+              {notify.header ? notify.header : "แจ้งเตือน"}
+            </AlertTitle>
+            {notify.message}
+          </Alert>
+        </Snackbar>
       </Container>
     );
   }
@@ -78,3 +162,4 @@ export default function EmailVerificationGuard({
   // 3. ถ้าผ่านเงื่อนไขทั้งหมด ให้แสดงเนื้อหาปกติ
   return <>{children}</>;
 }
+

@@ -16,10 +16,12 @@ import {
 } from "@/utils/services/EmailServices";
 import { getCurrentUserAndStoreIdsByToken } from "@/utils/lib/auth";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     // 1. ตรวจสอบ Session (ผู้ใช้ต้องล็อกอินอยู่ตามแผนที่คุณวางไว้)
     const { email, userId } = await getCurrentUserAndStoreIdsByToken(request);
+
+    console.log(email, userId)
 
     if (!userId) {
       return NextResponse.json(
@@ -42,10 +44,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. สร้าง Token สำหรับยืนยัน (สุ่ม String)
-    const token =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); 
+    // 2.3 สร้าง Verification Token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    // กำหนดเวลาหมดอายุ (เช่น 24 ชั่วโมง)
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // 4. บันทึกลงฐานข้อมูล (ถ้ามีอันเก่าให้ Update หรือสร้างใหม่)
     // await prisma.verificationToken.upsert({
@@ -57,15 +59,16 @@ export async function POST(request: NextRequest) {
     await prisma.verificationToken.create({
       data: {
         userId,
-        token,
+        token: verificationToken,
         purpose: "EMAIL_VERIFICATION", // <--- กำหนดวัตถุประสงค์
         expiresAt: expires,
       },
     });
 
+    console.log(verificationToken)
+
     // 5. ส่งอีเมล
-    const verificationUrl = `${process.env.NEXTAUTH_URL}/api/verify-email?token=${token}`;
-    await sendVerificationEmail(email, verificationUrl);
+    await sendVerificationEmail(email, verificationToken);
 
     return NextResponse.json(
       { message: "ส่งอีเมลยืนยันอีกครั้งสำเร็จ" },

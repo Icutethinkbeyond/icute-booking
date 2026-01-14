@@ -1,94 +1,109 @@
+
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Box, Typography, CircularProgress, Button, Container, Alert } from "@mui/material";
-import { useSession } from "next-auth/react"; // สมมติว่าใช้ NextAuth หรือใช้ระบบตรวจสอบ Token ของคุณเอง
+import { Box, Typography, CircularProgress, Button, Container, Alert, Paper } from "@mui/material";
+import { useSession } from "next-auth/react";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useLocale } from "next-intl";
 
-export default function AuthCallbackPage() {
+function VerificationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { data: session, status: authStatus } = useSession(); // จัดการสถานะการ Login
+  const { data: session, status: authStatus, update } = useSession();
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
-
-  // 1. ดึง Parameters จาก URL
   const status = searchParams.get("status");
   const message = searchParams.get("message");
-  const localActive = useLocale();
+  const locaActive = useLocale();
 
   useEffect(() => {
-    const checkAuthAndStatus = async () => {
-      // กรณีสถานะเป็น Error ให้แสดงข้อความแจ้งเตือน
-      if (status === "error") {
-        setErrorMessage(message || "เกิดข้อผิดพลาดบางอย่าง โปรดลองอีกครั้ง");
-        setIsProcessing(false);
-        return;
-      }
 
-      // กรณีสถานะเป็น Success
+    console.log(authStatus)
+    console.log(status)
+
+    
+    const handleLogic = async () => {
+
+          //       const data = await update(); // บังคับให้ session อัปเดตข้อมูลจาก DB ใหม่
+
+          // console.log(data)
+          
+      // 1. ถ้าเป็น Success ให้ลอง Update Session เพื่อดึงค่า emailVerified ล่าสุด
       if (status === "success") {
-        // รอให้สถานะ Auth โหลดเสร็จก่อน (กรณีใช้ useSession)
         if (authStatus === "loading") return;
 
         if (authStatus === "authenticated") {
-          // ถ้าล็อคอินอยู่แล้ว ให้หยุดโหลดและอยู่หน้านี้ (หรือแสดง UI สำเร็จ)
+          const data = await update(); // บังคับให้ session อัปเดตข้อมูลจาก DB ใหม่
+
+          console.log(data)
+
           setIsProcessing(false);
         } else if (authStatus === "unauthenticated") {
-          // ถ้าไม่ได้ล็อคอิน ให้ส่งกลับไปหน้า Sign-in
-          router.push(`/${localActive}/auth/sign-in`);
+          // ถ้าสำเร็จแต่ไม่ได้ล็อกอิน ให้ไปหน้า sign-in
+          router.push(`/${locaActive}/auth/sign-in`);
         }
+      } else {
+        // กรณี Error หรือสถานะอื่นๆ
+        setIsProcessing(false);
       }
     };
 
-    checkAuthAndStatus();
-  }, [status, message, authStatus, router]);
+    handleLogic();
+  }, [status, authStatus, router, update]);
 
-  // UI ระหว่างกำลังตรวจสอบ
-  if (isProcessing && !errorMessage) {
+  if (isProcessing) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', gap: 2 }}>
-        <CircularProgress />
-        <Typography>กำลังตรวจสอบสถานะการจองของคุณ...</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 10 }}>
+        <CircularProgress sx={{ mb: 2 }} />
+        <Typography>กำลังดำเนินการ...</Typography>
       </Box>
     );
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ py: 8, textAlign: 'center' }}>
-        {/* กรณีมี Error ให้แสดง UI แจ้งเตือน */}
-        {errorMessage ? (
+    <Container maxWidth="sm" sx={{ py: 8 }}>
+      <Paper elevation={3} sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+        {status === "success" ? (
           <Box>
-            <ErrorOutlineIcon sx={{ fontSize: 60, color: 'error.main', mb: 2 }} />
-            <Typography variant="h5" color="error" gutterBottom>
-              เกิดข้อผิดพลาด
+            <CheckCircleOutlineIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+            <Typography variant="h4" gutterBottom color="success.main" fontWeight="bold">
+              สำเร็จ!
             </Typography>
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {errorMessage}
-            </Alert>
-            <Button variant="contained" onClick={() => router.push("/")}>
-              กลับหน้าหลัก
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              {message || "ยืนยันอีเมลของคุณเรียบร้อยแล้ว"}
+            </Typography>
+            <Button variant="contained" fullWidth onClick={() => router.push(`/${locaActive}/protected/admin/dashboard`)}>
+              เข้าสู่ Dashboard
             </Button>
           </Box>
         ) : (
-          /* กรณี Success และ Login อยู่ จะเห็นข้อความนี้ */
           <Box>
-            <Typography variant="h4" color="primary" gutterBottom>
-              ทำรายการสำเร็จ 🎉
+            <ErrorOutlineIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
+            <Typography variant="h4" gutterBottom color="error.main" fontWeight="bold">
+              เกิดข้อผิดพลาด
             </Typography>
-            <Typography variant="body1" sx={{ mb: 3 }}>
-              {message || "ข้อมูลของคุณได้รับการยืนยันเรียบร้อยแล้ว"}
-            </Typography>
-            <Button variant="outlined" onClick={() => router.push(`/${localActive}/protected/admin/dashboard`)}>
-              ไปยัง Dashboard ของฉัน
+            <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
+              {message || "ไม่สามารถทำรายการได้ กรุณาลองใหม่อีกครั้ง"}
+            </Alert>
+            <Button variant="outlined" fullWidth onClick={() => router.push(`/${locaActive}`)}>
+              กลับไปหน้าหลัก
             </Button>
           </Box>
         )}
-      </Box>
+      </Paper>
     </Container>
+  );
+}
+
+// ต้องใช้ Suspense เพราะมีการใช้ useSearchParams
+export default function VerificationStatusPage() {
+  return (
+    <Suspense fallback={<CircularProgress />}>
+      <VerificationContent />
+    </Suspense>
   );
 }
