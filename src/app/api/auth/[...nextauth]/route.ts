@@ -46,6 +46,7 @@ const authOptions: NextAuthOptions = {
             password: true, // เลือก password
             email: true,
             userId: true,
+            isEmailVerified: true,
             role: {
               select: {
                 name: true,
@@ -71,7 +72,7 @@ const authOptions: NextAuthOptions = {
           },
         })
 
-        console.log(user?.store)
+        // console.log(user?.store)
 
         if (!user || !user.password) {
           throw new Error("โปรดตรวจสอบชื่อผู้ใช้งานเเละรหัสผ่าน");
@@ -90,6 +91,7 @@ const authOptions: NextAuthOptions = {
             roleId: user.role?.roleId,
             storeName: user.store?.storeName,
             storeId: user.store?.id,
+            emailVerified: user.isEmailVerified,
             provider: "credentials" // เพิ่มเพื่อให้แยกแยะได้
           } as any;
         }
@@ -188,6 +190,7 @@ const authOptions: NextAuthOptions = {
         token.storeName = (user as any).storeName;
         token.storeId = (user as any).storeId;
         token.provider = account?.provider;
+        token.emailVerified = (user as any).emailVerified;
       }
       return token;
     },
@@ -202,6 +205,7 @@ const authOptions: NextAuthOptions = {
           storeName: token.storeName,
           storeId: token.storeId,
           provider: token.provider,
+          emailVerified: token.emailVerified
         }
       } as any;
     },

@@ -7,6 +7,7 @@ interface User {
   roleId: string;
   storeName: string
   storeId: string
+  emailVerified: boolean | string
 }
 
 declare module 'next-auth' {
@@ -15,7 +16,8 @@ declare module 'next-auth' {
     roleId?: string;
     roleName?: string;
     storeName?: string;
-    storeId?: string
+    storeId?: string;
+    emailVerified: boolean | string
   }
 
   interface Session {

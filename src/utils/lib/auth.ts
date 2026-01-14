@@ -21,7 +21,7 @@ interface JWTUserPayload {
  * @returns Promise<{ userId: string, storeId: string }> - ID ผู้ใช้และ ID ร้านค้า
  * @throws Error 'Unauthorized' หากไม่พบ Token, Token หมดอายุ, หรือ Token ไม่สมบูรณ์
  */
-export async function getCurrentUserAndStoreIdsByToken(request: NextRequest): Promise<{ userId: string, storeId: string }> {
+export async function getCurrentUserAndStoreIdsByToken(request: NextRequest): Promise<{ userId: string, storeId: string, email: string }> {
     
     // 1. ดึง Token Payload
     // getToken จัดการการอ่าน Cookie, การถอดรหัส, และการตรวจสอบลายเซ็นให้
@@ -42,11 +42,12 @@ export async function getCurrentUserAndStoreIdsByToken(request: NextRequest): Pr
     // 4. ดึงค่าจาก Payload
     const userId = token.id;
     const storeId = token.storeId;
+    const email = token.email;
 
     if (!userId || !storeId) {
         // กรณีที่ Payload ไม่สมบูรณ์ (แม้จะผ่านการตรวจสอบ Signature แล้ว)
         throw new Error('Unauthorized'); 
     }
 
-    return { userId, storeId };
+    return { userId, storeId, email };
 }

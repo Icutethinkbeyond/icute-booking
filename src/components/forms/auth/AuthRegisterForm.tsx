@@ -27,14 +27,14 @@ import { authService } from "@/utils/services/api-services/AuthAPI";
 
 const validationSchema = Yup.object().shape({
   // username: Yup.string().required("กรุณากรอกชื่อผู้ใช้งาน"),
-  storeName: Yup.string().required("กรุณากรอกชื่อร้านค้า"),
-  storeUsername: Yup.string().required("กรุณากรอก User Name ร้านค้า"),
-  email: Yup.string().required("กรุณากรอกอีเมล").email("รูปแบบอีเมลไม่ถูกต้อง"),
-  password: Yup.string().required("กรุณากรอกรหัสผ่าน"),
-  confirmPassword: Yup.string()
-    .required("กรุณากรอกยืนยันรหัสผ่าน")
-    .oneOf([Yup.ref("password")], "รหัสผ่านไม่ตรงกัน"),
-  termsAccepted: Yup.bool().oneOf([true], "กรุณายอมรับเงื่อนไขการใช้บริการ"),
+  // storeName: Yup.string().required("กรุณากรอกชื่อร้านค้า"),
+  // storeUsername: Yup.string().required("กรุณากรอก User Name ร้านค้า"),
+  // email: Yup.string().required("กรุณากรอกอีเมล").email("รูปแบบอีเมลไม่ถูกต้อง"),
+  // password: Yup.string().required("กรุณากรอกรหัสผ่าน"),
+  // confirmPassword: Yup.string()
+  //   .required("กรุณากรอกยืนยันรหัสผ่าน")
+  //   .oneOf([Yup.ref("password")], "รหัสผ่านไม่ตรงกัน"),
+  // termsAccepted: Yup.bool().oneOf([true], "กรุณายอมรับเงื่อนไขการใช้บริการ"),
 });
 
 const AuthRegisterForm = () => {

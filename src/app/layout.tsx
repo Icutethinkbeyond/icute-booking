@@ -15,6 +15,7 @@ import { StoreProvider } from "@/contexts/StoreContext";
 import { ReportProvider } from "@/contexts/ReportContext";
 import { BookingProvider } from "@/contexts/BookingContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
+import EmailVerificationGuard from "@/components/forms/auth/EmailVerificationGuard";
 
 export const dynamic = "force-dynamic";
 
@@ -52,8 +53,9 @@ export default async function RootLayout({
                           <EmployeeProvider>
                             {/* <CategoryProvider> */}
                             <NextIntlClientProvider messages={messages}>
-                              
+                              <EmailVerificationGuard>
                               {children}
+                              </EmailVerificationGuard>
                             </NextIntlClientProvider>
                             {/* </CategoryProvider> */}
                           </EmployeeProvider>

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 import bcrypt from "bcryptjs";
 import { StoreRegister } from "@/interfaces/Store";
-import { sendVerificationEmail } from "@/utils/services/EmailServices";
+import { sendVerificationEmail, sendWithGoogle } from "@/utils/services/EmailServices";
 
 // กำหนดค่า SALT_ROUNDS สำหรับการเข้ารหัส
 const SALT_ROUNDS = 10;
@@ -122,6 +122,20 @@ export async function POST(request: Request) {
           storeUsername: storeUsername,
           lineOALink: lineOALink,
           userId: newUser.userId,
+          employeeSetting: {
+            allowCustomerSelectEmployee: true,
+            autoAssignEmployee: false,
+            maxQueuePerEmployeePerDay: 0,
+          },
+          bookingRule: {
+            minAdvanceBookingHours: 0,
+            maxAdvanceBookingDays: 0,
+            maxQueuePerService: 99,
+          },
+          cancelRule: {
+            minCancelBeforeHours: 0, // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
+            allowCustomerCancel: true,
+          },
           // สามารถกำหนดค่า default อื่นๆ ได้ตามต้องการ
         },
       });
@@ -140,27 +154,28 @@ export async function POST(request: Request) {
     });
 
     // --- 4. ส่งอีเมลยืนยัน (เรียกใช้ Service) ---
-    // try {
-    //   await sendVerificationEmail(email, result.newVerificationToken.token);
-    // } catch (emailError) {
-    //   // หากส่งอีเมลล้มเหลว ควรพิจารณา:
-    //   // 1. ตอบกลับสำเร็จ แต่เตือนให้ผู้ใช้ขอลิงก์ใหม่
-    //   // 2. หรือโยน Error 500
-    //   console.error(
-    //     "CRITICAL: Failed to send email after successful registration. Token:",
-    //     result.newVerificationToken.token
-    //   );
-    //   // ในกรณีนี้ เลือกที่จะให้ผู้ใช้สมัครสำเร็จ แต่แจ้งเตือนการส่งอีเมล
-    //   return NextResponse.json(
-    //     {
-    //       message:
-    //         "สมัครสมาชิกสำเร็จ แต่การส่งอีเมลยืนยันล้มเหลว! กรุณาเข้าสู่ระบบและขอลิงก์ยืนยันใหม่ภายหลัง",
-    //       userId: result.newUser.userId,
-    //       storeId: result.newStore.id,
-    //     },
-    //     { status: 201 }
-    //   );
-    // }
+    try {
+      await sendVerificationEmail(email, result.newVerificationToken.token);
+      // await sendWithGoogle(email, "ยืนยันอีเมล", "verify-email", result.newVerificationToken.token);
+    } catch (emailError) {
+      // หากส่งอีเมลล้มเหลว ควรพิจารณา:
+      // 1. ตอบกลับสำเร็จ แต่เตือนให้ผู้ใช้ขอลิงก์ใหม่
+      // 2. หรือโยน Error 500
+      console.error(
+        "CRITICAL: Failed to send email after successful registration. Token:",
+        result.newVerificationToken.token
+      );
+      // ในกรณีนี้ เลือกที่จะให้ผู้ใช้สมัครสำเร็จ แต่แจ้งเตือนการส่งอีเมล
+      return NextResponse.json(
+        {
+          message:
+            "สมัครสมาชิกสำเร็จ แต่การส่งอีเมลยืนยันล้มเหลว! กรุณาเข้าสู่ระบบและขอลิงก์ยืนยันใหม่ภายหลัง",
+          userId: result.newUser.userId,
+          storeId: result.newStore.id,
+        },
+        { status: 201 }
+      );
+    }
 
     // --- 4. ตอบกลับสำเร็จ ---
     return new NextResponse(
@@ -178,4 +193,3 @@ export async function POST(request: Request) {
     return new NextResponse(JSON.stringify({ error }), { status: 500 });
   }
 }
-

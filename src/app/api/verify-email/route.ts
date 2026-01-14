@@ -73,6 +73,6 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Email verification error:', error);
     // 6. ข้อผิดพลาดที่ไม่คาดคิด
-    return NextResponse.redirect(new URL('/verification-status?status=error&message=An unexpected error occurred during verification', url));
+    return NextResponse.redirect(new URL('/auth/verification-status?status=error&message=An unexpected error occurred during verification', url));
   }
 }

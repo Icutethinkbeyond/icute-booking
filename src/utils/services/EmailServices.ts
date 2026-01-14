@@ -1,55 +1,75 @@
-// import nodemailer from "nodemailer";
-// import fs from "fs";
-// import path from "path";
-
-// export const sendEmail = async (to: string, subject: string, templateName: string, replacements: Record<string, string>) => {
-//   try {
-//     // สร้าง transporter
-//     const transporter = nodemailer.createTransport({
-//       host: process.env.EMAIL_HOST, // ใช้จาก ENV
-//       port: Number(process.env.EMAIL_PORT) || 587, // ใช้จาก ENV
-//       secure: process.env.EMAIL_SECURE === "true", // ใช้ TLS/SSL
-//       auth: {
-//           user: process.env.EMAIL_USER, // อีเมลผู้ส่ง
-//           pass: process.env.EMAIL_PASSWORD, // รหัสผ่าน
-//       },
-//     });
-
-//     // อ่านเทมเพลต HTML
-//     const templatePath = path.join(process.cwd(), "src", "utils", "templates", "emails", `${templateName}.html`);
-//     let html = fs.readFileSync(templatePath, "utf8");
-
-//     // แทนค่าตัวแปรในเทมเพลต
-//     Object.keys(replacements).forEach((key) => {
-//       const value = replacements[key];
-//       html = html.replace(new RegExp(`{{${key}}}`, "g"), value);
-//     });
-
-//     // ส่งอีเมล
-//     await transporter.sendMail({
-//       from: '"Your Company" <your-email@example.com>',
-//       to,
-//       subject,
-//       html,
-//     });
-
-//     console.log("Email sent successfully to:", to);
-//   } catch (error) {
-//     console.error("Error sending email:", error);
-//     throw error;
-//   }
-// };
-
-// lib/emailService.ts
+import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 import { Resend } from 'resend';
 
 // ตรวจสอบและสร้าง Instance ของ Resend Client
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ดึง Base URL จาก Environment Variables
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'; 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 // กำหนดอีเมลผู้ส่ง (ต้อง verified ในระบบ Resend)
-const FROM_EMAIL = 'onboarding@yourdomain.com'; 
+const FROM_EMAIL = 'Acme <onboarding@resend.dev>';
+
+
+
+
+
+export const sendWithGoogle = async (
+  to: string,
+  subject: string,
+  templateName: string,
+  token: string,
+  // replacements: Record<string, string>
+): Promise<boolean> => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT) || 587,
+      secure: process.env.EMAIL_SECURE === "true",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // อ่าน template
+    const templatePath = path.join(
+      process.cwd(),
+      "src",
+      "utils",
+      "templates",
+      "emails",
+      `${templateName}.html`
+    );
+
+    let html = fs.readFileSync(templatePath, "utf8");
+
+    // replace ตัวแปร
+    // Object.entries(replacements).forEach(([key, value]) => {
+    //   html = html.replace(new RegExp(`{{${key}}}`, "g"), value);
+    // });
+
+    const verificationLink = `${BASE_URL}/api/verify-email?token=${token}`;
+    html = html.replace("ConfirmationURL", verificationLink);
+
+    await transporter.sendMail({
+      from: `"Your Company" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+    });
+
+    console.log("Email sent successfully to:", to);
+    return true; 
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false; 
+  }
+};
+
+
+
 
 /**
  * ฟังก์ชันสำหรับส่งอีเมลยืนยันบัญชี
@@ -58,7 +78,7 @@ const FROM_EMAIL = 'onboarding@yourdomain.com';
  */
 export async function sendVerificationEmail(toEmail: string, token: string) {
   // สร้างลิงก์ยืนยันที่ผู้ใช้จะต้องคลิก
-  const verificationLink = `${BASE_URL}/api/verify-email?token=${token}`; 
+  const verificationLink = `${BASE_URL}/api/verify-email?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -70,7 +90,7 @@ export async function sendVerificationEmail(toEmail: string, token: string) {
             <h2>สวัสดีครับ/ค่ะ,</h2>
             <p>ขอบคุณที่ลงทะเบียนใช้งานระบบของเรา! กรุณาคลิกลิงก์ด้านล่างเพื่อยืนยันอีเมลของคุณ:</p>
             <p>
-                <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; color: #ffffff; background-color: #3BB173; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; color: #182E4E; background-color: #3BB173; border-radius: 5px; text-decoration: none; font-weight: bold;">
                     ยืนยันอีเมล
                 </a>
             </p>
@@ -85,9 +105,9 @@ export async function sendVerificationEmail(toEmail: string, token: string) {
     if (error) {
       console.error('Error sending verification email via Resend:', error);
       // โยน Error เพื่อให้โค้ดที่เรียกใช้จัดการต่อ
-      throw new Error(`Resend Error: ${error.message}`); 
+      throw new Error(`Resend Error: ${error.message}`);
     }
-    
+
     console.log('Verification email sent successfully to:', toEmail, 'ID:', data.id);
     return true;
 
@@ -106,7 +126,7 @@ export async function sendVerificationEmail(toEmail: string, token: string) {
 
 export async function sendResetPasswordEmail(toEmail: string, token: string) {
   // ลิงก์นี้จะนำผู้ใช้ไปยังหน้า Frontend สำหรับการตั้งรหัสผ่านใหม่
-  const resetLink = `${BASE_URL}/reset-password?token=${token}`; 
+  const resetLink = `${BASE_URL}/reset-password?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -131,9 +151,9 @@ export async function sendResetPasswordEmail(toEmail: string, token: string) {
     });
 
     if (error) {
-      throw new Error(`Resend Error: ${error.message}`); 
+      throw new Error(`Resend Error: ${error.message}`);
     }
-    
+
     console.log('Reset password email sent successfully to:', toEmail, 'ID:', data.id);
     return true;
 
