@@ -17,51 +17,43 @@ import { useLocale } from "next-intl";
 import { KeyRound, Save } from "lucide-react";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
-import {
-  initialChangePassword,
-  ChangePassword,
-  ResetPassword,
-  initialResetPassword,
-} from "@/interfaces/User";
-import { authService } from "@/utils/services/api-services/AuthAPI";
+import { initialChangePassword, ChangePassword } from "@/interfaces/User";
 
 interface StoreProps {
   viewOnly?: boolean;
 }
 
-const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
+const ChangePasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
   const { StoreEdit, setStoreEdit, setStores, Stores } = useStoreContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
     useNotifyContext();
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabledForm, setDisabledForm] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState(5);
-  const [success, setSuccess] = useState<boolean>(false);
 
   const router = useRouter();
   const pathname = usePathname();
   const localActive = useLocale();
 
-  const redirectUrl = `/${localActive}/protected/admin/dashboard`;
-
   const searchParams = useSearchParams();
   const searchParamsToken = searchParams.get("token");
 
   const validationSchema = Yup.object().shape({
-    newPassword: Yup.string().required("กรุณากรอกรหัสผ่านใหม่"),
+    oldPassword: Yup.string().required("กรุณากรอกรหัสผ่านเดิม"),
+    password: Yup.string().required("กรุณากรอกรหัสผ่านใหม่"),
     confirmPassword: Yup.string()
       .required("กรุณากรอกยืนยันรหัสผ่าน")
-      .oneOf([Yup.ref("newPassword")], "รหัสผ่านไม่ตรงกัน"),
+      .oneOf([Yup.ref("password")], "รหัสผ่านไม่ตรงกัน"),
   });
 
   const handleFormSubmit = async (
-    values: ResetPassword,
+    values: ChangePassword,
     {
       setSubmitting,
       setErrors,
       resetForm,
       validateForm,
-    }: FormikHelpers<ResetPassword> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
+    }: FormikHelpers<ChangePassword> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
@@ -83,7 +75,7 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
     // 2. เรียกใช้ API
     let result;
 
-    result = await authService.resetPassword(values);
+    result = await storeService.updatePassword(values);
 
     // 3. จัดการเมื่อสำเร็จ
     setNotify({
@@ -91,37 +83,12 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
       message: result.message,
       color: result.success ? "success" : "error",
     });
-
-    console.log(result.success)
-
-    if (result.success) {
-      setSuccess(true);
-    }
   };
-
-  useEffect(() => {
-    if (success) {
-      const interval = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-
-      // ครบเวลา → logout
-      const timeout = setTimeout(async () => {
-        clearInterval(interval);
-        router.replace(redirectUrl);
-      }, countdown * 1000);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
-    }
-  }, [success]);
 
   return (
     <>
-      <Formik<ResetPassword>
-        initialValues={initialResetPassword}
+      <Formik
+        initialValues={initialChangePassword}
         validationSchema={validationSchema}
         onSubmit={handleFormSubmit}
         enableReinitialize // เพื่อให้ Formik อัปเดตค่าจาก useState
@@ -148,6 +115,36 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
                       </Typography>
                     </Grid2>
                   </Grid2>
+                </Grid2>
+
+                {/* Store ID */}
+                <Grid2 size={{ xs: 12 }}>
+                  <Field name="oldPassword">
+                    {({ field }: FieldProps) => (
+                      <TextField
+                        {...field}
+                        name="oldPassword"
+                        label="รหัสผ่านเก่า (จำเป็น)"
+                        // sx={{ textTransform: "uppercase" }}
+                        value={values.oldPassword ? values.oldPassword : ""}
+                        onChange={(e) => {
+                          setFieldValue("oldPassword", e.target.value);
+                        }}
+                        slotProps={{
+                          inputLabel: { shrink: true },
+                          input: {
+                            readOnly: viewOnly ? true : false,
+                          },
+                        }}
+                        error={
+                          touched.oldPassword && Boolean(errors.oldPassword)
+                        }
+                        helperText={touched.oldPassword && errors.oldPassword}
+                        fullWidth
+                        disabled={openBackdrop || isSubmitting || disabledForm}
+                      />
+                    )}
+                  </Field>
                 </Grid2>
 
                 <Grid2 size={{ xs: 12 }}>
@@ -223,25 +220,19 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
                   type="submit"
                   color="primary"
                   sx={{ mr: 1 }}
-                  disabled={isSubmitting || disabledForm}
-                  loading={isSubmitting}
+                  disabled={openBackdrop || isSubmitting || disabledForm}
+                  loading={openBackdrop || isSubmitting}
                   startIcon={<Save />}
                 >
-                  บันทึก{" "}
-                  {success && (
-                    <>
-                      {" "}
-                      <span style={{ paddingRight: 10, paddingLeft: 10 }}>
-                        ระบบกำลังนำคุณไปเข้าสู่ระบบใหม่{" "}
-                      </span>
-                      <span style={{ fontSize: 24, paddingRight: 10 }}>
-                        {" "}
-                        {countdown}{" "}
-                      </span>{" "}
-                      วินาที{" "}
-                    </>
-                  )}
+                  บันทึก
                 </LoadingButton>
+                {/* <ConfirmDelete
+                  itemId={uniqueId()}
+                  onDisable={openBackdrop || isSubmitting}
+                  onDelete={() => resetForm()}
+                  massage={`คุณต้องการล้างฟอร์มใช่หรือไม่?`}
+                  buttonType={ButtonType.Button}
+                /> */}
               </Grid2>
             </Box>
           </Form>
@@ -251,4 +242,4 @@ const ResetPasswordForm: FC<StoreProps> = ({ viewOnly = false }) => {
   );
 };
 
-export default ResetPasswordForm;
+export default ChangePasswordForm;

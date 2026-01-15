@@ -126,7 +126,7 @@ export async function sendVerificationEmail(toEmail: string, token: string) {
 
 export async function sendResetPasswordEmail(toEmail: string, token: string) {
   // ลิงก์นี้จะนำผู้ใช้ไปยังหน้า Frontend สำหรับการตั้งรหัสผ่านใหม่
-  const resetLink = `${BASE_URL}/reset-password?token=${token}`;
+  const resetLink = `${BASE_URL}/auth/reset-password?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({

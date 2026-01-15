@@ -3,18 +3,12 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcryptjs';
+import { ResetPassword } from '@/interfaces/User';
 
 const prisma = new PrismaClient();
 
 // กำหนดค่า SALT_ROUNDS สำหรับการเข้ารหัส
 const SALT_ROUNDS = 10;
-
-// Type สำหรับข้อมูลที่คาดหวังจาก Body ของ Request
-interface ResetPasswordRequest {
-    token: string;
-    newPassword: string;
-    confirmPassword: string; // ควรมีการยืนยันรหัสผ่านใหม่
-}
 
 /**
  * POST /api/reset-password
@@ -22,7 +16,7 @@ interface ResetPasswordRequest {
  */
 export async function POST(request: Request) {
     try {
-        const { token, newPassword, confirmPassword }: ResetPasswordRequest = await request.json();
+        const { token, newPassword, confirmPassword }: ResetPassword = await request.json();
 
         // 1. ตรวจสอบความถูกต้องของข้อมูลพื้นฐาน
         if (!token || !newPassword || !confirmPassword) {

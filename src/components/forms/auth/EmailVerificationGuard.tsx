@@ -38,8 +38,6 @@ export default function EmailVerificationGuard({
   const pathname = usePathname(); // ดึง Path ปัจจุบัน
   const localActive = useLocale();
 
-  console.log(pathname)
-
   // 1. กำหนดหน้าที่อนุญาตให้ผ่านได้ (White list)
   const isVerificationPage = pathname.startsWith(`/${localActive}/auth/verification-status`);
 

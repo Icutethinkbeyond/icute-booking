@@ -23,6 +23,13 @@ export interface ChangePassword {
     oldPassword?: string;
     newPassword?: string;
     confirmPassword?: string;
+    token: string;
+}
+
+export interface ResetPassword {
+    newPassword?: string;
+    confirmPassword?: string;
+    token: string;
 }
 
 export interface Role {
@@ -94,6 +101,13 @@ export const initialChangePassword: ChangePassword = {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
+    token: ""
+}
+
+export const initialResetPassword: ResetPassword = {
+    newPassword: "",
+    confirmPassword: "",
+    token: ""
 }
 
 export const initialResetPasswordToken: ResetPasswordToken = {

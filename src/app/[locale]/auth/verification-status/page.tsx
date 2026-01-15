@@ -22,9 +22,9 @@ function VerificationContent() {
   const locaActive = useLocale();
   const { data: session, status: authStatus, update } = useSession();
   const [countdown, setCountdown] = useState(5);
-  const [redirectUrl, setRedirectUrl] = useState(
-    `/${locaActive}/protected/admin/dashboard`
-  );
+
+
+  const redirectUrl = `/${locaActive}/protected/admin/dashboard`
 
   const [isProcessing, setIsProcessing] = useState(true);
   const status = searchParams.get("status");
