@@ -94,6 +94,10 @@ export interface Store {
   lineChannelId?: string;
   lineChannelSecret?: string;
 
+  employeeSetting: EmployeeSetting;
+  bookingRule: BookingRule;
+  cancelRule: CancelRule;
+
   newBooking?: string; //เเจ้งเตือนเมื่อได้รับการจองใหม่
   successBooking?: string;  //เเจ้งเตือนลูกค้าเมื่อจองสำเร็จ
   cancelBooking?: string;  //ข้อความเเจ้งเตือนลูกค้าเมื่อถูกยกเลิกการจอง
@@ -161,6 +165,24 @@ export interface ServiceList {
 export interface EmployeeList {
   id: string;
   name: string; // เช่น "ตัดผม 30 นาที"
+}
+
+export interface EmployeeSetting {
+  allowCustomerSelectEmployee: boolean;
+  autoAssignEmployee: boolean;
+
+  maxQueuePerEmployeePerDay?: number | null // null หรือ 0 = ไม่จำกัด
+}
+
+export interface BookingRule {
+  minAdvanceBookingHours: number // จองล่วงหน้าขั้นต่ำ (ชั่วโมง) 
+  maxAdvanceBookingDays: number // จองล่วงหน้าสูงสุด (วัน)
+  maxQueuePerPhone: number // จำนวนคิวสูงสุดต่อบริการ
+}
+
+export interface CancelRule {
+  minCancelBeforeHours: number  // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
+  allowCustomerCancel: boolean;
 }
 
 
@@ -242,9 +264,9 @@ export interface OperatingHourRequest {
 }
 
 export const initialOperatingHour: DefaultOperatingHour = {
+
   id: '',
 
-  // 2. สถานะและเวลาทำการปกติ
   MON_isOpen: "true",
   MON_openTime: null,
   MON_closeTime: null,
@@ -296,11 +318,6 @@ export const initialStore: Store = {
     longitude: null,
   },
 
-  // latitude: null,
-  // longitude: null,
-  // address: '',
-  // placeId: '',
-
   lineNotifyToken: undefined,
   lineChannelId: undefined,
   lineChannelSecret: undefined,
@@ -310,6 +327,21 @@ export const initialStore: Store = {
   cancelBooking: undefined,
   before24H: undefined,
   reSchedule: undefined,
+
+  employeeSetting: {
+    allowCustomerSelectEmployee: true,
+    autoAssignEmployee: false,
+    maxQueuePerEmployeePerDay: null // null หรือ 0 = ไม่จำกัด
+  },
+  bookingRule: {
+    minAdvanceBookingHours: 3, // จองล่วงหน้าขั้นต่ำ (ชั่วโมง) 
+    maxAdvanceBookingDays: 1, // จองล่วงหน้าสูงสุด (วัน)
+    maxQueuePerPhone: 3 // จำนวนคิวสูงสุดต่อบริการ
+  },
+  cancelRule: {
+    minCancelBeforeHours: 3,  // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง (ชั่วโมง) 
+    allowCustomerCancel: true,
+  },
 
   userId: '',
   user: undefined,

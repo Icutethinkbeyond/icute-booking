@@ -361,13 +361,12 @@ type EmployeeSetting {
 }
 
 type BookingRule {
-  minAdvanceBookingHours Int @default(0) // จองล่วงหน้าขั้นต่ำ (ชั่วโมง) 
-  maxAdvanceBookingDays  Int @default(0) // จองล่วงหน้าสูงสุด (วัน)
-
-  maxQueuePerService Int @default(99)// จำนวนคิวสูงสุดต่อบริการ
+  minAdvanceBookingHours Int @default(3) // จองล่วงหน้าขั้นต่ำ (ชั่วโมง) 
+  maxAdvanceBookingDays  Int @default(1) // จองล่วงหน้าสูงสุด (วัน)
+  maxQueuePerPhone Int @default(3)// จำนวนคิวสูงสุดต่อบริการ
 }
 
 type CancelRule {
-  minCancelBeforeHours Int @default(0)// ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
+  minCancelBeforeHours Int @default(3)// ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
   allowCustomerCancel  Boolean @default(true)
 }

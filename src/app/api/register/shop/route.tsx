@@ -125,15 +125,15 @@ export async function POST(request: Request) {
           employeeSetting: {
             allowCustomerSelectEmployee: true,
             autoAssignEmployee: false,
-            maxQueuePerEmployeePerDay: 0,
+            maxQueuePerEmployeePerDay: 10,
           },
           bookingRule: {
-            minAdvanceBookingHours: 0,
-            maxAdvanceBookingDays: 0,
-            maxQueuePerService: 99,
+            minAdvanceBookingHours: 3,
+            maxAdvanceBookingDays: 2,
+            maxQueuePerPhone: 3,
           },
           cancelRule: {
-            minCancelBeforeHours: 0, // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
+            minCancelBeforeHours: 3, // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
             allowCustomerCancel: true,
           },
           // สามารถกำหนดค่า default อื่นๆ ได้ตามต้องการ

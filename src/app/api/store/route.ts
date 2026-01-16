@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
-import { Store } from '@/interfaces/Store';
+import { Store, StoreRegister } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { getStoreByCurrentUserId } from '@/utils/services/database-services/StoreDBService';
 import { deleteImage, handleImageUpload } from '@/utils/services/cloudinary.service';
@@ -73,7 +73,9 @@ export async function PATCH(request: NextRequest) {
 
     try {
         const { userId, storeId: tokenStoreId } = await getCurrentUserAndStoreIdsByToken(request);
-        const data: any = await request.json(); // เปลี่ยนเป็น any เพื่อให้เข้าถึงฟิลด์ใหม่ได้ง่าย
+        const data: Store = await request.json(); // เปลี่ยนเป็น any เพื่อให้เข้าถึงฟิลด์ใหม่ได้ง่าย
+
+        // console.info(data.bookingRule.minAdvanceBookingHours)
 
         const id = data.id || tokenStoreId;
         if (!id) {
@@ -125,14 +127,14 @@ export async function PATCH(request: NextRequest) {
                     allowCustomerSelectEmployee: data.employeeSetting.allowCustomerSelectEmployee,
                     autoAssignEmployee: data.employeeSetting.autoAssignEmployee,
                     // ถ้าส่งมาเป็น 0 หรือ null ให้เก็บเป็น null (ไม่จำกัด)
-                    maxQueuePerEmployeePerDay: data.employeeSetting.maxQueuePerEmployeePerDay || null,
+                    maxQueuePerEmployeePerDay: Number(data.employeeSetting.maxQueuePerEmployeePerDay) || null,
                 } : undefined,
 
                 // 2. Booking Rule
                 bookingRule: data.bookingRule ? {
                     minAdvanceBookingHours: Number(data.bookingRule.minAdvanceBookingHours),
                     maxAdvanceBookingDays: Number(data.bookingRule.maxAdvanceBookingDays),
-                    maxQueuePerService: Number(data.bookingRule.maxQueuePerService),
+                    maxQueuePerPhone: Number(data.bookingRule.maxQueuePerPhone),
                 } : undefined,
 
                 // 3. Cancel Rule
@@ -155,6 +157,7 @@ export async function PATCH(request: NextRequest) {
         }, { status: 200 });
 
     } catch (error: any) {
+        console.error('Error updating:', error);
         // --- Rollback Logic --- (เหมือนเดิม)
         if (_logo?.action === "UPDATE" || _logo?.action === "CREATE") {
             if (_logo.publicId) await deleteImage(_logo.publicId);

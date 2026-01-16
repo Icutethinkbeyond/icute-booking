@@ -57,15 +57,6 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   const localActive = useLocale();
 
   const validationSchema = Yup.object().shape({
-    // serialNo: Yup.string().required("กรุณากรอกรหัสอุปกรณ์"),
-    // ServiceName: Yup.string().required("กรุณากรอกชื่ออุปกรณ์"),
-    // aboutService: Yup.object().shape({
-    //   rentalPriceCurrent: Yup.number()
-    //     .required("กรุณากรอกราคาค่าเช่า")
-    //     .min(1, "กรุณากรอกค่าที่มากกว่า 0"),
-    //   stockStatus: Yup.string().required("กรุณาเลือกสถานะอุปกรณ์"),
-    //   QTY: Yup.number().required("กรุณาใส่จำนวน"),
-    // }),
   });
 
   const downloadQR = () => {
