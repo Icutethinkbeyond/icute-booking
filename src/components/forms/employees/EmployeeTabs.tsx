@@ -4,7 +4,7 @@ import { Tabs, Box, Tab, Grid2 } from "@mui/material";
 // import { ReportType } from "@/contexts/ReportContext";
 import { a11yProps, CustomTabPanel } from "../../shared/TabSetting";
 import { CalendarMonth, LocalOffer, PriceCheck } from "@mui/icons-material";
-import NewEmployee from "./NewEmployee";
+import NewEmployee from "./NewEmployee_old";
 import EmployeeTable from "./EmployeeTable";
 
 export default function EmployeeTabs() {

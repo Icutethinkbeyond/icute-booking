@@ -16,7 +16,7 @@ import Breadcrumb from "@/components/shared/BreadcrumbCustom";
 import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import NewEmployee from "@/components/forms/employees/NewEmployee";
+import NewEmployee from "@/components/forms/employees/NewEmployee_old";
 
 const NewEmployeePage = () => {
   const t = useTranslations("HomePage");
