@@ -17,6 +17,7 @@ import {
   Chip,
   MenuItem,
   Theme,
+  CircularProgress,
 } from "@mui/material";
 import * as Yup from "yup";
 import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
@@ -144,32 +145,47 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   };
 
   const getService = async () => {
+    setIsLoading(true);
+
     const serviceId = params.get("serviceId");
 
-    if (serviceId) {
-      let result = await serviceService.getService(serviceId);
+    try {
+      if (serviceId) {
+        let result = await serviceService.getService(serviceId);
+        getEmployeeList();
 
-      console.log(result)
-
-      if (result.success) {
-        setServiceForm(result.data);
+        if (result.success) {
+          setServiceForm(result.data);
+        } else {
+          setNotify({
+            open: true,
+            message: result.message,
+            color: result.success ? "success" : "error",
+          });
+        }
       } else {
         setNotify({
           open: true,
-          message: result.message,
-          color: result.success ? "success" : "error",
+          message: "ไม่พบ Id",
+          color: "error",
         });
       }
-    } else {
+    } catch (error: any) {
       setNotify({
         open: true,
-        message: "ไม่พบ Id",
+        message: error.code,
         color: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
-  const getServiceList = async () => {
+  const getEmployeeList = async () => {
+    setIsLoading(true);
+
     try {
       let result = await employeeService.getEmployeeList();
 
@@ -180,15 +196,16 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
         message: error.code,
         color: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    setIsLoading(true);
-
-    getServiceList();
+    // getEmployeeList();
 
     if (pathname.includes("new")) {
+      getEmployeeList();
       setServiceForm(initialService);
       setServiceEdit(false);
       setDisabledForm(false);
@@ -203,6 +220,21 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
       setDisabledForm(false);
     };
   }, []);
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -565,7 +597,11 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
                                 <MenuItem
                                   key={id}
                                   value={id}
-                                  style={getStyles(id, values.employeeIds, theme)}
+                                  style={getStyles(
+                                    id,
+                                    values.employeeIds,
+                                    theme
+                                  )}
                                 >
                                   {name}
                                 </MenuItem>
