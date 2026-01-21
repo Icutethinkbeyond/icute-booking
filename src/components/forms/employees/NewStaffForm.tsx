@@ -693,6 +693,39 @@ export default function StaffForm({
                               },
                             }}
                           /> */}
+                          <Field name="phone">
+                            {({ field }: FieldProps) => (
+                              <TextField
+                                {...field}
+                                name="phone"
+                                label="เบอร์โทร *"
+                                value={values.phone}
+                                onChange={(e) => {
+                                  setFieldValue("phone", e.target.value);
+                                }}
+                                // placeholder="เบอร์โทร *"
+                                slotProps={{
+                                  inputLabel: { shrink: true },
+                                  input: {
+                                    startAdornment: (
+                                      <PhoneIcon
+                                        sx={{
+                                          mr: 1,
+                                          color: theme.palette.grey[400],
+                                        }}
+                                      />
+                                    ),
+                                  },
+                                }}
+                                error={touched.phone && Boolean(errors.phone)}
+                                helperText={touched.phone && errors.phone}
+                                fullWidth
+                                disabled={
+                                  openBackdrop || isSubmitting || disabledForm
+                                }
+                              />
+                            )}
+                          </Field>
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6 }}>
                           <TextField
