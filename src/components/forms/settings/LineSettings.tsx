@@ -12,10 +12,7 @@ import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
 
 import { LoadingButton } from "@mui/lab";
 import { useNotifyContext } from "@/contexts/NotifyContext";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useLocale } from "next-intl";
-import { MessageSquareMore, Save } from "lucide-react";
-import { More } from "@mui/icons-material";
+import { Save } from "lucide-react";
 import { storeService } from "@/utils/services/api-services/StoreAPI";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { Store, initialStore } from "@/interfaces/Store";
