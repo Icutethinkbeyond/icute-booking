@@ -69,6 +69,7 @@
     "react-to-print": "^3.0.5",
     "recharts": "^2.12.7",
     "resend": "^6.5.2",
+    "uuid": "^13.0.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "yup": "^1.6.1"
   },
@@ -84,6 +85,7 @@
     "@types/lodash": "4.14.196",
     "@types/node": "^22.10.2",
     "@types/nodemailer": "^6.4.17",
+    "@types/uuid": "^11.0.0",
     "prisma": "6.17.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"

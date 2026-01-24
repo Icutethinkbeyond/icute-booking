@@ -50,6 +50,7 @@ export interface EmployeeBreakTime {
 
 export interface EmployeeLeave {
   id?: string;
+  employeeId?: string | null;
 
   startDate: Dayjs | null | string;
   endDate: Dayjs | null | string;
@@ -96,7 +97,7 @@ export interface Employee {
   serviceIds: string[];
 
   workingDays: EmployeeWorkingDay[];
-  breakTimes: EmployeeBreakTime[];
+  // breakTimes: EmployeeBreakTime[];
   leaves: EmployeeLeave[];
 
   createdAt: string; // ISO Date
@@ -284,6 +285,8 @@ export const initialHoliday: Holiday = {
 }
 
 export const initialEmployeeLeave: EmployeeLeave = {
+  id: '',
+  employeeId: '',
   startDate: null,
   endDate: null,
   leaveType: LeaveType.VACATION,
@@ -318,24 +321,41 @@ export const createInitialBreakTimes = (): EmployeeBreakTime[] =>
     })
   );
 
-export const createInitialWorkingDay = (
-  day: DayOfWeek
-): EmployeeWorkingDay => {
-  const isWorking = !["SAT", "SUN"].includes(day);
+// export const createInitialWorkingDay = (
+//   day: DayOfWeek
+// ): EmployeeWorkingDay => {
+//   const isWorking = !["SAT", "SUN"].includes(day);
 
-  return {
-    dayOfWeek: day,
-    isWorking,
-    timeSlots: isWorking
-      ? [
-        {
-          startTime: "09:00",
-          endTime: "18:00",
-        },
-      ]
-      : [],
-  };
+//   return {
+//     dayOfWeek: day,
+//     isWorking,
+//     timeSlots: isWorking
+//       ? [
+//         {
+//           startTime: "09:00",
+//           endTime: "18:00",
+//         },
+//       ]
+//       : [],
+//   };
+// };
+
+export const DAY_LABEL: Record<DayOfWeek, string> = {
+  MON: "จันทร์",
+  TUE: "อังคาร",
+  WED: "พุธ",
+  THU: "พฤหัส",
+  FRI: "ศุกร์",
+  SAT: "เสาร์",
+  SUN: "อาทิตย์",
 };
+
+export const initialWorkingDays: EmployeeWorkingDay[] =
+  Object.values(DayOfWeek).map((day) => ({
+    dayOfWeek: day,
+    isWorking: false,
+    timeSlots: [],
+  }));
 
 
 export const initialEmployee: Employee = {
@@ -366,8 +386,8 @@ export const initialEmployee: Employee = {
 
   serviceIds: [],
 
-  workingDays: DAYS_OF_WEEK.map(createInitialWorkingDay),
-  breakTimes: createInitialBreakTimes(),
+  workingDays: [],
+  // breakTimes: createInitialBreakTimes(),
   leaves: [],
 
   createdAt: new Date().toISOString(),

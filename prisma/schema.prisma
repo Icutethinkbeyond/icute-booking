@@ -166,7 +166,7 @@ model Employee {
 
   // 🔥 ตารางเวลาพนักงาน
   workingDays EmployeeWorkingDay[]
-  breakTimes  EmployeeBreakTime[]
+  // breakTimes  EmployeeBreakTime[]
   leaves      EmployeeLeave[]
 
   createdAt DateTime @default(now())
@@ -204,18 +204,18 @@ model EmployeeWorkingTime {
 }
 
 // เวลาพักพนักงาน
-model EmployeeBreakTime {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId String @db.ObjectId
+// model EmployeeBreakTime {
+//   id         String @id @default(auto()) @map("_id") @db.ObjectId
+//   employeeId String @db.ObjectId
 
-  dayOfWeek DayOfWeek
+//   dayOfWeek DayOfWeek
 
-  startTime String // "12:00"
-  endTime   String // "13:00"
+//   startTime String // "12:00"
+//   endTime   String // "13:00"
 
-  createdAt DateTime @default(now())
-  employee  Employee @relation(fields: [employeeId], references: [id])
-}
+//   createdAt DateTime @default(now())
+//   employee  Employee @relation(fields: [employeeId], references: [id])
+// }
 
 // วันลาหยุดพนักงาน
 model EmployeeLeave {

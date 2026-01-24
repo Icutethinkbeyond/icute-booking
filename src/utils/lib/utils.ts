@@ -1,10 +1,26 @@
 import axios from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import * as XLSX from 'xlsx';
-import { DefaultOperatingHour, OperatingHourRequest } from "@/interfaces/Store"
+import { DefaultOperatingHour, EmployeeWorkingTime, OperatingHourRequest } from "@/interfaces/Store"
 // import { EquipmentRow } from '@/interfaces/Equipment';
 // import { ReportType, SelectType } from "@/contexts/ReportContext";
 // import { DocumentCategory, DocumentStep, MaintenanceType } from "@prisma/client";
+
+export function isOverlapping(
+  slots: EmployeeWorkingTime[],
+  index: number
+): boolean {
+  const current = slots[index];
+  if (!current) return false;
+
+  const start = current.startTime;
+  const end = current.endTime;
+
+  return slots.some((slot, i) => {
+    if (i === index) return false;
+    return start < slot.endTime && end > slot.startTime;
+  });
+}
 
 /**
  * ฟังก์ชันสำหรับแทนที่ตัวแปรในข้อความที่ดึงมาจาก DB
