@@ -1,51 +1,61 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Grid,
   Box,
-  TextField,
-  Button,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from "@mui/material";
-import PageContainer from "@/components/container/PageContainer";
-import { useLocale, useTranslations } from "next-intl";
-import Breadcrumb from "@/components/shared/BreadcrumbCustom";
-import BaseCard from "@/components/shared/BaseCard";
-import { useEffect, useState } from "react";
-import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import NewEmployee from "@/components/forms/employees/NewEmployee_old";
+import { useTheme } from "@mui/material/styles";
+import StaffForm from "@/components/forms/employees/NewEmployee";
+import { StaffFormData } from "@/components/lib/staff";
 
-const NewEmployeePage = () => {
-  const t = useTranslations("HomePage");
-  const localActive = useLocale();
+export default function EditEmployeePage() {
+  const theme = useTheme();
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
-  const { setBreadcrumbs } = useBreadcrumbContext();
+  const handleSubmit = (data: StaffFormData) => {
+    console.log("Staff data:", data);
+    setSnackbar({
+      open: true,
+      message: "เพิ่มพนักงานเรียบร้อยแล้ว",
+      severity: "success",
+    });
+    // In real app, redirect to staff list after success
+  };
 
-  useEffect(() => {
-    setBreadcrumbs([
-      { name: "หน้าแรก", href: `/${localActive}/protected/admin/dashboard` },
-      { name: "จัดการพนักงาน", href: `/${localActive}/protected/admin/employees` },
-      { name: "เพิ่มพนักงาน", href: `/${localActive}/protected/admin/employees/new` },
-    ]);
-    return () => {
-      setBreadcrumbs([]);
-    };
-  }, []);
+  const handleCancel = () => {
+    // In real app, navigate back to staff list
+    window.history.back();
+  };
 
   return (
-    <PageContainer title="" description="">
-      <Typography variant="h1" mt={2} >
-        การจัดการพนักงาน
-      </Typography>
-      <BaseCard title="">
-        <NewEmployee/>
-      </BaseCard>
-    </PageContainer>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+      }}
+    >
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 2, md: 3 },
+          // ml: { xs: 0, md: "280px" },
+        }}
+      >
+
+        {/* Staff Form */}
+        <StaffForm onSubmit={handleSubmit} onCancel={handleCancel} />
+      </Box>
+
+    </Box>
   );
-};
-
-export default NewEmployeePage;
-
+}

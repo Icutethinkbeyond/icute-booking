@@ -17,6 +17,7 @@ export const employeeService = {
     //     }
     // },
 
+
     async getEmployee(employeeId: string) {
         try {
             let data: any = await APIServices.get1only(`${EMPLOYEE_API_BASE_URL}/detail?employeeId=${employeeId}`);

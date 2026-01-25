@@ -63,6 +63,7 @@ import {
   EmployeeLeave,
   EmployeeWorkingDay,
   EmployeeWorkingTime,
+  initialEmployee,
   initialService,
   LEAVE_TYPE_MAP,
   LEAVE_TYPE_OPTIONS,
@@ -322,22 +323,63 @@ export default function StaffForm({
     }
   };
 
+    const getEmployee = async () => {
+      setIsLoading(true);
+  
+      const employeeId = params.get("employeeId");
+  
+      try {
+        if (employeeId) {
+          let result = await employeeService.getEmployee(employeeId);
+
+          console.log(result)
+          getServiceList();
+  
+          if (result.success) {
+            setEmployeeForm(result.data);
+          } else {
+            setNotify({
+              open: true,
+              message: result.message,
+              color: result.success ? "success" : "error",
+            });
+          }
+        } else {
+          setNotify({
+            open: true,
+            message: "ไม่พบ Id",
+            color: "error",
+          });
+        }
+      } catch (error: any) {
+        setNotify({
+          open: true,
+          message: error.code,
+          color: "error",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+  
+      setIsLoading(false);
+    };
+
   useEffect(() => {
     // getEmployeeList();
 
     if (pathname.includes("new")) {
       getServiceList();
-      setServiceForm(initialService);
-      setServiceEdit(false);
+      setEmployeeForm(initialEmployee);
+      setEmployeeEdit(false);
       setDisabledForm(false);
     } else {
-      // getService();
-      setServiceEdit(true);
+      getEmployee();
+      setEmployeeEdit(true);
     }
 
     return () => {
-      setServiceForm(initialService);
-      setServiceEdit(false);
+      setEmployeeForm(initialEmployee);
+      setEmployeeEdit(false);
       setDisabledForm(false);
     };
   }, []);

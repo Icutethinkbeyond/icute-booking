@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
         },
         store: { // ดึงข้อมูลร้านค้าพื้นฐาน
             select: { storeName: true, id: true }
-        }
+        },
+        employee
       }
     });
 

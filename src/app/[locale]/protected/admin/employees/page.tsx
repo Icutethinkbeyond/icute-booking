@@ -210,9 +210,9 @@ const EmployeePage = () => {
     // });
   };
 
-  const handleEdit = (serviceId: string) => {
+  const handleEdit = (employeeId: string) => {
     router.push(
-      `/${localActive}/protected/admin/employees/edit/?serviceId=${serviceId}`
+      `/${localActive}/protected/admin/employees/edit/?employeeId=${employeeId}`
     );
   };
 

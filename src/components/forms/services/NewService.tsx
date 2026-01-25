@@ -66,9 +66,6 @@ interface ServiceProps {
 }
 
 const validationSchema = Yup.object().shape({
-  // name: Yup.string().required("กรุณากรอกรหัสอุปกรณ์"),
-  // durationMinutes: Yup.number().required("กรุณาใส่เวลาของคอร์ส"),
-  // price: Yup.number().required("กรุณาใส่ราคาของคอร์ส"),
 });
 
 const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
@@ -78,8 +75,6 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
     serviceForm,
     serviceEdit,
     setServiceEdit,
-    setServiceList,
-    serviceList,
   } = useServiceContext();
   const { employeeList, setEmployeeList } = useEmployeeContext();
   const { setNotify, notify, setOpenBackdrop, openBackdrop } =
@@ -94,14 +89,6 @@ const ServiceForm: FC<ServiceProps> = ({ viewOnly = false }) => {
   const pathname = usePathname();
   const params = useSearchParams();
   const localActive = useLocale();
-
-  function getStyles(name: string, employeeList: string[], theme: Theme) {
-    return {
-      fontWeight: employeeList.includes(name)
-        ? theme.typography.fontWeightMedium
-        : theme.typography.fontWeightRegular,
-    };
-  }
 
   const handleFormSubmit = async (
     values: Service,
