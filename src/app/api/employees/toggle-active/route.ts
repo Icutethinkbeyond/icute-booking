@@ -29,30 +29,30 @@ export async function PATCH(request: NextRequest) {
     }
 
     // 4. ตรวจสอบว่าบริการที่จะแก้ไข เป็นของร้านค้านี้จริงหรือไม่
-    const service = await prisma.service.findFirst({
+    const employee = await prisma.employee.findFirst({
       where: {
         id: id,
         storeId: store.id,
       },
     });
 
-    if (!service) {
+    if (!employee) {
       return NextResponse.json({ message: "ไม่พบข้อมูลบริการในร้านของคุณ" }, { status: 404 });
     }
 
     // 5. อัปเดตสถานะ Active
     // ถ้า client ส่งค่า active มาให้ใช้ค่านั้นเลย ถ้าไม่ส่งมาให้สลับค่าเดิม (Toggle)
-    const newStatus = typeof active === "boolean" ? active : !service.active;
+    const newStatus = typeof active === "boolean" ? active : !employee.isActive;
 
-    const updatedService = await prisma.service.update({
+    const updatedEmployee = await prisma.employee.update({
       where: { id: id },
-      data: { active: newStatus },
-      select: { id: true, name: true, active: true }
+      data: { isActive: newStatus },
+      select: { id: true, name: true, isActive: true }
     });
 
     return NextResponse.json({
-      message: `เปลี่ยนสถานะเป็น ${updatedService.active ? "เปิด" : "ปิด"} เรียบร้อยแล้ว`,
-      active: updatedService.active
+      message: `เปลี่ยนสถานะเป็น ${updatedEmployee.isActive ? "เปิด" : "ปิด"} เรียบร้อยแล้ว`,
+      active: updatedEmployee.isActive
     }, { status: 200 });
 
   } catch (error) {
