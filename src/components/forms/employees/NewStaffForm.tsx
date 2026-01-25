@@ -56,15 +56,25 @@ import {
   DAYS_OF_WEEK,
 } from "@/components/lib/staff";
 import { services } from "@/utils/lib/booking-data";
-import { Field, FieldProps, Form, Formik, FormikHelpers } from "formik";
+import {
+  Field,
+  FieldProps,
+  Form,
+  Formik,
+  FormikHelpers,
+  useFormikContext,
+} from "formik";
 import {
   BlockedTime,
   DAY_LABEL,
   Employee,
   EmployeeLeave,
   EmployeeWorkingDay,
+  EmployeeWorkingTime,
   initialService,
   initialWorkingDays,
+  LEAVE_TYPE_MAP,
+  LEAVE_TYPE_OPTIONS,
 } from "@/interfaces/Store";
 import { useServiceContext } from "@/contexts/ServiceContext";
 import { useEmployeeContext } from "@/contexts/EmployeeContext";
@@ -81,7 +91,8 @@ import dayjs from "dayjs";
 import { serviceService } from "@/utils/services/api-services/ServiceAPI";
 import { LeaveType } from "@prisma/client";
 import { isOverlapping } from "@/utils/lib/utils";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import { employeeService } from "@/utils/services/api-services/EmployeeAPI";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -94,49 +105,13 @@ const MenuProps = {
   },
 };
 
-export const LEAVE_TYPE_OPTIONS = [
-  { value: "SICK", label: "ลาป่วย" },
-  { value: "VACATION", label: "ลาพักร้อน" },
-  { value: "PERSONAL", label: "ลากิจ" },
-  { value: "OTHER", label: "อื่น ๆ" },
-];
-
-const LEAVE_TYPE_MAP: Record<LeaveType, string> = {
-  SICK: "ลาป่วย",
-  VACATION: "ลาพักร้อน",
-  PERSONAL: "ลากิจ",
-  OTHER: "อื่น ๆ",
-};
-
 interface StaffFormProps {
   initialData?: StaffFormData;
   onSubmit: (data: StaffFormData) => void;
   onCancel: () => void;
 }
 
-// const defaultFormData: StaffFormData = {
-//   firstName: "",
-//   lastName: "",
-//   nickname: "",
-//   phone: "",
-//   email: "",
-//   password: "",
-//   avatar: "",
-//   role: "staff",
-//   workingDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
-//   workingHours: { start: "09:00", end: "18:00" },
-//   serviceIds: [],
-//   blockedTimes: [],
-//   isActive: true,
-//   notes: "",
-//   hireDate: null,
-// };
-
-const validationSchema = Yup.object().shape({
-  // name: Yup.string().required("กรุณากรอกรหัสอุปกรณ์"),
-  // durationMinutes: Yup.number().required("กรุณาใส่เวลาของคอร์ส"),
-  // price: Yup.number().required("กรุณาใส่ราคาของคอร์ส"),
-});
+const validationSchema = Yup.object().shape({});
 
 export default function StaffForm({
   initialData,
@@ -172,10 +147,8 @@ export default function StaffForm({
   const params = useSearchParams();
   const localActive = useLocale();
 
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-  const [days, setDays] = useState<EmployeeWorkingDay[]>(initialWorkingDays);
   const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showBlockedTimeForm, setShowBlockedTimeForm] = useState(false);
   const [newBlockedTime, setNewBlockedTime] = useState<
     Omit<EmployeeLeave, "id" | "employeeId">
@@ -186,80 +159,82 @@ export default function StaffForm({
     leaveType: LeaveType.VACATION,
   });
 
-  useEffect(() => {
-    setEmployeeForm({
-      ...employeeForm,
-      workingDays: days,
-    });
-  }, [days]);
-
-  useEffect(() => {
-    console.log(employeeForm);
-  }, [employeeForm]);
-
-  const toggleWorking = (dayIndex: number) => {
-    setDays((prev) =>
-      prev.map((d, i) =>
-        i === dayIndex
-          ? {
-              ...d,
-              isWorking: !d.isWorking,
-              timeSlots: !d.isWorking
-                ? [{ startTime: "09:00", endTime: "18:00" }]
-                : [],
-            }
-          : d
-      )
+  const toggleWorking = (
+    dayIndex: number,
+    setValue: any,
+    values: EmployeeWorkingDay[],
+  ) => {
+    const days = values.map((d: EmployeeWorkingDay, i: number) =>
+      i === dayIndex
+        ? {
+            ...d,
+            isWorking: !d.isWorking,
+            timeSlots: !d.isWorking
+              ? [{ startTime: "09:00", endTime: "18:00" }]
+              : [],
+          }
+        : d,
     );
+    setValue("workingDays", days);
   };
 
-  const removeTimeSlot = (dayIndex: number, slotIndex: number) => {
-    setDays((prev) =>
-      prev.map((d, i) =>
-        i === dayIndex
-          ? {
-              ...d,
-              timeSlots: d.timeSlots.filter((_, j) => j !== slotIndex),
-            }
-          : d
-      )
+  const removeTimeSlot = (
+    dayIndex: number,
+    slotIndex: number,
+    setValue: any,
+    values: EmployeeWorkingDay[],
+  ) => {
+    const days = values.map((d: EmployeeWorkingDay, i: number) =>
+      i === dayIndex
+        ? {
+            ...d,
+            timeSlots: d.timeSlots.filter((_, j) => j !== slotIndex),
+          }
+        : d,
     );
+    setValue("workingDays", days);
   };
 
   const updateTime = (
     dayIndex: number,
     slotIndex: number,
     field: "startTime" | "endTime",
-    value: string
+    value: string,
+    setValue: any,
+    values: EmployeeWorkingDay[],
   ) => {
-    setDays((prev) =>
-      prev.map((d, i) =>
-        i === dayIndex
-          ? {
-              ...d,
-              timeSlots: d.timeSlots.map((slot, j) =>
-                j === slotIndex ? { ...slot, [field]: value } : slot
-              ),
-            }
-          : d
-      )
+    const days = values.map((d: EmployeeWorkingDay, i: number) =>
+      i === dayIndex
+        ? {
+            ...d,
+            timeSlots: d.timeSlots.map(
+              (slot: EmployeeWorkingTime, j: number) =>
+                j === slotIndex ? { ...slot, [field]: value } : slot,
+            ),
+          }
+        : d,
     );
+    setValue("workingDays", days);
   };
 
-  const addTimeSlot = (dayIndex: number) => {
-    setDays((prev) =>
-      prev.map((d, i) =>
-        i === dayIndex
-          ? {
-              ...d,
-              timeSlots: [
-                ...d.timeSlots,
-                { startTime: "09:00", endTime: "18:00" },
-              ],
-            }
-          : d
-      )
+  const addTimeSlot = (
+    dayIndex: number,
+    setValue: any,
+    values: EmployeeWorkingDay[],
+  ) => {
+    const days = values.map((d: EmployeeWorkingDay, i: number) =>
+      i === dayIndex
+        ? {
+            ...d,
+            timeSlots: [
+              ...d.timeSlots,
+              { startTime: "09:00", endTime: "18:00" },
+            ],
+          }
+        : d,
     );
+
+    setValue("workingDays", days);
   };
 
   const handleAddBlockedTime = () => {
@@ -282,7 +257,7 @@ export default function StaffForm({
     }
   };
 
-  const handleRemoveBlockedTime = (id: string ) => {
+  const handleRemoveBlockedTime = (id: string) => {
     // setFormData({
     //   ...formData,
     //   blockedTimes: formData.blockedTimes.filter((bt) => bt.id !== id),
@@ -294,8 +269,6 @@ export default function StaffForm({
     });
   };
 
-  const handleTogglePassword = () => setShowPassword(!showPassword);
-
   const handleFormSubmit = async (
     values: Employee,
     {
@@ -303,41 +276,43 @@ export default function StaffForm({
       setErrors,
       resetForm,
       validateForm,
-    }: FormikHelpers<Employee> // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
+    }: FormikHelpers<Employee>, // ใช้ FormikHelpers เพื่อให้ Type ถูกต้อง
   ) => {
     validateForm(); // บังคับ validate หลังจากรีเซ็ต
     setSubmitting(true); // เริ่มสถานะ Loading/Submitting
 
+    console.log(values);
+
     // // 2. เรียกใช้ API
-    // let result;
+    let result;
 
-    // if (!serviceEdit) {
-    //   result = await serviceService.createService(values);
-    // } else {
-    //   result = await serviceService.updateService(values);
-    // }
+    if (!serviceEdit) {
+      result = await employeeService.createEmployee(values);
+    } else {
+      result = await employeeService.updateEmployee(values);
+    }
 
-    // // สำเร็จจะ redirect ไปที่ table
-    // if (result.success) {
-    //   resetForm();
+    // สำเร็จจะ redirect ไปที่ table
+    if (result.success) {
+      resetForm();
 
-    //   setNotify({
-    //     open: true,
-    //     message: result.message,
-    //     color: result.success ? "success" : "error",
-    //   });
+      setNotify({
+        open: true,
+        message: result.message,
+        color: result.success ? "success" : "error",
+      });
 
-    //   setTimeout(() => {
-    //     router.push(`/${localActive}/protected/admin/services`);
-    //   }, 1000);
-    // } else {
-    //   // // // 3. จัดการเมื่อสำเร็จ
-    //   setNotify({
-    //     open: true,
-    //     message: result.message,
-    //     color: "error",
-    //   });
-    // }
+      setTimeout(() => {
+        router.push(`/${localActive}/protected/admin/employees`);
+      }, 1000);
+    } else {
+      // // // 3. จัดการเมื่อสำเร็จ
+      setNotify({
+        open: true,
+        message: result.message,
+        color: "error",
+      });
+    }
   };
 
   const getServiceList = async () => {
@@ -425,7 +400,7 @@ export default function StaffForm({
                               onChange={(e) => {
                                 form.setFieldValue(
                                   field.name,
-                                  e.target.checked
+                                  e.target.checked,
                                 );
                               }}
                               color="primary"
@@ -638,14 +613,14 @@ export default function StaffForm({
                                 onChange={(newValue) => {
                                   form.setFieldValue(
                                     "date",
-                                    newValue ? newValue.toISOString() : null
+                                    newValue ? newValue.toISOString() : null,
                                   );
                                 }}
                                 slotProps={{
                                   textField: {
                                     fullWidth: true,
                                     error: Boolean(
-                                      touched.startDate && errors.startDate
+                                      touched.startDate && errors.startDate,
                                     ),
                                     helperText:
                                       touched.startDate && errors.startDate
@@ -788,7 +763,9 @@ export default function StaffForm({
                                     endAdornment: (
                                       <InputAdornment position="end">
                                         <IconButton
-                                          onClick={handleTogglePassword}
+                                          onClick={() =>
+                                            setShowPassword(!showPassword)
+                                          }
                                         >
                                           {showPassword ? (
                                             <VisibilityOff />
@@ -810,7 +787,7 @@ export default function StaffForm({
                               <TextField
                                 {...field}
                                 label="ยืนยันรหัสผ่าน"
-                                type={showPassword ? "text" : "password"}
+                                type={showConfirmPassword ? "text" : "password"}
                                 fullWidth
                                 error={
                                   touched.confirmPassword &&
@@ -835,9 +812,13 @@ export default function StaffForm({
                                     endAdornment: (
                                       <InputAdornment position="end">
                                         <IconButton
-                                          onClick={handleTogglePassword}
+                                          onClick={() =>
+                                            setShowConfirmPassword(
+                                              !showConfirmPassword,
+                                            )
+                                          }
                                         >
-                                          {showPassword ? (
+                                          {showConfirmPassword ? (
                                             <VisibilityOff />
                                           ) : (
                                             <Visibility />
@@ -872,7 +853,7 @@ export default function StaffForm({
                       </Typography>
 
                       <Stack spacing={2}>
-                        {days.map((day, dayIndex) => (
+                        {values.workingDays.map((day, dayIndex) => (
                           <Card key={day.dayOfWeek}>
                             <CardContent>
                               {/* Header */}
@@ -886,7 +867,13 @@ export default function StaffForm({
                                 </Typography>
                                 <Switch
                                   checked={day.isWorking}
-                                  onChange={() => toggleWorking(dayIndex)}
+                                  onChange={() =>
+                                    toggleWorking(
+                                      dayIndex,
+                                      setFieldValue,
+                                      values.workingDays,
+                                    )
+                                  }
                                 />
                               </Box>
 
@@ -898,8 +885,6 @@ export default function StaffForm({
                                       const invalid =
                                         slot.startTime >= slot.endTime ||
                                         isOverlapping(day.timeSlots, slotIndex);
-
-                                      // console.log(invalid);
 
                                       return (
                                         <Box
@@ -915,12 +900,13 @@ export default function StaffForm({
                                             size="small"
                                             value={slot.startTime}
                                             onChange={(e) => {
-                                              console.log(e.target.value);
                                               updateTime(
                                                 dayIndex,
                                                 slotIndex,
                                                 "startTime",
-                                                e.target.value
+                                                e.target.value,
+                                                setFieldValue,
+                                                values.workingDays,
                                               );
                                             }}
                                             error={invalid}
@@ -940,7 +926,9 @@ export default function StaffForm({
                                                 dayIndex,
                                                 slotIndex,
                                                 "endTime",
-                                                e.target.value
+                                                e.target.value,
+                                                setFieldValue,
+                                                values.workingDays,
                                               )
                                             }
                                             error={invalid}
@@ -954,7 +942,9 @@ export default function StaffForm({
                                             onClick={() =>
                                               removeTimeSlot(
                                                 dayIndex,
-                                                slotIndex
+                                                slotIndex,
+                                                setFieldValue,
+                                                values.workingDays,
                                               )
                                             }
                                           >
@@ -962,13 +952,19 @@ export default function StaffForm({
                                           </IconButton>
                                         </Box>
                                       );
-                                    }
+                                    },
                                   )}
 
                                   <Button
                                     size="small"
                                     startIcon={<AddIcon />}
-                                    onClick={() => addTimeSlot(dayIndex)}
+                                    onClick={() =>
+                                      addTimeSlot(
+                                        dayIndex,
+                                        setFieldValue,
+                                        values.workingDays,
+                                      )
+                                    }
                                   >
                                     เพิ่มช่วงเวลา
                                   </Button>
@@ -978,89 +974,6 @@ export default function StaffForm({
                           </Card>
                         ))}
                       </Stack>
-
-                      {/* <Box sx={{ mb: 3 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ mb: 1, color: theme.palette.text.secondary }}
-                        >
-                          วันทำงานประจำ *
-                        </Typography>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                          {DAYS_OF_WEEK.map((day) => (
-                            <Chip
-                              key={day.value}
-                              label={day.label}
-                              onClick={() => handleWorkingDayToggle(day.value)}
-                              sx={{
-                                cursor: "pointer",
-                                backgroundColor: employeeForm.workingDays.includes(
-                                  day.value
-                                )
-                                  ? theme.palette.primary.main
-                                  : theme.palette.grey[100],
-                                color: formData.workingDays.includes(day.value)
-                                  ? "white"
-                                  : theme.palette.text.primary,
-                                "&:hover": {
-                                  backgroundColor:
-                                    formData.workingDays.includes(day.value)
-                                      ? theme.palette.primary.dark
-                                      : theme.palette.grey[200],
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                        {errors.workingDays && (
-                          <FormHelperText error>
-                            {errors.workingDays}
-                          </FormHelperText>
-                        )}
-                      </Box> */}
-                      {/* 
-                      <Grid2 container spacing={2}>
-                        <Grid2 size={{ xs: 6 }}>
-                          <TextField
-                            label="เวลาเข้างาน"
-                            type="time"
-                            fullWidth
-                            value={formData.workingHours.start}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                workingHours: {
-                                  ...formData.workingHours,
-                                  start: e.target.value,
-                                },
-                              })
-                            }
-                            slotProps={{
-                              inputLabel: { shrink: true },
-                            }}
-                          />
-                        </Grid2>
-                        <Grid2 size={{ xs: 6 }}>
-                          <TextField
-                            label="เวลาเลิกงาน"
-                            type="time"
-                            fullWidth
-                            value={formData.workingHours.end}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                workingHours: {
-                                  ...formData.workingHours,
-                                  end: e.target.value,
-                                },
-                              })
-                            }
-                            slotProps={{
-                              inputLabel: { shrink: true },
-                            }}
-                          />
-                        </Grid2>
-                      </Grid2> */}
                     </CardContent>
                   </Card>
 
@@ -1306,9 +1219,9 @@ export default function StaffForm({
                                     color="text.secondary"
                                   >
                                     {`วันที่${dayjs(bt.startDate).format(
-                                      "DD MMMM YYYY"
+                                      "DD MMMM YYYY",
                                     )}-วันที่${dayjs(bt.endDate).format(
-                                      "DD MMMM YYYY"
+                                      "DD MMMM YYYY",
                                     )}`}{" "}
                                     `
                                   </Typography>
@@ -1322,7 +1235,9 @@ export default function StaffForm({
                               </Box>
                               <IconButton
                                 size="small"
-                                onClick={() => bt.id && handleRemoveBlockedTime(bt.id)}
+                                onClick={() =>
+                                  bt.id && handleRemoveBlockedTime(bt.id)
+                                }
                                 sx={{ color: theme.palette.error.main }}
                               >
                                 <DeleteIcon fontSize="small" />
@@ -1370,7 +1285,7 @@ export default function StaffForm({
                                   // On autofill we get a stringified value.
                                   typeof value === "string"
                                     ? value.split(",")
-                                    : value
+                                    : value,
                                 );
                               }}
                               input={
@@ -1389,7 +1304,7 @@ export default function StaffForm({
                                 >
                                   {selected.map((value) => {
                                     const service = serviceList.find(
-                                      (serv) => serv.id === value
+                                      (serv) => serv.id === value,
                                     );
 
                                     return (
@@ -1436,7 +1351,7 @@ export default function StaffForm({
                                         secondary={`${durationMinutes} นาที | ${price.toLocaleString()} บาท`}
                                       />
                                     </MenuItem>
-                                  )
+                                  ),
                                 )}
                             </Select>
                           )}

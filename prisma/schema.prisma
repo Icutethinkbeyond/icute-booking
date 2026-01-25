@@ -129,8 +129,10 @@ model Service {
   // ความสัมพันธ์
   storeId     String     @db.ObjectId
   store       Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   employees   Employee[] @relation(references: [id], fields: [employeeIds]) // พนักงานที่ทำบริการนี้ได้
   employeeIds String[]   @db.ObjectId // Reference IDs
+
   bookings    Booking[]
 
   createdAt DateTime @default(now()) // วันที่สร้าง
@@ -158,6 +160,7 @@ model Employee {
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   bookings   Booking[]
+  
   services   Service[] @relation(references: [id], fields: [serviceIds])
   serviceIds String[]  @db.ObjectId
 
@@ -185,7 +188,7 @@ model EmployeeWorkingDay {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  employee  Employee @relation(fields: [employeeId], references: [id])
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   @@unique([employeeId, dayOfWeek])
 }
@@ -198,24 +201,11 @@ model EmployeeWorkingTime {
   startTime String // "09:00"
   endTime   String // "18:00"
 
-  workingDay EmployeeWorkingDay @relation(fields: [workingDayId], references: [id])
+  workingDay EmployeeWorkingDay @relation(fields: [workingDayId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
 
-// เวลาพักพนักงาน
-// model EmployeeBreakTime {
-//   id         String @id @default(auto()) @map("_id") @db.ObjectId
-//   employeeId String @db.ObjectId
-
-//   dayOfWeek DayOfWeek
-
-//   startTime String // "12:00"
-//   endTime   String // "13:00"
-
-//   createdAt DateTime @default(now())
-//   employee  Employee @relation(fields: [employeeId], references: [id])
-// }
 
 // วันลาหยุดพนักงาน
 model EmployeeLeave {
@@ -229,7 +219,7 @@ model EmployeeLeave {
   note      String?
 
   createdAt DateTime @default(now())
-  employee  Employee @relation(fields: [employeeId], references: [id])
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 model DefaultOperatingHour {

@@ -3,6 +3,20 @@ import { User } from "./User";
 import { Booking } from "./Booking";
 import { Dayjs } from "dayjs";
 
+export const LEAVE_TYPE_OPTIONS = [
+  { value: "SICK", label: "ลาป่วย" },
+  { value: "VACATION", label: "ลาพักร้อน" },
+  { value: "PERSONAL", label: "ลากิจ" },
+  { value: "OTHER", label: "อื่น ๆ" },
+];
+
+export const LEAVE_TYPE_MAP: Record<LeaveType, string> = {
+  SICK: "ลาป่วย",
+  VACATION: "ลาพักร้อน",
+  PERSONAL: "ลากิจ",
+  OTHER: "อื่น ๆ",
+};
+
 
 export interface StoreRegister {
   storeName: string;
@@ -97,7 +111,6 @@ export interface Employee {
   serviceIds: string[];
 
   workingDays: EmployeeWorkingDay[];
-  // breakTimes: EmployeeBreakTime[];
   leaves: EmployeeLeave[];
 
   createdAt: string; // ISO Date
@@ -386,7 +399,97 @@ export const initialEmployee: Employee = {
 
   serviceIds: [],
 
-  workingDays: [],
+  workingDays: [
+    {
+      "dayOfWeek": "MON",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "TUE",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "WED",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "THU",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "FRI",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "SAT",
+      "isWorking": true,
+      "timeSlots": [
+        {
+          "startTime": "09:00",
+          "endTime": "12:00"
+        },
+        {
+          "startTime": "13:00",
+          "endTime": "18:00"
+        }
+      ]
+    },
+    {
+      "dayOfWeek": "SUN",
+      "isWorking": false,
+      "timeSlots": []
+    }
+  ],
   // breakTimes: createInitialBreakTimes(),
   leaves: [],
 

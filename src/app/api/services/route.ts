@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
   try {
 
-    const { userId } = await getCurrentUserAndStoreIdsByToken(request);
+    const { userId, storeId } = await getCurrentUserAndStoreIdsByToken(request);
 
     const data: Service = await request.json();
     const {
@@ -39,26 +39,6 @@ export async function POST(request: NextRequest) {
       imageUrl,
     } = data;
 
-    //  ค้นหา Store ID ที่ผูกกับ User ID นี้
-    const store = await prisma.store.findUnique({
-      where: {
-        userId: userId
-      },
-      select: { id: true }
-    });
-
-    if (!store) {
-      // หากไม่พบ Store ที่ผูกกับ User
-      return new NextResponse(
-        JSON.stringify({
-          message: 'ไม่พบร้านค้าที่ผูกกับบัญชีผู้ใช้งานนี้ หรือผู้ใช้ไม่มีสิทธิ์',
-        }),
-        { status: 403 }
-      );
-    }
-
-    const storeId = store.id;
-
     // --- 1. การตรวจสอบความถูกต้องของข้อมูล (Validation) ---
 
     if (!name || name.trim() === '') {
@@ -67,7 +47,6 @@ export async function POST(request: NextRequest) {
           message: 'กรุณาระบุชื่อบริการ',
         }),
         { status: 400 })
-
     }
 
     if (!durationMinutes || durationMinutes <= 0) {
@@ -254,7 +233,7 @@ export async function GET(request: NextRequest) {
         },
         include: {
           employees: { // ดึงข้อมูลพนักงานที่เกี่ยวข้องมาด้วย
-            select: { userId: true, name: true }
+            select: { id: true, name: true }
           }
         }
       })
