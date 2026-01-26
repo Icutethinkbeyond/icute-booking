@@ -4,6 +4,7 @@ import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 
 const prisma = new PrismaClient();
 
+export const dynamic = "force-dynamic"
 
 /**
  * GET /api/employees/simple
