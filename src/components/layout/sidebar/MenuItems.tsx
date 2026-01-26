@@ -12,7 +12,7 @@ import {
 import { IconHome } from "@tabler/icons-react";
 
 import { uniqueId } from "lodash";
-import { Calendar } from "lucide-react";
+import { BookMarked, Calendar } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 
 export const useMenuItems = () => {
@@ -35,7 +35,7 @@ export const useMenuItems = () => {
     {
       id: uniqueId(),
       title: "รายการจอง",
-      icon: Settings,
+      icon: BookMarked,
       href: `/${localActive}/protected/admin/bookings`,
     },
     {

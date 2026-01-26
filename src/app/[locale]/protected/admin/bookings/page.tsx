@@ -114,8 +114,7 @@ const Booking = () => {
   }, [filteredBookings, page, rowsPerPage]);
 
   const handleAddNew = () => {
-    // Navigate to booking form or open dialog
-    // setSnackbar({ open: true, message: 'เปิดหน้าเพิ่มการจองใหม่', severity: 'success' })
+    router.push(`/${localActive}/protected/admin/bookings/new`)
   };
 
   const handleExport = (format: "xlsx" | "csv") => {

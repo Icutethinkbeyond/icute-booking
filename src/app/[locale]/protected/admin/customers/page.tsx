@@ -1,27 +1,15 @@
 "use client";
 
 import {
-  Grid,
   Box,
-  TextField,
-  Button,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   useTheme,
   Grid2,
 } from "@mui/material";
 import PageContainer from "@/components/container/PageContainer";
 import { useLocale, useTranslations } from "next-intl";
-import Breadcrumb from "@/components/shared/BreadcrumbCustom";
-import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useMemo, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import EmployeeTabs from "@/components/forms/employees/EmployeeTabs";
-import ServiceTabs from "@/components/forms/services/ServiceTabs";
-import ServiceTable from "@/components/forms/services/ServiceTable";
-import FloatingButton from "@/components/shared/FloatingButton";
 import { useRouter } from "next/navigation";
 import { CustomerData, CustomerType, mockCustomers } from "@/components/lib/customer";
 import { CustomerDetailDialog } from "@/components/forms/customer/CustomerDetailDialog";
@@ -33,10 +21,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import StarIcon from "@mui/icons-material/Star";
 import FiberNewIcon from "@mui/icons-material/FiberNew";
 import BlockIcon from "@mui/icons-material/Block";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const Services = () => {
-  const t = useTranslations("HomePage");
+  
   const router = useRouter();
   const localActive = useLocale();
 

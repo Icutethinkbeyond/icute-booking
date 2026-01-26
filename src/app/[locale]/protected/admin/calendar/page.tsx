@@ -1,26 +1,15 @@
 "use client";
 
 import {
-  Grid,
   Box,
-  TextField,
-  Button,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   useTheme,
 } from "@mui/material";
 import PageContainer from "@/components/container/PageContainer";
 import { useLocale, useTranslations } from "next-intl";
-import Breadcrumb from "@/components/shared/BreadcrumbCustom";
 import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import EmployeeTabs from "@/components/forms/employees/EmployeeTabs";
-import ServiceTabs from "@/components/forms/services/ServiceTabs";
-import ServiceTable from "@/components/forms/services/ServiceTable";
-import FloatingButton from "@/components/shared/FloatingButton";
 import { useRouter } from "next/navigation";
 import WeekView from "@/components/forms/calendar/WeekView";
 import AppointmentDialog from "@/components/forms/calendar/AppointmentDialog";
@@ -38,6 +27,7 @@ const Services = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const localActive = useLocale();
 
+  const router = useRouter();
   const { setBreadcrumbs } = useBreadcrumbContext();
 
   useEffect(() => {
@@ -61,6 +51,8 @@ const Services = () => {
   };
 
   const handleAddAppointment = () => {
+
+    router.push(`/${localActive}/protected/admin/bookings/new`)
     // setSnackbar({
     //   open: true,
     //   message: 'เปิดฟอร์มสร้างนัดหมายใหม่',

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, FC } from "react";
 import {
   Box,
   Card,
@@ -20,7 +20,13 @@ import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EventNoteIcon from "@mui/icons-material/EventNote";
-import { BookingFormData, defaultBookingFormData, generateTimeSlots, mockServices, mockStaff } from "@/components/lib/admin-booking";
+import {
+  BookingFormData,
+  defaultBookingFormData,
+  generateTimeSlots,
+  mockServices,
+  mockStaff,
+} from "@/components/lib/admin-booking";
 import { ChannelSelector } from "@/components/forms/admin-new-booking/ChannelSelector";
 import { BookingSummary } from "@/components/forms/admin-new-booking/BookingSummary";
 import { CustomerInfoForm } from "@/components/forms/admin-new-booking/CustomerInfoForm";
@@ -28,18 +34,24 @@ import { ServiceSelector } from "@/components/forms/admin-new-booking/ServiceSel
 import { StaffSelector } from "@/components/forms/admin-new-booking/StaffSelector";
 import { DateTimePicker } from "@mui/lab";
 
-
 interface BookingFormProps {
   onSubmit?: (data: BookingFormData) => void;
   onCancel?: () => void;
 }
 
-const STEPS = ["ช่องทางและบริการ", "วันเวลาและพนักงาน", "ข้อมูลลูกค้า", "ยืนยันการจอง"];
+const STEPS = [
+  "ช่องทางและบริการ",
+  "วันเวลาและพนักงาน",
+  "ข้อมูลลูกค้า",
+  "ยืนยันการจอง",
+];
 
-function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
+const BookingForm: FC<BookingFormProps> = ({ onSubmit, onCancel }) => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState<BookingFormData>(defaultBookingFormData);
+  const [formData, setFormData] = useState<BookingFormData>(
+    defaultBookingFormData
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -74,10 +86,15 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
         }
         if (!formData.customerPhone.trim()) {
           newErrors.customerPhone = "กรุณากรอกเบอร์โทรศัพท์";
-        } else if (!/^0[0-9]{8,9}$/.test(formData.customerPhone.replace(/-/g, ""))) {
+        } else if (
+          !/^0[0-9]{8,9}$/.test(formData.customerPhone.replace(/-/g, ""))
+        ) {
           newErrors.customerPhone = "รูปแบบเบอร์โทรไม่ถูกต้อง";
         }
-        if (formData.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)) {
+        if (
+          formData.customerEmail &&
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail)
+        ) {
           newErrors.customerEmail = "รูปแบบอีเมลไม่ถูกต้อง";
         }
         break;
@@ -139,7 +156,9 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
               mb: 3,
             }}
           >
-            <EventNoteIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />
+            <EventNoteIcon
+              sx={{ fontSize: 40, color: theme.palette.success.main }}
+            />
           </Box>
           <Typography variant="h5" fontWeight={600} gutterBottom>
             บันทึกการจองสำเร็จ
@@ -247,7 +266,10 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
                   />
                   <Divider />
                   <Box>
-                    <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ mb: 1.5, fontWeight: 600 }}
+                    >
                       หมายเหตุ (ถ้ามี)
                     </Typography>
                     <TextField
@@ -274,7 +296,14 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
                     staffList={mockStaff}
                   />
                   {formData.notes && (
-                    <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.grey[50], borderRadius: 2 }}>
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 2,
+                        bgcolor: theme.palette.grey[50],
+                        borderRadius: 2,
+                      }}
+                    >
                       <Typography variant="subtitle2" gutterBottom>
                         หมายเหตุ:
                       </Typography>
@@ -304,7 +333,11 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
                   {activeStep === 0 ? "ยกเลิก" : "ย้อนกลับ"}
                 </Button>
                 {activeStep < STEPS.length - 1 ? (
-                  <Button variant="contained" onClick={handleNext} endIcon={<ArrowForwardIcon />}>
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    endIcon={<ArrowForwardIcon />}
+                  >
                     ถัดไป
                   </Button>
                 ) : (
@@ -335,6 +368,6 @@ function BookingForm({ onSubmit, onCancel }: BookingFormProps) {
       </Grid2>
     </Box>
   );
-}
+};
 
 export default BookingForm;

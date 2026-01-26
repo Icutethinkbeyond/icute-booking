@@ -126,14 +126,16 @@ model Service {
   colorOfService  String?
   active          Boolean @default(true)
 
+  isDelete Boolean @default(false)
+
   // ความสัมพันธ์
-  storeId     String     @db.ObjectId
-  store       Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeId String @db.ObjectId
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   employees   Employee[] @relation(references: [id], fields: [employeeIds]) // พนักงานที่ทำบริการนี้ได้
   employeeIds String[]   @db.ObjectId // Reference IDs
 
-  bookings    Booking[]
+  bookings Booking[]
 
   createdAt DateTime @default(now()) // วันที่สร้าง
   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
@@ -151,16 +153,18 @@ model Employee {
 
   isActive Boolean @default(true)
 
-  imageId  String?
-  imageUrl String?
-  position String?
+  isDelete Boolean @default(false)
+
+  imageId   String?
+  imageUrl  String?
+  position  String?
   startDate DateTime?
 
   storeId String @db.ObjectId
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  bookings   Booking[]
-  
+  bookings Booking[]
+
   services   Service[] @relation(references: [id], fields: [serviceIds])
   serviceIds String[]  @db.ObjectId
 
@@ -205,7 +209,6 @@ model EmployeeWorkingTime {
 
   createdAt DateTime @default(now())
 }
-
 
 // วันลาหยุดพนักงาน
 model EmployeeLeave {
@@ -315,6 +318,8 @@ model Store {
   cancelBooking  String? //ข้อความเเจ้งเตือนลูกค้าเมื่อถูกยกเลิกการจอง
   before24H      String? //ข้อความเเจ้งเตือนลูกค้าเมื่อใกล้ถึงเวลานัด 24 ชั่วโมง
   reSchedule     String? //ข้อความเเจ้งเตือนลูกค้าเมื่อถูกเลื่อนการจอง
+
+  isDelete Boolean @default(false)
 
   employeeSetting EmployeeSetting
   bookingRule     BookingRule

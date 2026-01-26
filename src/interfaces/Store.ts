@@ -106,6 +106,8 @@ export interface Employee {
   storeId: string;
   store?: Store;
 
+  isDelete: boolean;
+
   bookings?: Booking[];
   services?: Service[];
   serviceIds: string[];
@@ -154,6 +156,8 @@ export interface Store {
   coverId?: string;
 
   addressCustom?: string;
+
+  isDelete: boolean;
 
   lineNotifyToken?: string;
   lineChannelId?: string;
@@ -269,6 +273,8 @@ export interface Service {
   imageUrl?: string;
   colorOfService?: string;
   active: boolean | string
+
+  isDelete: boolean;
 
   storeId: string;
   store?: Store;
@@ -388,6 +394,8 @@ export const initialEmployee: Employee = {
   phone: '',
   note: '',
   startDate: null,
+
+  isDelete: false,
 
   roleId: undefined,
   role: undefined,
@@ -564,6 +572,8 @@ export const initialStore: Store = {
   addressCustom: '',
   mapUrl: '',
 
+  isDelete: false,
+
   location: {
     latitude: null,
     longitude: null,
@@ -620,6 +630,8 @@ export const initialService: Service = {
   imageUrl: '',
   colorOfService: '',
   active: true,
+
+  isDelete: false,
 
   storeId: '',
   store: undefined,
