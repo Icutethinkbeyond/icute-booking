@@ -82,53 +82,53 @@ export async function POST(request: NextRequest) {
     
     if (!finalCustomerId) {
         // ค้นหาลูกค้าที่มีอยู่ หรือสร้างใหม่
-        const customer = await prisma.customer.upsert({
-            where: { phone: customerPhone }, // ใช้เบอร์โทรศัพท์เป็น unique identifier
-            update: {
-                name: customerName,
-                email: customerEmail,
-            },
-            create: {
-                name: customerName,
-                phone: customerPhone,
-                email: customerEmail,
-            },
-            select: { id: true }
-        });
-        finalCustomerId = customer.id;
+        // const customer = await prisma.customer.upsert({
+        //     where: { phone: customerPhone }, // ใช้เบอร์โทรศัพท์เป็น unique identifier
+        //     update: {
+        //         name: customerName,
+        //         email: customerEmail,
+        //     },
+        //     create: {
+        //         name: customerName,
+        //         phone: customerPhone,
+        //         email: customerEmail,
+        //     },
+        //     select: { id: true }
+        // });
+        // finalCustomerId = customer.id;
     }
     
     // 7. สร้างรายการจอง (Booking)
-    const newBooking = await prisma.booking.create({
-      data: {
-        customerName: customerName,
-        customerPhone: customerPhone,
-        customerEmail: customerEmail,
+    // const newBooking = await prisma.booking.create({
+    //   data: {
+    //     customerName: customerName,
+    //     customerPhone: customerPhone,
+    //     customerEmail: customerEmail,
         
-        bookingDate: bookingDateTime, // ใช้ค่าที่แปลงแล้ว
-        bookingTime: bookingDateTime, // 💡 หาก schema Booking Time ถูกใช้เพื่อเก็บวันที่+เวลา
-                                     // ถ้า schema ของคุณมี duration ให้คำนวณ end time ด้วย
+    //     bookingDate: bookingDateTime, // ใช้ค่าที่แปลงแล้ว
+    //     bookingTime: bookingDateTime, // 💡 หาก schema Booking Time ถูกใช้เพื่อเก็บวันที่+เวลา
+    //                                  // ถ้า schema ของคุณมี duration ให้คำนวณ end time ด้วย
 
-        status: 'PENDING', // สถานะเริ่มต้นของการจอง
-        customerType: customerId ? 'MEMBER' : 'GUEST', // หรือใช้ logic อื่น
+    //     status: 'PENDING', // สถานะเริ่มต้นของการจอง
+    //     customerType: customerId ? 'MEMBER' : 'GUEST', // หรือใช้ logic อื่น
         
-        storeId: storeId,
-        serviceId: serviceId,
-        employeeId: employeeId,
-        customerId: finalCustomerId, // ผูกกับ ID ลูกค้าที่หา/สร้างได้
-      },
-      include: {
-        service: { select: { name: true } },
-        employee: { select: { name: true } },
-        customer: { select: { name: true } },
-      }
-    });
+    //     storeId: storeId,
+    //     serviceId: serviceId,
+    //     employeeId: employeeId,
+    //     customerId: finalCustomerId, // ผูกกับ ID ลูกค้าที่หา/สร้างได้
+    //   },
+    //   include: {
+    //     service: { select: { name: true } },
+    //     employee: { select: { name: true } },
+    //     customer: { select: { name: true } },
+    //   }
+    // });
 
     // 8. ตอบกลับสำเร็จ (201 Created)
     return new NextResponse(
       JSON.stringify({
         message: 'สร้างรายการจองสำเร็จ',
-        booking: newBooking,
+        // booking: newBooking,
       }), {
         status: 201, // 201 Created
         headers: { 'Content-Type': 'application/json' }

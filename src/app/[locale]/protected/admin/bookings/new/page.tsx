@@ -34,10 +34,10 @@ import { ServiceSelector } from "@/components/forms/admin-new-booking/ServiceSel
 import { StaffSelector } from "@/components/forms/admin-new-booking/StaffSelector";
 import { DateTimePicker } from "@mui/lab";
 
-interface BookingFormProps {
-  onSubmit?: (data: BookingFormData) => void;
-  onCancel?: () => void;
-}
+// interface BookingFormProps {
+//   onSubmit?: (data: BookingFormData) => void;
+//   onCancel?: () => void;
+// }
 
 const STEPS = [
   "ช่องทางและบริการ",
@@ -46,7 +46,7 @@ const STEPS = [
   "ยืนยันการจอง",
 ];
 
-const BookingForm: FC<BookingFormProps> = ({ onSubmit, onCancel }) => {
+const BookingForm = () => {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<BookingFormData>(
@@ -116,10 +116,15 @@ const BookingForm: FC<BookingFormProps> = ({ onSubmit, onCancel }) => {
 
   const handleSubmit = () => {
     if (validateStep(activeStep)) {
-      onSubmit?.(formData);
+      // onSubmit?.(formData);
       setSubmitSuccess(true);
     }
   };
+
+  const onCancel = () => {
+    
+  }
+  
 
   const handleReset = () => {
     setFormData(defaultBookingFormData);

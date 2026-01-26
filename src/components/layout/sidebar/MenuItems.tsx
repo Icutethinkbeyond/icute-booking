@@ -8,6 +8,7 @@ import {
   CalendarMonthOutlined,
   HourglassBottom,
   Groups2,
+  Assignment,
 } from "@mui/icons-material";
 import { IconHome } from "@tabler/icons-react";
 
@@ -35,7 +36,7 @@ export const useMenuItems = () => {
     {
       id: uniqueId(),
       title: "รายการจอง",
-      icon: BookMarked,
+      icon: Assignment,
       href: `/${localActive}/protected/admin/bookings`,
     },
     {

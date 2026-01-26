@@ -28,7 +28,7 @@ import PageTitle from "@/components/shared/PageTitle";
 import { initialReport, ReportSetting } from "@/interfaces/Report";
 import { uniqueId } from "lodash";
 import { FilePenLine } from "lucide-react";
-import { ServiceSelect } from "@/interfaces/Store";
+// import { ServiceSelect } from "@/interfaces/Store";
 import { useStoreContext } from "@/contexts/StoreContext";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -248,7 +248,7 @@ const ReportExport: React.FC<Props> = (
                       <Autocomplete
                         id="id"
                         options={servicesSelect}
-                        getOptionLabel={(option: ServiceSelect) => option.name}
+                        // getOptionLabel={(option: ServiceSelect) => option.name}
                         loading
                         onInputChange={(event, value) => {
                           // Handle typed value when no matching option
