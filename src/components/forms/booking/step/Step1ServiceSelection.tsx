@@ -21,6 +21,7 @@ import { useServiceContext } from "@/contexts/ServiceContext";
 import { Service } from "@/interfaces/Store";
 import { useParams } from "next/navigation";
 import { ServiceCard } from "../../services/ServiceCard";
+import { useBookingContext } from "@/contexts/BookingContext";
 
 interface Step1Props {
   value?: string;
@@ -31,8 +32,17 @@ export function Step1ServiceSelection({ value, onChange }: Step1Props) {
   const params = useParams<{ shop_id: string }>();
 
   const { setServices, services } = useServiceContext();
+  const { setBookingForm, bookingForm } = useBookingContext();
   const { setNotify } = useNotifyContext();
   const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSelect = (id: string) => {
+    // Logic: ถ้ากดตัวเดิมให้ยกเลิก (null) ถ้ากดตัวใหม่ให้แทนที่ตัวเก่า
+    setBookingForm((prevState) => ({
+      ...prevState,
+      serviceId: id,
+    }));
+  };
 
   const getServices = async () => {
     try {
@@ -108,13 +118,18 @@ export function Step1ServiceSelection({ value, onChange }: Step1Props) {
           gap: 2,
         }}
       >
-        {services.map((service: Service) => (
-             <ServiceCard
-              service={service}
-              displayToggle={false}
-              displayCTA={false}
-              displayColorOfService={false}
-            /> 
+        {services.map((service: Service, index) => (
+          <ServiceCard
+            key={index}
+            service={service}
+            displayToggle={false}
+            displayCTA={false}
+            displayColorOfService={false}
+            onSelect={handleSelect}
+            selectable={true}
+            // เช็คว่า ID นี้ตรงกับที่เลือกไว้หรือไม่
+            selected={bookingForm.serviceId === service.id}
+          />
         ))}
       </Box>
     </Box>

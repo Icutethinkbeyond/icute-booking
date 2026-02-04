@@ -5,33 +5,34 @@ import { Check } from "lucide-react"
 // import { staffMembers } from "@/lib/booking-data"
 
 interface Step3Props {
-  value?: string
-  onChange?: (value: string) => void
-  serviceType?: "with-staff" | "without-staff"
+  // value?: string
+  // onChange?: (value: string) => void
+  // serviceType?: "with-staff" | "without-staff"
 }
 
-export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props) {
+export function Step3StaffSelection({ }: Step3Props) {
+  
   const theme = useTheme()
 
-  if (serviceType === "without-staff") {
-    return (
-      <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", textAlign: "center" }}>
-        <Typography
-          variant="h5"
-          sx={{
-            mb: 1,
-            fontWeight: 600,
-            color: "text.primary",
-          }}
-        >
-          Staff member
-        </Typography>
-        <Typography variant="body1" sx={{ color: "text.secondary" }}>
-          You selected any available staff member. We'll assign the best person for your service.
-        </Typography>
-      </Box>
-    )
-  }
+  // if (serviceType === "without-staff") {
+  //   return (
+  //     <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", textAlign: "center" }}>
+  //       <Typography
+  //         variant="h5"
+  //         sx={{
+  //           mb: 1,
+  //           fontWeight: 600,
+  //           color: "text.primary",
+  //         }}
+  //       >
+  //         Staff member
+  //       </Typography>
+  //       <Typography variant="body1" sx={{ color: "text.secondary" }}>
+  //         You selected any available staff member. We'll assign the best person for your service.
+  //       </Typography>
+  //     </Box>
+  //   )
+  // }
 
   return (
     <Box sx={{ width: "100%", maxWidth: 800, mx: "auto" }}>
@@ -43,7 +44,7 @@ export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props
           color: "text.primary",
         }}
       >
-        Select staff member
+        เลือกพนักงาน
       </Typography>
       <Typography
         variant="body2"
@@ -52,7 +53,7 @@ export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props
           color: "text.secondary",
         }}
       >
-        Choose your preferred staff member
+        เลือกพนักงานที่คุณต้องการ
       </Typography>
 
       <Box
@@ -68,12 +69,12 @@ export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props
             sx={{
               cursor: "pointer",
               transition: "all 0.2s ease-in-out",
-              border:
-                value === staff.id ? `2px solid ${theme.palette.primary.main}` : `2px solid ${theme.palette.divider}`,
-              backgroundColor: value === staff.id ? theme.palette.action.selected : theme.palette.background.paper,
-              "&:hover": {
-                borderColor: value === staff.id ? theme.palette.primary.main : theme.palette.primary.light,
-              },
+              // border:
+              //   value === staff.id ? `2px solid ${theme.palette.primary.main}` : `2px solid ${theme.palette.divider}`,
+              // backgroundColor: value === staff.id ? theme.palette.action.selected : theme.palette.background.paper,
+              // "&:hover": {
+              //   borderColor: value === staff.id ? theme.palette.primary.main : theme.palette.primary.light,
+              // },
             }}
             // onClick={() => onChange(staff.id)}
           >
@@ -102,7 +103,7 @@ export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props
                     }}
                   />
                 </Box>
-                {value === staff.id && (
+                {/* {value === staff.id && (
                   <Box
                     sx={{
                       bgcolor: theme.palette.primary.main,
@@ -115,7 +116,7 @@ export function Step3StaffSelection({ value, onChange, serviceType }: Step3Props
                   >
                     <Check size={16} color="white" />
                   </Box>
-                )}
+                )} */}
               </Box>
             </CardContent>
           </Card>

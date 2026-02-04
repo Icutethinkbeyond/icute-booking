@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Stepper,
   Step,
@@ -14,150 +14,84 @@ import {
   createTheme,
   useTheme,
   LinearProgress,
-} from "@mui/material"
-import { ArrowRight, ArrowLeft, Check } from "lucide-react"
-import { Step1ServiceSelection } from "@/components/forms/booking/step/Step1ServiceSelection"
-import { Step5ContactInfo } from "@/components/forms/booking/step/Step5ContactInfo"
-import { Step3StaffSelection } from "@/components/forms/booking/step/Step3StaffSelection"
-import { Step4DateTime } from "@/components/forms/booking/step/Step4DateTime"
-import { Step2ServiceType } from "@/components/forms/booking/step/Step2ServiceType"
-import { useNotifyContext } from "@/contexts/NotifyContext"
-import { useStoreContext } from "@/contexts/StoreContext"
-
-const steps = ["เลือกบริการ", "เลือกประเภทบริการ", "เลือกพนักงาน", "วันที่-เวลาเข้ารับบริการ", "ข้อมูลติดต่อ"]
-
-function NavigationButtons({
-  activeStep,
-  stepsLength,
-  onBack,
-  onNext,
-  isValid,
-}: {
-  activeStep: number
-  stepsLength: number
-  onBack: () => void
-  onNext: () => void
-  isValid?: boolean
-}) {
-  const theme = useTheme()
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        mt: { xs: 3, md: 4 },
-        pt: { xs: 2, md: 3 },
-        borderTop: `1px solid ${theme.palette.divider}`,
-        gap: 1.5,
-      }}
-    >
-      <Button
-        disabled={activeStep === 0}
-        onClick={onBack}
-        variant="outlined"
-        size="medium"
-        startIcon={<ArrowLeft size={16} />}
-        sx={{
-          fontSize: { xs: "0.875rem", md: "1rem" },
-          px: { xs: 2, md: 2.75 },
-          py: { xs: 1, md: 1.25 },
-        }}
-      >
-        ย้อนกลับ
-      </Button>
-      <Button
-        onClick={onNext}
-        // disabled={!isValid}
-        variant="contained"
-        size="medium"
-        endIcon={<ArrowRight size={16} />}
-        sx={{
-          fontSize: { xs: "0.875rem", md: "1rem" },
-          px: { xs: 2.5, md: 2.75 },
-          py: { xs: 1, md: 1.25 },
-        }}
-      >
-        {activeStep === stepsLength - 1 ? (
-          <>
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              ยืนยันการจอง
-            </Box>
-            <Box component="span" sx={{ display: { xs: "inline", sm: "none" } }}>
-              ยืนยัน
-            </Box>
-          </>
-        ) : (
-          "ต่อไป"
-        )}
-      </Button>
-    </Box>
-  )
-}
+  CircularProgress,
+} from "@mui/material";
+import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { Step1ServiceSelection } from "@/components/forms/booking/step/Step1ServiceSelection";
+import { Step5ContactInfo } from "@/components/forms/booking/step/Step5ContactInfo";
+import { Step3StaffSelection } from "@/components/forms/booking/step/Step3StaffSelection";
+import { Step4DateTime } from "@/components/forms/booking/step/Step4DateTime";
+import { Step2ServiceType } from "@/components/forms/booking/step/Step2ServiceType";
+import { useNotifyContext } from "@/contexts/NotifyContext";
+import { useStoreContext } from "@/contexts/StoreContext";
+import APIServices from "@/utils/services/APIServices";
+import { useParams } from "next/navigation";
+import { NavigationButtons } from "@/components/shared/NavigationButtons";
+import { AllowSelectEmpType, initialBooking } from "@/interfaces/Booking";
+import { useBookingContext } from "@/contexts/BookingContext";
+import { initialStore } from "@/interfaces/Store";
+import { OpenTimeRes } from "@/app/api/store/public/open-time-settings/route";
+import { AppDialog } from "@/components/shared/CustomDialog";
 
 export default function BookingPage() {
-  const [activeStep, setActiveStep] = useState(0)
-   const { StoreForm, setStoreForm } = useStoreContext();
-    const { setNotify } = useNotifyContext();
-    const [loading, setLoading] = useState<boolean>(false);
-  // const [lineUser, setLineUser] = useState<LineUser | null>(null)
-  // const [bookingData, setBookingData] = useState<BookingData>({
-  //   service: "",
-  //   serviceType: "with-staff",
-  //   staff: "",
-  //   date: null,
-  //   time: "",
-  //   name: "",
-  //   phone: "",
-  //   email: "",
-  // })
+  const params = useParams<{ shop_id: string }>();
+
+  const { StoreForm, setStoreForm } = useStoreContext();
+  const { bookingForm, setBookingForm } = useBookingContext();
+  const { setNotify } = useNotifyContext();
+
+  const [activeStep, setActiveStep] = useState<number>(2);
+  const [steps, setSteps] = useState<string[]>([]);
+  const [allowCustomerSelectEmployee, setAllowCustomerSelectEmployee] =
+    useState<boolean>(false);
+  const [shopIsClosed, setShopIsClosed] = useState<OpenTimeRes>({
+    isClosed: false,
+    reason: "",
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
-  }
+    if (
+      bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff &&
+      activeStep === 1
+    ) {
+      setActiveStep(3);
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  }
+    // setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    if (
+      bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff &&
+      activeStep === 3
+    ) {
+      setActiveStep(1);
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
+  };
 
   const handleReset = () => {
-    setActiveStep(0)
-    // setLineUser(null)
-    // setBookingData({
-    //   service: "",
-    //   serviceType: "with-staff",
-    //   staff: "",
-    //   date: null,
-    //   time: "",
-    //   name: "",
-    //   phone: "",
-    //   email: "",
-    // })
-  }
+    setActiveStep(0);
+    setBookingForm(initialBooking);
+  };
 
-  // const handleLineLogin = () => {
-  //   const mockUser: LineUser = {
-  //     userId: "U1234567890abcdef",
-  //     displayName: "สมชาย ใจดี",
-  //     pictureUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=user1",
-  //     email: "somchai@example.com",
-  //   }
-  //   setLineUser(mockUser)
-  //   setBookingData({
-  //     ...bookingData,
-  //     name: mockUser.displayName,
-  //     email: mockUser.email || "",
-  //   })
-  // }
+  const stepsAllowSelect = [
+    "เลือกบริการ",
+    "เลือกประเภทบริการ",
+    "เลือกพนักงาน",
+    "วันที่-เวลาเข้ารับบริการ",
+    "ข้อมูลติดต่อ",
+  ];
 
-  // const handleLineLogout = () => {
-  //   setLineUser(null)
-  //   setBookingData({
-  //     ...bookingData,
-  //     name: "",
-  //     email: "",
-  //   })
-  // }
+  const stepsNotAllowSelect = [
+    "เลือกบริการ",
+    "วันที่-เวลาเข้ารับบริการ",
+    "ข้อมูลติดต่อ",
+  ];
 
   // const isStepValid = () => {
   //   switch (activeStep) {
@@ -175,148 +109,175 @@ export default function BookingPage() {
   //       return false
   //   }
   // }
-    const getStoreSetting = async () => {
-      try {
-        setLoading(true);
-        let data: any = await APIServices.get(
-          `/api/services/public/?store_username=${params.shop_id}`,
-        );
-        console.log(data);
-        setServices(data.data);
-      } catch (error: any) {
-        setNotify({
-          open: true,
-          message: error.code,
-          color: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    useEffect(() => {
-      getServices();
-      return () => {
-        setServices([]);
-      };
-    }, []);
 
-  const renderStepContent = (step: number) => {
+  const getStoreSetting = async () => {
+    try {
+      setLoading(true);
+
+      const [rule_settings, open_time_settings]: any = await Promise.all([
+        APIServices.get(
+          `/api/store/public/rule-settings/?store_username=${params.shop_id}`,
+        ),
+        APIServices.get(
+          `/api/store/public/open-time-settings/?store_username=${params.shop_id}`,
+        ),
+      ]);
+
+      setShopIsClosed(open_time_settings);
+      setAllowCustomerSelectEmployee(
+        rule_settings.employeeSetting.allowCustomerSelectEmployee,
+      );
+
+      rule_settings.employeeSetting.allowCustomerSelectEmployee
+        ? setSteps(stepsAllowSelect)
+        : setSteps(stepsNotAllowSelect);
+
+      // setStoreForm(data.data);
+    } catch (error: any) {
+      setNotify({
+        open: true,
+        message: error.code,
+        color: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getStoreSetting();
+    return () => {
+      setStoreForm(initialStore);
+      setSteps([]);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  const renderStepContentAllowSelect = (step: number) => {
     switch (step) {
       case 0:
-        return (
-          <Step1ServiceSelection
-            // value={bookingData.service}
-            // onChange={(value) => setBookingData({ ...bookingData, service: value })}
-          />
-        )
+        return <Step1ServiceSelection />;
       case 1:
-        return (
-          <Step2ServiceType
-            // value={bookingData.serviceType}
-            // onChange={(value) => setBookingData({ ...bookingData, serviceType: value })}
-          />
-        )
+        return <Step2ServiceType />;
       case 2:
-        return (
-          <Step3StaffSelection
-            // value={bookingData.staff}
-            // onChange={(value) => setBookingData({ ...bookingData, staff: value })}
-            // serviceType={bookingData.serviceType}
-          />
-        )
+        return <Step3StaffSelection />;
       case 3:
         return (
           <Step4DateTime
-            // date={bookingData.date}
-            // time={bookingData.time}
-            // onDateChange={(value) => setBookingData({ ...bookingData, date: value })}
-            // onTimeChange={(value) => setBookingData({ ...bookingData, time: value })}
+          // date={bookingData.date}
+          // time={bookingData.time}
+          // onDateChange={(value) => setBookingData({ ...bookingData, date: value })}
+          // onTimeChange={(value) => setBookingData({ ...bookingData, time: value })}
           />
-        )
+        );
       case 4:
         return (
           <Step5ContactInfo
-            // name={bookingData.name}
-            // phone={bookingData.phone}
-            // email={bookingData.email}
-            // onNameChange={(value) => setBookingData({ ...bookingData, name: value })}
-            // onPhoneChange={(value) => setBookingData({ ...bookingData, phone: value })}
-            // onEmailChange={(value) => setBookingData({ ...bookingData, email: value })}
-            // isLoggedIn={lineUser !== null}
+          // name={bookingData.name}
+          // phone={bookingData.phone}
+          // email={bookingData.email}
+          // onNameChange={(value) => setBookingData({ ...bookingData, name: value })}
+          // onPhoneChange={(value) => setBookingData({ ...bookingData, phone: value })}
+          // onEmailChange={(value) => setBookingData({ ...bookingData, email: value })}
+          // isLoggedIn={lineUser !== null}
           />
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
+
+  const renderStepContentNotAllowSelect = (step: number) => {
+    switch (step) {
+      case 0:
+        return <Step1ServiceSelection />;
+      case 1:
+        return <Step4DateTime />;
+      case 2:
+        return <Step5ContactInfo />;
+      default:
+        return null;
+    }
+  };
 
   return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          bgcolor: "background.default",
-          py: { xs: 2, md: 4, lg: 6 },
-        }}
-      >
-        <Container maxWidth="xl">
-          <Box
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        py: { xs: 2, md: 4, lg: 6 },
+      }}
+    >
+      <Container maxWidth="xl">
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: { xs: 3, md: 4 },
+            px: { xs: 2, md: 0 },
+          }}
+        >
+          <Typography
+            variant="h3"
             sx={{
-              textAlign: "center",
-              mb: { xs: 3, md: 4 },
-              px: { xs: 2, md: 0 },
+              fontWeight: 700,
+              color: "text.primary",
+              mb: 1,
+              fontSize: { xs: "1.5rem", md: "2rem" },
             }}
           >
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 700,
-                color: "text.primary",
-                mb: 1,
-                fontSize: { xs: "1.5rem", md: "2rem" },
-              }}
-            >
-              จองบริการ
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: "text.secondary",
-                fontSize: { xs: "0.875rem", md: "1rem" },
-              }}
-            >
-              ทำตามขั้นตอนด้านล่างเพื่อกำหนดเวลานัดหมายรับบริการ
-            </Typography>
-          </Box>
-
-          <Box
+            จองบริการ
+          </Typography>
+          <Typography
+            variant="body1"
             sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", 
-                // lg: "2fr 1fr",
-                lg: "1fr" 
-              },
-              gap: 4,
+              color: "text.secondary",
+              fontSize: { xs: "0.875rem", md: "1rem" },
             }}
           >
-            <Box>
-              {/* <Box sx={{ mb: { xs: 2, md: 3 } }}>
-                <LineLoginButton user={lineUser} onLogin={handleLineLogin} onLogout={handleLineLogout} />
-              </Box> */}
+            ทำตามขั้นตอนด้านล่างเพื่อกำหนดเวลานัดหมายรับบริการ
+          </Typography>
+        </Box>
 
-              <Paper
-                elevation={2}
-                sx={{
-                  p: { xs: 2, md: 3, lg: 4 },
-                  bgcolor: "background.paper",
-                  border: 1,
-                  borderColor: "divider",
-                }}
-              >
-                <Box sx={{ display: { xs: "none", md: "block" } }}>
-                  <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-                    {steps.map((label) => (
-                      <Step key={label}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              // lg: "2fr 1fr",
+              lg: "1fr",
+            },
+            gap: 4,
+          }}
+        >
+          <Box>
+            <Paper
+              elevation={2}
+              sx={{
+                p: { xs: 2, md: 3, lg: 4 },
+                bgcolor: "background.paper",
+                border: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Box sx={{ display: { xs: "none", md: "block" } }}>
+                <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+                  {steps.length &&
+                    steps.map((label, index) => (
+                      <Step key={index}>
                         <StepLabel
                           sx={{
                             "& .MuiStepLabel-label": {
@@ -328,126 +289,146 @@ export default function BookingPage() {
                         </StepLabel>
                       </Step>
                     ))}
-                  </Stepper>
-                </Box>
+                </Stepper>
+              </Box>
 
-                <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}>
-                  <Box
+              <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      mb: 1.5,
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: "text.primary",
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontSize: "0.875rem",
-                        fontWeight: 500,
-                        color: "text.primary",
-                      }}
-                    >
-                      ขั้นตอนที่ {activeStep + 1} จาก {steps.length}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontSize: "0.75rem",
-                        color: "text.secondary",
-                      }}
-                    >
-                      {steps[activeStep]}
-                    </Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={((activeStep + 1) / steps.length) * 100}
+                    ขั้นตอนที่ {activeStep + 1} จาก {steps.length}
+                  </Typography>
+                  <Typography
+                    variant="body2"
                     sx={{
-                      height: 6,
+                      fontSize: "0.75rem",
+                      color: "text.secondary",
+                    }}
+                  >
+                    {steps[activeStep]}
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={((activeStep + 1) / steps.length) * 100}
+                  sx={{
+                    height: 6,
+                    borderRadius: 1,
+                    bgcolor: "grey.200",
+                    "& .MuiLinearProgress-bar": {
                       borderRadius: 1,
-                      bgcolor: "grey.200",
-                      "& .MuiLinearProgress-bar": {
-                        borderRadius: 1,
-                        bgcolor: "primary.main",
-                      },
-                    }}
-                  />
-                </Box>
+                      bgcolor: "primary.main",
+                    },
+                  }}
+                />
+              </Box>
 
-                {activeStep === steps.length ? (
+              {activeStep === steps.length ? (
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    py: 6,
+                  }}
+                >
                   <Box
                     sx={{
-                      textAlign: "center",
-                      py: 6,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 64,
+                      height: 64,
+                      borderRadius: "50%",
+                      bgcolor: "primary.main",
+                      mb: 2,
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: 64,
-                        height: 64,
-                        borderRadius: "50%",
-                        bgcolor: "primary.main",
-                        mb: 2,
-                      }}
-                    >
-                      <Check size={32} color="white" />
-                    </Box>
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        mb: 1,
-                        fontWeight: 600,
-                        color: "text.primary",
-                      }}
-                    >
-                      ยืนยันการจอง!
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: "text.secondary",
-                        mb: 3,
-                      }}
-                    >
-                      การนัดหมายของคุณได้รับการกำหนดเวลาเรียบร้อยแล้ว อีเมลยืนยันได้ถูกส่งไปยัง{" "}
-                      {/* {bookingData.email}. */}
-                    </Typography>
-                    <Button onClick={handleReset} variant="contained" size="large">
-                      จองนัดหมายเพิ่มเติม
-                    </Button>
+                    <Check size={32} color="white" />
                   </Box>
-                ) : (
-                  <>
-                    <Box
-                      sx={{
-                        minHeight: { xs: 350, md: 400 },
-                        py: { xs: 2, md: 3 },
-                      }}
-                    >
-                      {renderStepContent(activeStep)}
-                    </Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      mb: 1,
+                      fontWeight: 600,
+                      color: "text.primary",
+                    }}
+                  >
+                    ยืนยันการจอง!
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "text.secondary",
+                      mb: 3,
+                    }}
+                  >
+                    การนัดหมายของคุณได้รับการกำหนดเวลาเรียบร้อยแล้ว
+                    อีเมลยืนยันได้ถูกส่งไปยัง {bookingForm.customerEmail}.
+                  </Typography>
+                  <Button
+                    onClick={handleReset}
+                    variant="contained"
+                    size="large"
+                  >
+                    จองนัดหมายเพิ่มเติม
+                  </Button>
+                </Box>
+              ) : (
+                <>
+                  <Box
+                    sx={{
+                      minHeight: { xs: 350, md: 400 },
+                      py: { xs: 2, md: 3 },
+                    }}
+                  >
+                    {allowCustomerSelectEmployee
+                      ? renderStepContentAllowSelect(activeStep)
+                      : renderStepContentNotAllowSelect(activeStep)}
+                  </Box>
 
-                    <NavigationButtons
-                      activeStep={activeStep}
-                      stepsLength={steps.length}
-                      onBack={handleBack}
-                      onNext={handleNext}
-                      // isValid={isStepValid()}
-                    />
-                  </>
-                )}
-              </Paper>
-            </Box>
+                  <NavigationButtons
+                    activeStep={activeStep}
+                    stepsLength={steps.length}
+                    onBack={handleBack}
+                    onNext={handleNext}
+                    // isValid={isStepValid()}
+                  />
+                </>
+              )}
+            </Paper>
+          </Box>
 
-            {/* <Box sx={{ display: { xs: "none", lg: "block" } }}>
+          {/* <Box sx={{ display: { xs: "none", lg: "block" } }}>
               <BookingSummary bookingData={bookingData} />
             </Box> */}
-          </Box>
-        </Container>
-      </Box>
-  )
+
+          <AppDialog
+            open={open}
+            type="success"
+            title="บันทึกข้อมูลสำเร็จ"
+            description="ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว"
+            imageSrc="/images/success.png"
+            confirmText="ตกลง"
+            onConfirm={() => {
+              console.log("confirm");
+              setOpen(false);
+            }}
+            onClose={() => setOpen(false)}
+          />
+        </Box>
+      </Container>
+    </Box>
+  );
 }

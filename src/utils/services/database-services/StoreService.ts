@@ -1,7 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { OpenTimeRes } from "@/app/api/store/public/open-time-settings/route";
 
+dayjs.extend(customParseFormat);
 dayjs.extend(isBetween);
 
 const prisma = new PrismaClient();
@@ -48,7 +51,7 @@ export const StoreRuleService = {
       minAdvanceMinutes: store.bookingRule.minAdvanceBookingHours * 60,
       maxAdvanceMinutes: store.bookingRule.maxAdvanceBookingDays * 24 * 60,
       maxQueuePerPhone: store.bookingRule.maxQueuePerPhone,
-      
+
       // การยกเลิก
       allowCancel: store.cancelRule.allowCustomerCancel,
       minCancelMinutes: store.cancelRule.minCancelBeforeHours * 60,
@@ -56,67 +59,79 @@ export const StoreRuleService = {
       // พนักงาน
       staffSelection: store.employeeSetting, // { allowCustomerSelectEmployee, autoAssignEmployee, maxQueuePerEmployeePerDay }
     };
-  }
+  },
 
-  async isClosedNow(storeId: string, targetDate: Date = new Date()) {
+  async isClosedNow(storeId: string, targetDate: Date = new Date()): Promise<OpenTimeRes> {
+
+    const dayMap: Record<number, string> = {
+      0: "SUN",
+      1: "MON",
+      2: "TUE",
+      3: "WED",
+      4: "THU",
+      5: "FRI",
+      6: "SAT",
+    };
+
+
     const now = dayjs(targetDate);
     const day = now.date();
     const month = now.month() + 1;
-    const dayOfWeek = now.day(); // 0 (อาทิตย์) - 6 (เสาร์)
-    const currentTime = now.format("HH:mm");
+    const prefix = dayMap[now.day()]; // เช่น "MON"
 
     // 1. ตรวจสอบวันหยุด (Holidays)
-    const holiday = await prisma.storeHoliday.findFirst({
+    const holiday = await prisma.holiday.findFirst({
       where: {
         storeId,
         OR: [
           { date: now.startOf("day").toDate() }, // วันหยุดพิเศษระบุวันที่
-          { isAnnual: true, day, month }         // วันหยุดประจำปี (เช่น 1 ม.ค.)
         ]
       }
     });
 
     if (holiday) {
-      return { 
-        isClosed: true, 
-        reason: `วันหยุด: ${holiday.name}`,
-        type: "HOLIDAY" 
+      return {
+        isClosed: true,
+        reason: `วันหยุด: ${holiday.holidayName}`,
       };
     }
 
     // 2. ตรวจสอบเวลาทำการปกติ (Default Operating Hours)
-    const workingDay = await prisma.defaultOperatingHour.findFirst({
-      where: { storeId, dayOfWeek }
+    const workingDay: any = await prisma.defaultOperatingHour.findFirst({
+      where: { storeId }
     });
 
-    // ถ้าไม่มีการตั้งค่า หรือตั้งว่าปิด (isOpen: false)
-    if (!workingDay || !workingDay.isOpen) {
-      return { 
-        isClosed: true, 
-        reason: "ร้านปิดทำการในวันนี้",
-        type: "OFF_DAY" 
+    const isOpen = workingDay[`${prefix}_openTime`];;
+    const openTimeDate = workingDay[`${prefix}_openTime`];
+    const closeTimeDate = workingDay[`${prefix}_closeTime`];
+
+    // 3. ตรวจสอบว่าวันนั้นร้านเปิดหรือไม่
+    if (!isOpen) {
+      return {
+        isClosed: true,
+        reason: `ร้านปิดทำการในวัน${prefix}`,
       };
     }
 
-    // 3. ตรวจสอบช่วงเวลา (Time Range)
-    // เปรียบเทียบ String "HH:mm" ได้เลย เช่น "09:00" <= "10:30" <= "18:00"
-    const isWithinOperatingHours = 
-      currentTime >= workingDay.openTime && 
-      currentTime <= workingDay.closeTime;
+    // 4. เปรียบเทียบเวลา (เช็คเฉพาะ HH:mm)
+    // เนื่องจากใน DB เก็บเป็น Date object เราจะดึงเฉพาะเวลามาเทียบ
+    const currentTime = now.format("HH:mm");
+    const openTime = dayjs(openTimeDate).format("HH:mm");
+    const closeTime = dayjs(closeTimeDate).format("HH:mm");
 
-    if (!isWithinOperatingHours) {
-      return { 
-        isClosed: true, 
-        reason: `อยู่นอกเวลาทำการ (เปิด ${workingDay.openTime} - ${workingDay.closeTime})`,
-        type: "OUT_OF_HOURS" 
+    // ตรรกะการเปรียบเทียบ String เวลา (เช่น "09:00" <= "10:30" <= "18:00")
+    const isWithinHours = currentTime >= openTime && currentTime <= closeTime;
+
+    if (!isWithinHours) {
+      return {
+        isClosed: true,
+        reason: `อยู่นอกเวลาทำการ (เปิด ${openTime} - ${closeTime})`,
       };
     }
 
-    // ถ้าผ่านทุกเงื่อนไข แปลว่าร้านเปิดอยู่
-    return { 
-      isClosed: false, 
+    return {
+      isClosed: false,
       reason: "ร้านเปิดให้บริการ",
-      type: "OPEN" 
     };
   }
 };

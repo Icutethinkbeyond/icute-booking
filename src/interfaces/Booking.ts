@@ -14,6 +14,8 @@ export interface Booking {
   bookingDate: Dayjs | null | string; // ใช้ string เพราะจาก API มักส่ง ISO Date เช่น "2025-10-14T10:00:00Z"
   bookingTime: Dayjs | null | string;
 
+  needSelectEmployee: AllowSelectEmpType | null | undefined;
+
   status: BookingStatus;
   customerType: CustomerType;
 
@@ -35,11 +37,17 @@ export interface Booking {
   updatedAt: string;
 }
 
+export enum AllowSelectEmpType {
+  withstaff = "with-staff",
+  withoutstaff = "without-staff"
+}
+
 export const initialBooking: Booking = {
   id: '',
   customerName: '',
   customerPhone: '',
   customerEmail: '',
+  needSelectEmployee: null,
   // กำหนดค่าเริ่มต้นเป็นเวลาปัจจุบัน (หรือเวลาที่คุณต้องการให้ฟอร์มเริ่มต้น)
   bookingDate: null,
   // endTime สามารถคำนวณจาก startTime + duration ของ service

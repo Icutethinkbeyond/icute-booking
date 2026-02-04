@@ -14,6 +14,8 @@ import {
   Tooltip,
   Switch,
   Chip,
+  Button,
+  alpha,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -22,15 +24,21 @@ import {
   Schedule as ScheduleIcon,
   AttachMoney as MoneyIcon,
   LocalOffer as OfferIcon,
+  MonetizationOn,
 } from "@mui/icons-material";
 
 import { Service } from "@/interfaces/Store";
+import { CheckCircleIcon, Eye } from "lucide-react";
+import { useState } from "react";
 
 interface ServiceCardProps {
   service: Service;
   displayToggle?: boolean;
   displayColorOfService?: boolean;
   displayCTA?: boolean;
+  selectable?: boolean;
+  selected?: boolean;
+  onSelect?: (serviceId: string) => void;
   onEdit?: (serviceId: string) => void;
   onDelete?: (serviceId: string) => void;
   onToggleStatus?: (serviceId: string, active: boolean) => void;
@@ -44,8 +52,15 @@ export function ServiceCard({
   displayToggle = true,
   displayColorOfService = true,
   displayCTA = true,
+  selectable = false, // ค่าเริ่มต้นเป็น false
+  selected = false,
+  onSelect,
 }: ServiceCardProps) {
   const theme = useTheme();
+
+  const [expanded, setExpanded] = useState(false);
+
+  const hasDetail = !!service.detail && service.detail.length > 80;
 
   const hasDiscount = service.discount > 0 && service.discount < service.price;
   const finalPrice = hasDiscount ? service.discount : service.price;
@@ -59,26 +74,61 @@ export function ServiceCard({
     }
   };
 
+const handleCardClick = () => {
+    if (selectable && onSelect) {
+      // สำหรับ Single Selection: ถ้ากดซ้ำรายการเดิม อาจจะให้ยกเลิก หรือไม่ทำอะไรเลยก็ได้
+      // ในที่นี้คือส่ง ID ไปให้ Parent จัดการสลับค่า
+      onSelect(service.id);
+    }
+  };
+
   return (
     <Card
       elevation={0}
+      onClick={handleCardClick} // เพิ่ม event คลิกที่ Card
       sx={{
         height: "100%",
         display: "flex",
         flexDirection: "column",
         borderRadius: 3,
         overflow: "hidden",
-        border: `1px solid ${theme.palette.divider}`,
-        transition: "all 0.3s ease",
+        border: `2px solid ${
+          selected ? theme.palette.primary.main : theme.palette.divider
+        }`, // ปรับขอบให้หนาขึ้นเมื่อเลือก
+        transition: "all 0.2s ease-in-out",
         position: "relative",
+        cursor: selectable ? "pointer" : "default",
         opacity: service.active ? 1 : 0.65,
+        backgroundColor: selected
+          ? alpha(theme.palette.primary.main, 0.04)
+          : theme.palette.background.paper,
         "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: `0 8px 24px ${theme.palette.primary.main}20`,
+          transform: selectable ? "translateY(-4px)" : "none",
+          boxShadow: selected
+            ? `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`
+            : `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
           borderColor: theme.palette.primary.main,
         },
       }}
     >
+      {/* ส่วนบ่งชี้ว่าถูกเลือก (Checkmark Badge) */}
+      {selectable && selected && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            zIndex: 10,
+            color: theme.palette.primary.main,
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: "50%",
+            lineHeight: 0,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          }}
+        >
+          <CheckCircleIcon style={{ fontSize: 28 }} />
+        </Box>
+      )}
       {/* Service Image */}
       <Box sx={{ position: "relative" }}>
         <CardMedia
@@ -89,8 +139,21 @@ export function ServiceCard({
           sx={{
             objectFit: "cover",
             backgroundColor: theme.palette.grey[100],
+            // เพิ่ม Filter เมื่อเลือก
+            filter: selected ? "brightness(0.9)" : "none",
           }}
         />
+        {/* Overlay เมื่อเลือก */}
+        {selected && (
+          <Box 
+            sx={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              pointerEvents: 'none'
+            }}
+          />
+        )}
 
         {/* {service.displayNumber > 0 && (
           <Box
@@ -170,7 +233,7 @@ export function ServiceCard({
             variant="h6"
             sx={{
               fontWeight: 600,
-              color: theme.palette.text.primary,
+              color: selected ? theme.palette.primary.dark : theme.palette.text.primary,
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
@@ -257,19 +320,30 @@ export function ServiceCard({
         <Typography
           variant="body2"
           sx={{
-            color: theme.palette.text.secondary,
-            mb: 2,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
+            color: "text.secondary",
+            mb: 1,
+            overflow: expanded ? "visible" : "hidden",
+            textOverflow: expanded ? "unset" : "ellipsis",
+            display: expanded ? "block" : "-webkit-box",
+            WebkitLineClamp: expanded ? "unset" : 2,
             WebkitBoxOrient: "vertical",
-            minHeight: 40,
-            flexGrow: 1,
+            minHeight: expanded ? "auto" : 40,
+            transition: "all 0.2s ease",
           }}
         >
           {service.detail || "ไม่มีคำอธิบาย"}
         </Typography>
+
+        {hasDetail && (
+          <Button
+            size="small"
+            variant="contained"
+            sx={{ p: 0, minWidth: "auto", mb: 2 }}
+            onClick={() => setExpanded((prev) => !prev)}
+          >
+            {expanded ? "ย่อ" : "อ่านต่อ"}
+          </Button>
+        )}
 
         {/* Service Details */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mb: 2 }}>
@@ -317,7 +391,7 @@ export function ServiceCard({
                         fontWeight: 700,
                       }}
                     >
-                      ฿{finalPrice.toLocaleString()}
+                      {finalPrice.toLocaleString()} บาท
                     </Typography>
                     <Typography
                       variant="body2"
@@ -326,7 +400,7 @@ export function ServiceCard({
                         color: theme.palette.text.disabled,
                       }}
                     >
-                      ฿{service.price.toLocaleString()}
+                      {service.price.toLocaleString()} บาท
                     </Typography>
                   </Box>
                   <Chip
@@ -344,7 +418,7 @@ export function ServiceCard({
               </>
             ) : (
               <>
-                <MoneyIcon
+                <MonetizationOn
                   sx={{ fontSize: 18, color: theme.palette.success.main }}
                 />
                 <Typography
@@ -354,7 +428,7 @@ export function ServiceCard({
                     fontWeight: 700,
                   }}
                 >
-                  ฿{service.price.toLocaleString()}
+                  {service.price.toLocaleString()} บาท
                 </Typography>
               </>
             )}

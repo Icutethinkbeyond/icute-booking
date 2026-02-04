@@ -13,17 +13,28 @@ import {
   useTheme,
 } from "@mui/material"
 import { User, Users } from "lucide-react"
+import { useBookingContext } from "@/contexts/BookingContext"
+import { AllowSelectEmpType } from "@/interfaces/Booking"
 
 interface Step2Props {
-  value?: "with-staff" | "without-staff"
-  onChange?: (value: "with-staff" | "without-staff") => void
+  // value?: "with-staff" | "without-staff"
+  // onChange?: (value: AllowSelectEmpType) => void
 }
 
-export function Step2ServiceType({ value, onChange }: Step2Props) {
+export function Step2ServiceType({ 
+  // value, onChange
+ }: Step2Props) {
+
   const theme = useTheme()
+  const { setBookingForm, bookingForm } = useBookingContext();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // onChange(event.target.value as "with-staff" | "without-staff")
+    console.log(event.target.value)
+    setBookingForm((prevState) => ({
+      ...prevState,
+        needSelectEmployee: event.target.value as unknown as AllowSelectEmpType
+    }));
+    console.log(bookingForm)
   }
 
   return (
@@ -52,27 +63,28 @@ export function Step2ServiceType({ value, onChange }: Step2Props) {
         {/* <FormLabel component="legend" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden" }}>
           ประเภทบริการ
         </FormLabel> */}
-        <RadioGroup value={value} onChange={handleChange} sx={{ gap: 2 }}>
+        <RadioGroup value={AllowSelectEmpType} onChange={handleChange} sx={{ gap: 2 }}>
           <Paper
-            elevation={value === "with-staff" ? 3 : 0}
+            elevation={bookingForm.needSelectEmployee === AllowSelectEmpType.withstaff ? 3 : 0}
             sx={{
               p: 2,
               cursor: "pointer",
               transition: "all 0.2s ease-in-out",
               border:
-                value === "with-staff"
+                bookingForm.needSelectEmployee === AllowSelectEmpType.withstaff
                   ? `2px solid ${theme.palette.primary.main}`
                   : `2px solid ${theme.palette.divider}`,
-              backgroundColor: value === "with-staff" ? theme.palette.action.selected : theme.palette.background.paper,
+              backgroundColor: bookingForm.needSelectEmployee === AllowSelectEmpType.withstaff ? theme.palette.action.selected : theme.palette.background.paper,
               "&:hover": {
-                borderColor: value === "with-staff" ? theme.palette.primary.main : theme.palette.primary.light,
+                borderColor: bookingForm.needSelectEmployee === AllowSelectEmpType.withstaff ? theme.palette.primary.main : theme.palette.primary.light,
               },
             }}
-            // onClick={() => onChange("with-staff")}
+            // onClick={() => handleChange(AllowSelectEmpType.withstaff)}
           >
             <FormControlLabel
-              value="with-staff"
+              value={AllowSelectEmpType.withstaff}
               control={<Radio />}
+              checked={bookingForm.needSelectEmployee === AllowSelectEmpType.withstaff}
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml: 1 }}>
                   <Users size={24} color={theme.palette.primary.main} />
@@ -91,35 +103,36 @@ export function Step2ServiceType({ value, onChange }: Step2Props) {
           </Paper>
 
           <Paper
-            elevation={value === "without-staff" ? 3 : 0}
+            elevation={bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff ? 3 : 0}
             sx={{
               p: 2,
               cursor: "pointer",
               transition: "all 0.2s ease-in-out",
               border:
-                value === "without-staff"
+                bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff
                   ? `2px solid ${theme.palette.primary.main}`
                   : `2px solid ${theme.palette.divider}`,
               backgroundColor:
-                value === "without-staff" ? theme.palette.action.selected : theme.palette.background.paper,
+                bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff ? theme.palette.action.selected : theme.palette.background.paper,
               "&:hover": {
-                borderColor: value === "without-staff" ? theme.palette.primary.main : theme.palette.primary.light,
+                borderColor: bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff ? theme.palette.primary.main : theme.palette.primary.light,
               },
             }}
-            // onClick={() => onChange("without-staff")}
+            // onClick={() => handleChange("without-staff")}
           >
             <FormControlLabel
-              value="without-staff"
+              value={AllowSelectEmpType.withoutstaff}
+              checked={bookingForm.needSelectEmployee === AllowSelectEmpType.withoutstaff}
               control={<Radio />}
               label={
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, ml: 1 }}>
                   <User size={24} color={theme.palette.primary.main} />
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
-                      Without staff preference
+                      ให้ระบบเลือกพนักงาน
                     </Typography>
                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                      Any available staff member
+                      โดยระบบจะเลือกพนักงานที่ว่างตรงกับเวลาที่คุณเลือก
                     </Typography>
                   </Box>
                 </Box>

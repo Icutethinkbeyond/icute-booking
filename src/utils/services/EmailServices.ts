@@ -69,8 +69,6 @@ export const sendWithGoogle = async (
 };
 
 
-
-
 /**
  * ฟังก์ชันสำหรับส่งอีเมลยืนยันบัญชี
  * @param toEmail อีเมลผู้รับ

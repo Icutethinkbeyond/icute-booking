@@ -4,11 +4,8 @@
 
 import {
   Booking,
-  initialBooking,
-  // initialbooking,
-  // bookingSelect,
+  initialBooking
 } from "@/interfaces/Booking";
-import { faker } from "@faker-js/faker";
 import React, {
   createContext,
   useContext,
@@ -26,9 +23,6 @@ interface BookingContextProps {
   setBookingForm: Dispatch<React.SetStateAction<Booking>>;
   bookingEdit: boolean;
   setBookingEdit: Dispatch<React.SetStateAction<boolean>>;
-  // setTypeForm: Dispatch<React.SetStateAction<Booking>>;
-  // setbookingSelectState: Dispatch<React.SetStateAction<bookingSelect[]>>;
-  // bookingSelectState: bookingSelect[];
 }
 
 // สร้าง Context
@@ -37,10 +31,8 @@ const BookingContext = createContext<BookingContextProps | undefined>(
 );
 
 export const BookingProvider = ({ children }: { children: ReactNode }) => {
+
   const [bookings, setBookings] = useState<Booking[]>([]);
-  // const [bookingSelectState, setbookingSelectState] = useState<
-  //   bookingSelect[]
-  // >([]);
   const [bookingForm, setBookingForm] = useState<Booking>(initialBooking)
   const [bookingEdit, setBookingEdit] = useState<boolean>(false);
 
@@ -69,9 +61,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
         bookingForm,
         setBookingForm,
         bookingEdit,
-        setBookingEdit,
-        // bookingSelectState,
-        // setbookingSelectState,
+        setBookingEdit
       }}
     >
       {children}
