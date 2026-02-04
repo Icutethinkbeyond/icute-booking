@@ -21,9 +21,8 @@ import { Step5ContactInfo } from "@/components/forms/booking/step/Step5ContactIn
 import { Step3StaffSelection } from "@/components/forms/booking/step/Step3StaffSelection"
 import { Step4DateTime } from "@/components/forms/booking/step/Step4DateTime"
 import { Step2ServiceType } from "@/components/forms/booking/step/Step2ServiceType"
-// import { BookingSummary } from "@/components/booking/booking-summary"
-// import { LineLoginButton } from "@/components/booking/line-login-button"
-// import type { BookingData, LineUser } from "@/types/booking"
+import { useNotifyContext } from "@/contexts/NotifyContext"
+import { useStoreContext } from "@/contexts/StoreContext"
 
 const steps = ["เลือกบริการ", "เลือกประเภทบริการ", "เลือกพนักงาน", "วันที่-เวลาเข้ารับบริการ", "ข้อมูลติดต่อ"]
 
@@ -98,6 +97,9 @@ function NavigationButtons({
 
 export default function BookingPage() {
   const [activeStep, setActiveStep] = useState(0)
+   const { StoreForm, setStoreForm } = useStoreContext();
+    const { setNotify } = useNotifyContext();
+    const [loading, setLoading] = useState<boolean>(false);
   // const [lineUser, setLineUser] = useState<LineUser | null>(null)
   // const [bookingData, setBookingData] = useState<BookingData>({
   //   service: "",
@@ -173,6 +175,31 @@ export default function BookingPage() {
   //       return false
   //   }
   // }
+    const getStoreSetting = async () => {
+      try {
+        setLoading(true);
+        let data: any = await APIServices.get(
+          `/api/services/public/?store_username=${params.shop_id}`,
+        );
+        console.log(data);
+        setServices(data.data);
+      } catch (error: any) {
+        setNotify({
+          open: true,
+          message: error.code,
+          color: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      getServices();
+      return () => {
+        setServices([]);
+      };
+    }, []);
 
   const renderStepContent = (step: number) => {
     switch (step) {

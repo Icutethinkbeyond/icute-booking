@@ -21,9 +21,6 @@ import { Step5ContactInfo } from "@/components/forms/booking/step/Step5ContactIn
 import { Step3StaffSelection } from "@/components/forms/booking/step/Step3StaffSelection"
 import { Step4DateTime } from "@/components/forms/booking/step/Step4DateTime"
 import { Step2ServiceType } from "@/components/forms/booking/step/Step2ServiceType"
-// import { BookingSummary } from "@/components/booking/booking-summary"
-// import { LineLoginButton } from "@/components/booking/line-login-button"
-// import type { BookingData, LineUser } from "@/types/booking"
 
 const steps = ["เลือกบริการ", "ประเภทบริการ", "เลือกพนักงาน", "วันที่-เวลานัด", "Contact Info"]
 
