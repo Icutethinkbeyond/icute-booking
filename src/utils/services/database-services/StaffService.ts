@@ -21,11 +21,15 @@ export const StaffService = {
     return { isOnLeave: leaves.length > 0, currentBookings: bookings };
   },
 
-  // 2. ดึงพนักงานที่ทำบริการที่กำหนดได้ (ผ่าน relation serviceIds)
+  // 2. ดึงพนักงานที่ทำบริการที่กำหนดได้ (ผ่าน relation services)
   async getStaffByService(serviceId: string) {
     return await prisma.employee.findMany({
       where: {
-        serviceIds: { has: serviceId },
+        services: {
+          some: {
+            id: serviceId
+          }
+        },
         isActive: true,
         isDelete: false
       }

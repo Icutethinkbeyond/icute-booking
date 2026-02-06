@@ -17,7 +17,6 @@ import { useTranslations } from "next-intl";
 import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import BookingTable from "@/components/forms/booking/BookingTable";
 import IncomeChart from "@/components/forms/dashboard/IncomeChart";
 import Appointment from "@/components/forms/dashboard/Appointment";
 import StaffAvailabilityList from "@/components/forms/dashboard/StaffAvailability";
@@ -49,76 +48,76 @@ const Booking = () => {
   return (
     <PageContainer title="" description="">
 
-<Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: theme.palette.background.default,
-      }}
-    >
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          p: { xs: 2, md: 4 },
-          // ml: { xs: 0, md: "280px" },
+          display: "flex",
           minHeight: "100vh",
+          backgroundColor: theme.palette.background.default,
         }}
       >
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              color: theme.palette.text.primary,
-              mb: 1,
-            }}
-          >
-            แผงควบคุม
-          </Typography>
-          <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
-            ยินดีต้อนรับกลับมา! นี่คือภาพรวมของวันนี้
-          </Typography>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: { xs: 2, md: 4 },
+            // ml: { xs: 0, md: "280px" },
+            minHeight: "100vh",
+          }}
+        >
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                mb: 1,
+              }}
+            >
+              แผงควบคุม
+            </Typography>
+            <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+              ยินดีต้อนรับกลับมา! นี่คือภาพรวมของวันนี้
+            </Typography>
+          </Box>
+
+          {/* Stats Cards */}
+          <Box sx={{ mb: 4 }}>
+            <StatsCards stats={mockDashboardStats} />
+          </Box>
+
+          {/* Main Section */}
+          <Grid2 container spacing={3} sx={{ mb: 4 }}>
+            {/* Today's Appointments */}
+            <Grid2 size={{ xs: 12, lg: 4 }} >
+              <TodayAppointments appointments={mockAppointments} />
+            </Grid2>
+
+            {/* Upcoming Appointments */}
+            <Grid2 size={{ xs: 12, lg: 4 }}>
+              <UpcomingAppointments appointments={mockAppointments} />
+            </Grid2>
+
+            {/* Staff Availability */}
+            <Grid2 size={{ xs: 12, lg: 4 }}>
+              <StaffAvailabilityList staffList={mockStaffAvailability} />
+            </Grid2>
+          </Grid2>
+
+          {/* Charts Section */}
+          <Grid2 container spacing={3}>
+            {/* Revenue Chart */}
+            <Grid2 size={{ xs: 12, lg: 6 }}>
+              <RevenueChart data={mockRevenueData} />
+            </Grid2>
+
+            {/* Customer Chart */}
+            <Grid2 size={{ xs: 12, lg: 6 }}>
+              <CustomerChart data={mockCustomerData} />
+            </Grid2>
+          </Grid2>
         </Box>
-
-        {/* Stats Cards */}
-        <Box sx={{ mb: 4 }}>
-          <StatsCards stats={mockDashboardStats} />
-        </Box>
-
-        {/* Main Section */}
-        <Grid2 container spacing={3} sx={{ mb: 4 }}>
-          {/* Today's Appointments */}
-          <Grid2 size={{ xs: 12, lg: 4}} >
-            <TodayAppointments appointments={mockAppointments} />
-          </Grid2>
-
-          {/* Upcoming Appointments */}
-          <Grid2 size={{ xs: 12, lg: 4}}>
-            <UpcomingAppointments appointments={mockAppointments} />
-          </Grid2>
-
-          {/* Staff Availability */}
-          <Grid2 size={{ xs: 12, lg: 4}}>
-            <StaffAvailabilityList staffList={mockStaffAvailability} />
-          </Grid2>
-        </Grid2>
-
-        {/* Charts Section */}
-        <Grid2 container spacing={3}>
-          {/* Revenue Chart */}
-          <Grid2 size={{ xs: 12, lg: 6}}>
-            <RevenueChart data={mockRevenueData} />
-          </Grid2>
-
-          {/* Customer Chart */}
-          <Grid2 size={{ xs: 12, lg: 6}}>
-            <CustomerChart data={mockCustomerData} />
-          </Grid2>
-        </Grid2>
       </Box>
-    </Box>
     </PageContainer>
   );
 };

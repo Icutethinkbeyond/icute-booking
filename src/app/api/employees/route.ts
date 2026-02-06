@@ -35,8 +35,12 @@ export async function GET(request: NextRequest) {
                 lastPage: Math.ceil(total / limit),
             },
         });
-    } catch (error) {
-        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    } catch (error: any) {
+        console.error('GET /api/employees Error:', error);
+        return NextResponse.json({
+            message: "Internal Server Error",
+            error: error.message
+        }, { status: 500 });
     }
 }
 

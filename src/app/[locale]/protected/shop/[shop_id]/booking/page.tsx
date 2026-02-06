@@ -124,11 +124,13 @@ export default function BookingPage() {
       ]);
 
       setShopIsClosed(open_time_settings);
-      setAllowCustomerSelectEmployee(
-        rule_settings.employeeSetting.allowCustomerSelectEmployee,
-      );
 
-      rule_settings.employeeSetting.allowCustomerSelectEmployee
+      const employeeSetting = rule_settings.employeeSetting as any;
+      const allowSelect = employeeSetting?.allowCustomerSelectEmployee ?? false;
+
+      setAllowCustomerSelectEmployee(allowSelect);
+
+      allowSelect
         ? setSteps(stepsAllowSelect)
         : setSteps(stepsNotAllowSelect);
 
@@ -403,7 +405,7 @@ export default function BookingPage() {
                     stepsLength={steps.length}
                     onBack={handleBack}
                     onNext={handleNext}
-                    // isValid={isStepValid()}
+                  // isValid={isStepValid()}
                   />
                 </>
               )}

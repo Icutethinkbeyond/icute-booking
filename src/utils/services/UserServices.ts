@@ -11,7 +11,7 @@ export class TokenService {
 
   // สร้าง Token
   generateToken(payload: object): string {
-    return jwt.sign(payload, this.secretKey, { expiresIn: this.expiresIn });
+    return jwt.sign(payload, this.secretKey, { expiresIn: this.expiresIn } as jwt.SignOptions);
   }
 
   // ตรวจสอบ Token และดึงข้อมูล

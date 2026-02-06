@@ -25,10 +25,7 @@ import { useLocale, useTranslations } from "next-intl";
 import BaseCard from "@/components/shared/BaseCard";
 import { useEffect, useMemo, useState } from "react";
 import { useBreadcrumbContext } from "@/contexts/BreadcrumbContext";
-import BookingTabs from "@/components/forms/booking/BookingTabs";
-import FloatingButton from "@/components/shared/FloatingButton";
 import { useRouter } from "next/navigation";
-import BookingTable from "@/components/forms/booking/BookingTable";
 import { BookingFilters, BookingRecord } from "@/components/lib/bookings";
 import { mockBookings } from "@/components/lib/bookings-data";
 import BookingDetailDialog from "@/components/forms/admin-booking/BookingDetailDialog";
@@ -138,8 +135,8 @@ const Booking = () => {
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    // setRowsPerPage(parseInt(event.target.value, 10))
-    // setPage(0)
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   useEffect(() => {
@@ -166,168 +163,168 @@ const Booking = () => {
         การจองทั้งหมด
       </Typography> */}
       {/* <BaseCard title=""> */}
+      <Box
+        sx={{
+          display: "flex",
+          minHeight: "100vh",
+          bgcolor: theme.palette.background.default,
+        }}
+      >
         <Box
+          component="main"
           sx={{
-            display: "flex",
-            minHeight: "100vh",
-            bgcolor: theme.palette.background.default,
+            flexGrow: 1,
+            p: { xs: 2, md: 3 },
+            // ml: { xs: 0, md: '280px' },
+            // width: { xs: '100%', md: 'calc(100% - 280px)' }
           }}
         >
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: { xs: 2, md: 3 },
-              // ml: { xs: 0, md: '280px' },
-              // width: { xs: '100%', md: 'calc(100% - 280px)' }
-            }}
-          >
-            <BookingsHeader
-              filters={filters}
-              onFilterChange={setFilters}
-              onAddNew={handleAddNew}
-              onExport={handleExport}
-            />
+          <BookingsHeader
+            filters={filters}
+            onFilterChange={setFilters}
+            onAddNew={handleAddNew}
+            onExport={handleExport}
+          />
 
-            {/* Desktop Table View */}
-            {!isMobile && (
-              <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ bgcolor: theme.palette.grey[100] }}>
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          รหัส / ลูกค้า
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>บริการ</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>วันเวลา</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>พนักงาน</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>ราคา</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>สถานะ</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>ช่องทาง</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          แก้ไขล่าสุด
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 600 }}>
-                          จัดการ
+          {/* Desktop Table View */}
+          {!isMobile && (
+            <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ bgcolor: theme.palette.grey[100] }}>
+                      <TableCell sx={{ fontWeight: 600 }}>
+                        รหัส / ลูกค้า
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>บริการ</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>วันเวลา</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>พนักงาน</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>ราคา</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>สถานะ</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>ช่องทาง</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
+                        แก้ไขล่าสุด
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600 }}>
+                        จัดการ
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedBookings.length > 0 ? (
+                      paginatedBookings.map((booking) => (
+                        <BookingRow
+                          key={booking.id}
+                          booking={booking}
+                          onView={handleView}
+                          onEdit={handleEdit}
+                        />
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={9} align="center" sx={{ py: 8 }}>
+                          <Typography
+                            variant="body1"
+                            sx={{ color: theme.palette.text.secondary }}
+                          >
+                            ไม่พบรายการจอง
+                          </Typography>
                         </TableCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paginatedBookings.length > 0 ? (
-                        paginatedBookings.map((booking) => (
-                          <BookingRow
-                            key={booking.id}
-                            booking={booking}
-                            onView={handleView}
-                            onEdit={handleEdit}
-                          />
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} align="center" sx={{ py: 8 }}>
-                            <Typography
-                              variant="body1"
-                              sx={{ color: theme.palette.text.secondary }}
-                            >
-                              ไม่พบรายการจอง
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-                <TablePagination
-                  component="div"
-                  count={filteredBookings.length}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25, 50]}
-                  labelRowsPerPage="แสดง:"
-                  labelDisplayedRows={({ from, to, count }) =>
-                    `${from}-${to} จาก ${count}`
-                  }
-                  sx={{
-                    borderTop: `1px solid ${theme.palette.divider}`,
-                  }}
-                />
-              </Paper>
-            )}
+              <TablePagination
+                component="div"
+                count={filteredBookings.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25, 50]}
+                labelRowsPerPage="แสดง:"
+                labelDisplayedRows={({ from, to, count }) =>
+                  `${from}-${to} จาก ${count}`
+                }
+                sx={{
+                  borderTop: `1px solid ${theme.palette.divider}`,
+                }}
+              />
+            </Paper>
+          )}
 
-            {/* Mobile Card View */}
-            {isMobile && (
-              <Box>
-                {paginatedBookings.length > 0 ? (
-                  <>
-                    {paginatedBookings.map((booking) => (
-                      <BookingCardMobile
-                        key={booking.id}
-                        booking={booking}
-                        onView={handleView}
-                        onEdit={handleEdit}
-                      />
-                    ))}
-                    <Paper sx={{ mt: 2, borderRadius: 2 }}>
-                      <TablePagination
-                        component="div"
-                        count={filteredBookings.length}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        labelRowsPerPage="แสดง:"
-                        labelDisplayedRows={({ from, to, count }) =>
-                          `${from}-${to} จาก ${count}`
-                        }
-                      />
-                    </Paper>
-                  </>
-                ) : (
-                  <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: theme.palette.text.secondary }}
-                    >
-                      ไม่พบรายการจอง
-                    </Typography>
+          {/* Mobile Card View */}
+          {isMobile && (
+            <Box>
+              {paginatedBookings.length > 0 ? (
+                <>
+                  {paginatedBookings.map((booking) => (
+                    <BookingCardMobile
+                      key={booking.id}
+                      booking={booking}
+                      onView={handleView}
+                      onEdit={handleEdit}
+                    />
+                  ))}
+                  <Paper sx={{ mt: 2, borderRadius: 2 }}>
+                    <TablePagination
+                      component="div"
+                      count={filteredBookings.length}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      rowsPerPageOptions={[5, 10, 25]}
+                      labelRowsPerPage="แสดง:"
+                      labelDisplayedRows={({ from, to, count }) =>
+                        `${from}-${to} จาก ${count}`
+                      }
+                    />
                   </Paper>
-                )}
-              </Box>
-            )}
-
-            {/* Summary */}
-            <Box
-              sx={{
-                mt: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 1,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: theme.palette.text.secondary }}
-              >
-                พบ {filteredBookings.length} รายการ
-              </Typography>
+                </>
+              ) : (
+                <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: theme.palette.text.secondary }}
+                  >
+                    ไม่พบรายการจอง
+                  </Typography>
+                </Paper>
+              )}
             </Box>
-          </Box>
+          )}
 
-          {/* Booking Detail Dialog */}
-          <BookingDetailDialog
-            open={detailDialogOpen}
-            booking={selectedBooking}
-            onClose={() => setDetailDialogOpen(false)}
-            onEdit={handleEdit}
-          />
+          {/* Summary */}
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: theme.palette.text.secondary }}
+            >
+              พบ {filteredBookings.length} รายการ
+            </Typography>
+          </Box>
         </Box>
+
+        {/* Booking Detail Dialog */}
+        <BookingDetailDialog
+          open={detailDialogOpen}
+          booking={selectedBooking}
+          onClose={() => setDetailDialogOpen(false)}
+          onEdit={handleEdit}
+        />
+      </Box>
       {/* </BaseCard> */}
     </PageContainer>
   );

@@ -46,18 +46,23 @@ export const StoreRuleService = {
     });
     if (!store) return null;
 
+    // Type assertions for JSON fields to fix TypeScript errors
+    const bookingRule = store.bookingRule as any;
+    const cancelRule = store.cancelRule as any;
+    const employeeSetting = store.employeeSetting as any;
+
     return {
       // การจอง
-      minAdvanceMinutes: store.bookingRule.minAdvanceBookingHours * 60,
-      maxAdvanceMinutes: store.bookingRule.maxAdvanceBookingDays * 24 * 60,
-      maxQueuePerPhone: store.bookingRule.maxQueuePerPhone,
+      minAdvanceMinutes: bookingRule?.minAdvanceBookingHours ? bookingRule.minAdvanceBookingHours * 60 : 0,
+      maxAdvanceMinutes: bookingRule?.maxAdvanceBookingDays ? bookingRule.maxAdvanceBookingDays * 24 * 60 : 30 * 24 * 60,
+      maxQueuePerPhone: bookingRule?.maxQueuePerPhone || 3,
 
       // การยกเลิก
-      allowCancel: store.cancelRule.allowCustomerCancel,
-      minCancelMinutes: store.cancelRule.minCancelBeforeHours * 60,
+      allowCancel: cancelRule?.allowCustomerCancel ?? true,
+      minCancelMinutes: cancelRule?.minCancelBeforeHours ? cancelRule.minCancelBeforeHours * 60 : 0,
 
       // พนักงาน
-      staffSelection: store.employeeSetting, // { allowCustomerSelectEmployee, autoAssignEmployee, maxQueuePerEmployeePerDay }
+      staffSelection: employeeSetting || {}, // { allowCustomerSelectEmployee, autoAssignEmployee, maxQueuePerEmployeePerDay }
     };
   },
 

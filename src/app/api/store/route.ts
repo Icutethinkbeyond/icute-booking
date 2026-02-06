@@ -117,27 +117,28 @@ export async function PATCH(request: NextRequest) {
                 detail: data.detail,
 
                 // --- ฟิลด์ที่เพิ่มใหม่ ---
-                
+
+                // Type assertions for JSON fields
                 // 1. Employee Setting
                 employeeSetting: data.employeeSetting ? {
-                    allowCustomerSelectEmployee: data.employeeSetting.allowCustomerSelectEmployee,
-                    autoAssignEmployee: data.employeeSetting.autoAssignEmployee,
+                    allowCustomerSelectEmployee: (data.employeeSetting as any)?.allowCustomerSelectEmployee ?? false,
+                    autoAssignEmployee: (data.employeeSetting as any)?.autoAssignEmployee ?? false,
                     // ถ้าส่งมาเป็น 0 หรือ null ให้เก็บเป็น null (ไม่จำกัด)
-                    maxQueuePerEmployeePerDay: Number(data.employeeSetting.maxQueuePerEmployeePerDay) || null,
-                } : undefined,
+                    maxQueuePerEmployeePerDay: Number((data.employeeSetting as any)?.maxQueuePerEmployeePerDay) || null,
+                } : {},
 
                 // 2. Booking Rule
                 bookingRule: data.bookingRule ? {
-                    minAdvanceBookingHours: Number(data.bookingRule.minAdvanceBookingHours),
-                    maxAdvanceBookingDays: Number(data.bookingRule.maxAdvanceBookingDays),
-                    maxQueuePerPhone: Number(data.bookingRule.maxQueuePerPhone),
-                } : undefined,
+                    minAdvanceBookingHours: Number((data.bookingRule as any)?.minAdvanceBookingHours) || 0,
+                    maxAdvanceBookingDays: Number((data.bookingRule as any)?.maxAdvanceBookingDays) || 30,
+                    maxQueuePerPhone: Number((data.bookingRule as any)?.maxQueuePerPhone) || 3,
+                } : {},
 
                 // 3. Cancel Rule
                 cancelRule: data.cancelRule ? {
-                    minCancelBeforeHours: Number(data.cancelRule.minCancelBeforeHours),
-                    allowCustomerCancel: data.cancelRule.allowCustomerCancel,
-                } : undefined,
+                    minCancelBeforeHours: Number((data.cancelRule as any)?.minCancelBeforeHours) || 0,
+                    allowCustomerCancel: (data.cancelRule as any)?.allowCustomerCancel ?? true,
+                } : {},
 
                 // ข้อมูลรูปภาพ
                 logoUrl: _logo.url ?? data.logoUrl,
