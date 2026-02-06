@@ -45,6 +45,14 @@ const EmployeePage = () => {
     initialPaginationMeta
   );
 
+  const [filters, setFilters] = useState<EmployeeFilters>({
+    search: '',
+    category: 'all',
+    status: 'all',
+    priceRange: [0, 10000],
+    duration: 'all'
+  });
+
   const handleSubmit = (data: any) => {
     // console.log("[v0] Employee data submitted:", data)
     // setShowForm(false)
@@ -61,42 +69,11 @@ const EmployeePage = () => {
   //   setSelectedEmployee(null)
   // }
 
-  const handleFiltersChange = (filters: EmployeeFilters) => {
-    console.log("[v0] Filters changed:", filters);
-    // let result = [...employees]
-
-    // // Search filter
-    // if (filters.search) {
-    //   const searchLower = filters.search.toLowerCase()
-    //   result = result.filter(
-    //     (s) => s.name.toLowerCase().includes(searchLower) || s.detail.toLowerCase().includes(searchLower),
-    //   )
-    // }
-
-    // // Status filter
-    // if (filters.status !== "all") {
-    //   result = result.filter((s) => (filters.status === "active" ? s.active : !s.active))
-    // }
-
-    // // Price range filter
-    // result = result.filter((s) => s.price >= filters.priceRange[0] && s.price <= filters.priceRange[1])
-
-    // // Duration filter
-    // if (filters.duration !== "all") {
-    //   const duration = Number.parseInt(filters.duration)
-    //   result = result.filter((s) => {
-    //     if (duration === 120) return s.durationMinutes >= 120
-    //     return s.durationMinutes === duration
-    //   })
-    // }
-
-    // setFilteredEmployee(result)
-    // setPagination((prev) => ({
-    //   ...prev,
-    //   totalItems: result.length,
-    //   totalPages: Math.ceil(result.length / prev.pageSize),
-    //   currentPage: 1,
-    // }))
+  const handleFiltersChange = (newFilters: EmployeeFilters) => {
+    console.log("[v0] Filters changed:", newFilters);
+    setFilters(newFilters);
+    // Reset to page 1 when filters change
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
   const handleExport = (format: "xlsx" | "csv") => {
@@ -122,18 +99,35 @@ const EmployeePage = () => {
   const getEmployee = async () => {
     try {
       setLoading(true);
-      let data: any = await APIServices.get1only(
-        `/api/employees?page=${pagination.currentPage + 1}&pageSize=${
-          pagination.pageSize
-        }`
-      );
-      console.log(data);
-      setPagination((prev) => ({ ...prev, totalItems: data.totalItems }));
-      setEmployee(data.data);
+
+      // Build query params with filters
+      const params = new URLSearchParams({
+        page: pagination.currentPage.toString(),
+        pageSize: pagination.pageSize.toString(),
+      });
+
+      if (filters.search) params.append('search', filters.search);
+      if (filters.status !== 'all') params.append('status', filters.status);
+
+      let data: any = await APIServices.get1only(`/api/employees?${params.toString()}`);
+
+      console.log('Employees data:', data);
+
+      setPagination({
+        currentPage: data.metadata?.page || 1,
+        pageSize: data.metadata?.pageSize || 10,
+        totalItems: data.metadata?.total || 0,
+        totalPages: data.metadata?.lastPage || 1,
+        hasNextPage: (data.metadata?.page || 1) < (data.metadata?.lastPage || 1),
+        hasPrevPage: (data.metadata?.page || 1) > 1,
+      });
+
+      setEmployee(data.data || []);
     } catch (error: any) {
+      console.error('Get employees error:', error);
       setNotify({
         open: true,
-        message: error.code,
+        message: error.message || error.code || 'เกิดข้อผิดพลาดในการดึงข้อมูล',
         color: "error",
       });
     } finally {
@@ -168,10 +162,16 @@ const EmployeePage = () => {
         id: serviceId,
         active: active, // ส่งค่าที่ต้องการเปลี่ยนไป
       });
+
+      setNotify({
+        open: true,
+        message: 'เปลี่ยนสถานะสำเร็จ',
+        color: "success",
+      });
     } catch (error: any) {
       setNotify({
         open: true,
-        message: error.code,
+        message: error.code || 'เกิดข้อผิดพลาด',
         color: "error",
       });
     } finally {
@@ -181,23 +181,30 @@ const EmployeePage = () => {
 
   const handlePageChange = (page: number) => {
     console.log("[v0] Page changed to:", page);
-    // TODO: Fetch data for new page
-    // setPagination((prev) => ({ ...prev, currentPage: page }))
+    setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
+  // Fetch employees when pagination or filters change
+  // ค้นหาเมื่อพิมพ์อย่างน้อย 3 ตัว หรือเมื่อเคลียร์ search (empty string)
+  useEffect(() => {
+    const shouldSearch = filters.search === '' || filters.search.length >= 3;
+
+    if (shouldSearch) {
+      // Debounce search: รอ 500ms หลังจากพิมพ์เสร็จ
+      const timeoutId = setTimeout(() => {
+        getEmployee();
+      }, filters.search === '' ? 0 : 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [pagination.currentPage, pagination.pageSize, filters.search, filters.status]);
+
+  // Don't cleanup employees array, it causes flickering
   // useEffect(() => {
-  //   getEmployee();
   //   return () => {
   //     setEmployee([]);
   //   };
-  // }, [pagination]);
-
-  useEffect(() => {
-    getEmployee();
-    return () => {
-      setEmployee([]);
-    };
-  }, []);
+  // }, []);
 
   useEffect(() => {
     setBreadcrumbs([

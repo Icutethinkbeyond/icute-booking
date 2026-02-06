@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         },
 
         store: {
-          connect:{ id: storeId },
+          connect: { id: storeId },
         },
 
         // fields อื่นๆ จะถูกกำหนดโดย @default(now()) และ @updatedAt โดย Prisma
@@ -163,8 +163,8 @@ export async function POST(request: NextRequest) {
 
 
 /**
- * GET /api/services?page=1&pageSize=10
- * สำหรับดึงรายการบริการทั้งหมดของร้านค้า พร้อม Pagination
+ * GET /api/services?page=1&pageSize=10&search=&status=&category=
+ * สำหรับดึงรายการบริการทั้งหมดของร้านค้า พร้อม Pagination + Search + Filter
  */
 export async function GET(request: NextRequest) {
   try {
@@ -200,6 +200,9 @@ export async function GET(request: NextRequest) {
     // ดึงค่า page และ pageSize จาก Query Parameter
     const page = parseInt(searchParams.get('page') || '1', 10); // หน้าเริ่มต้นที่ 1
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10); // จำนวนข้อมูลต่อหน้าเริ่มต้นที่ 10
+    const search = searchParams.get('search') || '';
+    const status = searchParams.get('status') || 'all';
+    const category = searchParams.get('category') || 'all';
 
     // ตรวจสอบค่าที่รับมา
     if (page < 1 || pageSize < 1 || pageSize > 100) { // จำกัด pageSize ไม่ให้มากเกินไป
@@ -213,15 +216,39 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
+    // Build where clause
+    const where: any = {
+      storeId,
+      isDelete: false
+    };
+
+    // Add search filter
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { detail: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Add status filter
+    if (status === 'active') {
+      where.active = true;
+    } else if (status === 'inactive') {
+      where.active = false;
+    }
+
+    // Add category filter if needed
+    if (category !== 'all') {
+      where.category = category;
+    }
+
     // 4. ดึงข้อมูลบริการและจำนวนรวมด้วย Transaction
     const [totalItems, services] = await prisma.$transaction([
       // A. นับจำนวนรายการทั้งหมด
-      prisma.service.count({
-        where: { storeId }
-      }),
+      prisma.service.count({ where }),
       // B. ดึงรายการบริการแบบ Paginate
       prisma.service.findMany({
-        where: { storeId },
+        where,
         skip: skip,
         take: take,
         orderBy: {
@@ -249,6 +276,12 @@ export async function GET(request: NextRequest) {
       JSON.stringify({
         message: 'ดึงรายการบริการสำเร็จ',
         data: dataWithIndex,
+        metadata: {
+          total: totalItems,
+          page,
+          pageSize: pageSize,
+          lastPage: totalPages,
+        },
         pagination: {
           totalItems,
           totalPages,

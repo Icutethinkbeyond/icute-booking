@@ -6,25 +6,53 @@ import { deleteImage, handleImageUpload } from "@/utils/services/cloudinary.serv
 import dayjs from "dayjs";
 import { prisma } from "../../../../lib/prisma";
 
-// [GET] ดึงข้อมูลพนักงานทั้งหมด พร้อม Pagination
+// [GET] ดึงข้อมูลพนักงานทั้งหมด พร้อม Pagination + Search + Filter
 export async function GET(request: NextRequest) {
     try {
         const { storeId } = await getCurrentUserAndStoreIdsByToken(request);
         const { searchParams } = new URL(request.url);
 
         const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "10");
+        const pageSize = parseInt(searchParams.get("pageSize") || "10");
+        const limit = parseInt(searchParams.get("limit") || pageSize.toString());
         const skip = (page - 1) * limit;
+
+        // Get search and filter params
+        const search = searchParams.get("search") || "";
+        const status = searchParams.get("status") || "all";
+
+        // Build where clause
+        const where: any = {
+            storeId,
+            isDelete: false
+        };
+
+        // Add search filter (search in name, surname, email, phone)
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: 'insensitive' } },
+                { surname: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        // Add status filter
+        if (status === 'active') {
+            where.isActive = true;
+        } else if (status === 'inactive') {
+            where.isActive = false;
+        }
 
         const [employees, total] = await Promise.all([
             prisma.employee.findMany({
-                where: { storeId },
+                where,
                 skip,
                 take: limit,
                 orderBy: { createdAt: "desc" },
                 include: { role: true, services: true } // ดึงข้อมูลความสัมพันธ์มาด้วย
             }),
-            prisma.employee.count({ where: { storeId } }),
+            prisma.employee.count({ where }),
         ]);
 
         return NextResponse.json({
@@ -32,6 +60,7 @@ export async function GET(request: NextRequest) {
             metadata: {
                 total,
                 page,
+                pageSize: limit,
                 lastPage: Math.ceil(total / limit),
             },
         });
