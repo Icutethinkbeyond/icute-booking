@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-import { prisma } from '../../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 /**
  * GET /api/employees/simple

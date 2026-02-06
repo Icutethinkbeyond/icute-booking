@@ -1,17 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { User } from "@/interfaces/User";
-// import { TokenService } from '@/utils/services/TokenService';
-// import { sendEmail } from '@/utils/services/EmailServices';
-
 export const dynamic = "force-dynamic";
 
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import {
   sendVerificationEmail,
   sendWithGoogle,
 } from "@/utils/services/EmailServices";
 import { getCurrentUserAndStoreIdsByToken } from "@/utils/lib/auth";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/../lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {

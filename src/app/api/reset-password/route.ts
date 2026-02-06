@@ -1,11 +1,9 @@
 // app/api/reset-password/route.ts
 
 import { NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcryptjs';
 import { ResetPassword } from '@/interfaces/User';
-
-const prisma = new PrismaClient();
+import { prisma } from "@/../lib/prisma";
 
 // กำหนดค่า SALT_ROUNDS สำหรับการเข้ารหัส
 const SALT_ROUNDS = 10;

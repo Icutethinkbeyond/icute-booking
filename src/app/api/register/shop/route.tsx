@@ -1,16 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { User } from "@/interfaces/User";
-// import { TokenService } from '@/utils/services/TokenService';
-// import { sendEmail } from '@/utils/services/EmailServices';
-import { PasswordService } from "@/utils/services/PasswordServices";
-
 export const dynamic = "force-dynamic";
 
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { StoreRegister } from "@/interfaces/Store";
 import { sendVerificationEmail, sendWithGoogle } from "@/utils/services/EmailServices";
-import { prisma } from "../../../../../lib/prisma";
+import { prisma } from "@/../lib/prisma";
 
 // กำหนดค่า SALT_ROUNDS สำหรับการเข้ารหัส
 const SALT_ROUNDS = 10;
@@ -19,7 +14,7 @@ const SALT_ROUNDS = 10;
  * POST /api/shop/register
  * สำหรับจัดการการสมัครสมาชิกร้านค้า
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const data: StoreRegister = await request.json();
     const {

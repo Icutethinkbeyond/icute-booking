@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChangePassword } from '@/interfaces/User';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import bcrypt from 'bcryptjs'; // ใช้สำหรับการแฮชและเปรียบเทียบรหัสผ่าน
-import { prisma } from '../../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 /**
  * PATCH /api/admin/change-password

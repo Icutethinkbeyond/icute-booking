@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DefaultOperatingHour, Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { checkBooleanValue, getTimeAsDateTime } from "@/utils/lib/utils"
-import { prisma } from '../../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 
 // --------------------------------------------------------------------------

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Employee } from '@/interfaces/Store';
 
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-import { prisma } from '@/../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 
 /**

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { StoreRuleService } from "@/utils/services/database-services/StoreService";
-import { prisma } from "../../../../../../lib/prisma";
+import { prisma } from "@/../lib/prisma";
 
 export interface OpenTimeRes {
   isClosed: boolean,

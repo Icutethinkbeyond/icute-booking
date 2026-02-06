@@ -3,7 +3,7 @@ import dayjs from 'dayjs'; // ต้องติดตั้ง dayjs: npm insta
 
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { Booking } from '@/interfaces/Booking';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 
 // --------------------------------------------------------------------------

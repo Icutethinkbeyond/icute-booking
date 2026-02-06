@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { Employee } from "@/interfaces/Store";
 import { deleteImage, handleImageUpload } from "@/utils/services/cloudinary.service";
 import dayjs from "dayjs";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "@/../lib/prisma";
 
 // [GET] ดึงข้อมูลพนักงานทั้งหมด พร้อม Pagination + Search + Filter
 export async function GET(request: NextRequest) {

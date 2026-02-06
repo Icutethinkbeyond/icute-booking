@@ -3,7 +3,7 @@ import { Store, StoreRegister } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { getStoreByCurrentUserId } from '@/utils/services/database-services/StoreDBService';
 import { deleteImage, handleImageUpload } from '@/utils/services/cloudinary.service';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 // --------------------------------------------------------------------------
 // GET METHOD: ดึงข้อมูลร้านค้าปัจจุบัน
 // --------------------------------------------------------------------------

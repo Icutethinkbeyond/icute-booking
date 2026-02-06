@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import dayjs from 'dayjs';
-import { prisma } from '../../../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 
 // [GET] ดึงข้อมูลรายรายการ
 export async function GET(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../../lib/prisma';
+import { prisma } from "@/../lib/prisma";
 /**
  * GET /api/public/services?store_username="xxxx"
  * สำหรับดึงรายการบริการทั้งหมดของร้านค้า พร้อม Pagination
