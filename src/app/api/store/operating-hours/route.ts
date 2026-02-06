@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { DefaultOperatingHour, Store } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { checkBooleanValue, getTimeAsDateTime } from "@/utils/lib/utils"
-import { OperatingHourRequest } from "@/interfaces/Store"
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../../../lib/prisma';
 
 
 // --------------------------------------------------------------------------

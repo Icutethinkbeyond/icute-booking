@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client";
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../../../../../lib/prisma';
 
 /**
  * GET /api/employees/simple

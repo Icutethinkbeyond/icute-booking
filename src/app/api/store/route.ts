@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { Store, StoreRegister } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { getStoreByCurrentUserId } from '@/utils/services/database-services/StoreDBService';
 import { deleteImage, handleImageUpload } from '@/utils/services/cloudinary.service';
-
-const prisma = new PrismaClient();
-
-
+import { prisma } from '../../../../lib/prisma';
 // --------------------------------------------------------------------------
 // GET METHOD: ดึงข้อมูลร้านค้าปัจจุบัน
 // --------------------------------------------------------------------------

@@ -2,10 +2,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { sendResetPasswordEmail } from '@/utils/services/EmailServices';
-
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../../lib/prisma';
 
 /**
  * POST /api/forgot-password

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../../../lib/prisma";
 
 // [DELETE] ลบพนักงาน
 export async function DELETE(

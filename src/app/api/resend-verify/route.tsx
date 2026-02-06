@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import { User } from "@/interfaces/User";
 // import { TokenService } from '@/utils/services/TokenService';
 // import { sendEmail } from '@/utils/services/EmailServices';
-import { PasswordService } from "@/utils/services/PasswordServices";
-
-const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +11,7 @@ import {
   sendWithGoogle,
 } from "@/utils/services/EmailServices";
 import { getCurrentUserAndStoreIdsByToken } from "@/utils/lib/auth";
+import { prisma } from "../../../../lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {

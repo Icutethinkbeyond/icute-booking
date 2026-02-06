@@ -1,10 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { Service } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../../../lib/prisma';
 
 export async function PATCH(request: NextRequest) {
   try {

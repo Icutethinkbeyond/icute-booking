@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
 import { User } from "@/interfaces/User";
 // import { TokenService } from '@/utils/services/TokenService';
 // import { sendEmail } from '@/utils/services/EmailServices';
 import { PasswordService } from "@/utils/services/PasswordServices";
 
-const prisma = new PrismaClient();
-
 export const dynamic = "force-dynamic";
 
 import bcrypt from "bcryptjs";
 import { StoreRegister } from "@/interfaces/Store";
 import { sendVerificationEmail, sendWithGoogle } from "@/utils/services/EmailServices";
+import { prisma } from "../../../../../lib/prisma";
 
 // กำหนดค่า SALT_ROUNDS สำหรับการเข้ารหัส
 const SALT_ROUNDS = 10;

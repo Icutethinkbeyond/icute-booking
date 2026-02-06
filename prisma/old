@@ -1,0 +1,458 @@
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "mongodb"
+//   url      = env("DATABASE_URL")
+// }
+
+// model User {
+//   userId          String     @id @default(auto()) @map("_id") @db.ObjectId
+//   email           String     @unique
+//   password        String?
+//   name            String?
+//   userStatus      UserStatus @default(ACTIVE)
+//   isEmailVerified Boolean    @default(false)
+
+//   role   Role?   @relation(fields: [roleId], references: [roleId])
+//   roleId String? @db.ObjectId
+
+//   store Store?
+
+//   verificationTokens VerificationToken[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model VerificationToken {
+//   id        String       @id @default(auto()) @map("_id") @db.ObjectId
+//   userId    String       @db.ObjectId
+//   user      User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+//   token     String       @unique // <--- ต้องเป็น unique
+//   purpose   TokenPurpose // <--- เพิ่ม purpose field
+//   expiresAt DateTime // ISO Date string
+//   used      Boolean      @default(false)
+//   createdAt DateTime     @default(now())
+//   updatedAt DateTime     @updatedAt
+// }
+
+// model Role {
+//   roleId      String     @id @default(auto()) @map("_id") @db.ObjectId
+//   name        RoleName
+//   description String?
+//   employees   Employee[]
+//   employeeIds String[]   @db.ObjectId
+//   users       User[]
+//   userIds     String[]   @db.ObjectId
+//   customers   Customer[]
+//   customerIds String[]   @db.ObjectId
+//   createdAt   DateTime   @default(now())
+//   updatedAt   DateTime   @updatedAt
+
+//   @@unique([name])
+// }
+
+// model Customer {
+//   id   String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name String?
+
+//   lineUserId    String  @unique
+//   displayName   String? // ชื่อที่ LINE ตั้งไว้ (Nullable)
+//   pictureUrl    String? // URL รูปโปรไฟล์ (Nullable)
+//   statusMessage String? // สถานะข้อความ (Nullable)
+//   isLineLinked  Boolean @default(true) // ยืนยันว่าผูก LINE แล้ว
+
+//   // Contact Data - ข้อมูลติดต่อที่ได้จากการจอง
+//   phone String? // เบอร์โทรศัพท์ (Nullable)
+//   email String? // อีเมล (Nullable) @unique
+
+//   booking Booking[]
+
+//   role   Role?   @relation(fields: [roleId], references: [roleId])
+//   roleId String? @db.ObjectId
+
+//   // 4. Metadata
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt // อัปเดตวันที่เองเมื่อมีการแก้ไข Record
+// }
+
+// model Booking {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+//   customerName  String // 3.6
+//   customerPhone String // 3.6
+//   customerEmail String?
+
+//   bookingDate DateTime // 3.5 วัน-เวลาเริ่ม
+//   bookingTime DateTime // คำนวณจาก startTime + Service.durationMinutes
+
+//   status       BookingStatus @default(CONFIRMED) // 2.7, 2.8, 2.9
+//   customerType CustomerType  @default(LINE) // 2.4 เพิ่มคิว walk-in
+
+//   // ความสัมพันธ์
+//   storeId String @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   serviceId String  @db.ObjectId
+//   service   Service @relation(fields: [serviceId], references: [id])
+
+//   employeeId String   @db.ObjectId
+//   employee   Employee @relation(fields: [employeeId], references: [id])
+
+//   customerId String   @db.ObjectId
+//   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+//   notifications Notification[] // เชื่อมกับ Notification
+
+//   // 3.7 ข้อความ LINE ส่งไปหาลูกค้า (ต้องใช้ Logic ใน Application)
+
+//   createdAt DateTime @default(now()) // วันที่สร้าง
+//   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+// }
+
+// model Service {
+//   id              String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name            String // "ตัดผม 30 นาที", "นวดตัว 1 ชม."
+//   durationMinutes Int     @default(0) // ระยะเวลาเป็นนาที เช่น 30, 60
+//   price           Float   @default(0)
+//   discount        Float   @default(0)
+//   bufferTime      Int     @default(0)
+//   detail          String?
+//   displayNumber   Int?
+//   imageId         String?
+//   imageUrl        String?
+//   colorOfService  String?
+//   active          Boolean @default(true)
+
+//   isDelete Boolean @default(false)
+
+//   // ความสัมพันธ์
+//   storeId String @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   employees   Employee[] @relation(references: [id], fields: [employeeIds]) // พนักงานที่ทำบริการนี้ได้
+//   employeeIds String[]   @db.ObjectId // Reference IDs
+
+//   bookings Booking[]
+
+//   createdAt DateTime @default(now()) // วันที่สร้าง
+//   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+// }
+
+// model Employee {
+//   id       String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name     String
+//   surname  String
+//   nickname String?
+//   email    String
+//   password String
+//   phone    String?
+//   note     String?
+
+//   isActive Boolean @default(true)
+
+//   isDelete Boolean @default(false)
+
+//   imageId   String?
+//   imageUrl  String?
+//   position  String?
+//   startDate DateTime?
+
+//   storeId String @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   bookings Booking[]
+
+//   services   Service[] @relation(references: [id], fields: [serviceIds])
+//   serviceIds String[]  @db.ObjectId
+
+//   roleId String? @db.ObjectId
+//   role   Role?   @relation(fields: [roleId], references: [roleId])
+
+//   // 🔥 ตารางเวลาพนักงาน
+//   workingDays EmployeeWorkingDay[]
+//   // breakTimes  EmployeeBreakTime[]
+//   leaves      EmployeeLeave[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// // ตารางวันทำงานพนักงาน (Working Day)
+// model EmployeeWorkingDay {
+//   id         String @id @default(auto()) @map("_id") @db.ObjectId
+//   employeeId String @db.ObjectId
+
+//   dayOfWeek DayOfWeek
+//   isWorking Boolean   @default(false)
+
+//   timeSlots EmployeeWorkingTime[]
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+//   @@unique([employeeId, dayOfWeek])
+// }
+
+// // เวลาทำงานต่อวัน
+// model EmployeeWorkingTime {
+//   id           String @id @default(auto()) @map("_id") @db.ObjectId
+//   workingDayId String @db.ObjectId
+
+//   startTime String // "09:00"
+//   endTime   String // "18:00"
+
+//   workingDay EmployeeWorkingDay @relation(fields: [workingDayId], references: [id], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+// }
+
+// // วันลาหยุดพนักงาน
+// model EmployeeLeave {
+//   id         String @id @default(auto()) @map("_id") @db.ObjectId
+//   employeeId String @db.ObjectId
+
+//   startDate DateTime
+//   endDate   DateTime
+
+//   leaveType LeaveType
+//   note      String?
+
+//   createdAt DateTime @default(now())
+//   employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+// }
+
+// model DefaultOperatingHour {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+//   // 2. สถานะและเวลาทำการปกติ
+//   MON_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   MON_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   MON_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   TUE_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   TUE_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   TUE_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   WED_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   WED_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   WED_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   THU_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   THU_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   THU_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   FRI_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   FRI_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   FRI_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   SAT_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   SAT_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   SAT_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   SUN_isOpen    Boolean   @default(false) // true = เปิด, false = ปิด (วันปิดปกติของสัปดาห์)
+//   SUN_openTime  DateTime? // "09:00" รูปแบบ HH:MM
+//   SUN_closeTime DateTime? // "18:00" รูปแบบ HH:MM
+
+//   // 3. ความสัมพันธ์กับร้านค้า
+//   storeId String @unique @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   // 4. Index และ Constraint
+//   // บังคับว่า storeId หนึ่งต้องมีข้อมูลของ DayOfWeek หนึ่งได้เพียงครั้งเดียว (เช่น จันทร์เดียว)
+//   @@map("defaultOperatingHours")
+// }
+
+// model Holiday {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+//   date        DateTime
+//   startTime   DateTime?
+//   fullDay     Boolean     @default(true)
+//   endTime     DateTime?
+//   holidayName String
+//   holidayType HolidayType @default(ANNUAL)
+
+//   // 3. ความสัมพันธ์กับร้านค้า
+//   storeId String @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model Store {
+//   id            String @id @default(auto()) @map("_id") @db.ObjectId
+//   storeName     String
+//   storeUsername String @unique
+//   lineOALink    String
+
+//   latitude  Float?
+//   longitude Float?
+//   address   String?
+//   placeId   String?
+
+//   storeNameTH   String?
+//   tel           String?
+//   addressCustom String?
+//   mapUrl        String?
+//   detail        String?
+
+//   logoUrl  String?
+//   logoId   String?
+//   coverUrl String?
+//   coverId  String?
+
+//   lineNotifyToken   String? // 2.6 สำหรับการแจ้งเตือนเจ้าของร้าน
+//   lineChannelId     String? // สำหรับ LINE Messaging API (ถ้าใช้)
+//   lineChannelSecret String? // สำหรับ LINE Messaging API (ถ้าใช้)
+
+//   newBooking     String? //เเจ้งเตือนเมื่อได้รับการจองใหม่
+//   successBooking String? //เเจ้งเตือนลูกค้าเมื่อจองสำเร็จ
+//   cancelBooking  String? //ข้อความเเจ้งเตือนลูกค้าเมื่อถูกยกเลิกการจอง
+//   before24H      String? //ข้อความเเจ้งเตือนลูกค้าเมื่อใกล้ถึงเวลานัด 24 ชั่วโมง
+//   reSchedule     String? //ข้อความเเจ้งเตือนลูกค้าเมื่อถูกเลื่อนการจอง
+
+//   isDelete Boolean @default(false)
+
+//   employeeSetting EmployeeSetting
+//   bookingRule     BookingRule
+//   cancelRule      CancelRule
+
+//   userId String @unique @db.ObjectId
+//   user   User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+//   // ความสัมพันธ์
+//   employees      Employee[]
+//   services       Service[]
+//   bookings       Booking[]
+//   operatingHours DefaultOperatingHour? // เวลาเปิด-ปิดวันปกติ
+//   notifications  Notification[] // เชื่อมกับ Notification
+//   holiday        Holiday[]
+//   // reports          Report[]
+
+//   createdAt DateTime @default(now()) // วันที่สร้าง
+//   updatedAt DateTime @updatedAt // อัปเดตล่าสุด
+// }
+
+// model Notification {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+//   // ข้อมูลที่จำเป็นในการส่ง
+//   type          NotificationType
+//   method        SendMethod // วิธีการส่ง: LINE/EMAIL
+//   message       String // ข้อความที่จะส่ง
+//   targetAddress String // เบอร์โทร/อีเมลลูกค้า, หรือ Store ID (สำหรับ LINE Notify)
+
+//   // สถานะการส่ง
+//   isSent       Boolean   @default(false)
+//   sentAt       DateTime?
+//   errorMessage String? // เก็บ error ถ้าส่งไม่สำเร็จ
+
+//   // การอ้างอิง
+//   storeId String @db.ObjectId
+//   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+//   bookingId String?  @db.ObjectId
+//   booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+//   // เพิ่มเติม: สำหรับลูกค้าที่ใช้ LINE Messaging API 
+//   // (ถ้ามีการเชื่อมต่อ LINE OA และเก็บ User ID)
+//   lineUserId String?
+// }
+
+// enum UserStatus {
+//   ACTIVE
+//   INACTIVE
+// }
+
+// enum TokenPurpose {
+//   EMAIL_VERIFICATION
+//   PASSWORD_RESET
+// }
+
+// enum RoleName {
+//   ADMIN
+//   STOREADMIN
+//   CUSTOMER
+// }
+
+// enum BookingStatus {
+//   PENDING // รอลูกค้ายืนยัน (ถ้ามี), หรือรอยืนยันจากร้าน (ถ้าตั้งค่าไว้)
+//   CONFIRMED // ยืนยันแล้ว (จองสำเร็จ)
+//   RESCHEDULED // เลื่อนนัด
+//   CANCELLED // ยกเลิก
+//   COMPLETED // เสร็จสิ้นบริการ
+// }
+
+// enum HolidayType {
+//   ANNUAL
+//   SPECIAL
+// }
+
+// enum NotificationType {
+//   // สำหรับร้านค้า (Store)
+//   STORE_NEW_BOOKING // 2.7 มีการจองใหม่
+//   STORE_CANCELED_BY_CUSTOMER
+//   STORE_BOOKING_MODIFIED
+
+//   // สำหรับลูกค้า (Customer)
+//   CUSTOMER_BOOKING_SUCCESS // 3.7 จองสำเร็จ
+//   CUSTOMER_CONFIRMED // 2.9 ร้านยืนยันคิว
+//   CUSTOMER_RESCHEDULED // 2.8, 2.9 ร้านเลื่อน
+//   CUSTOMER_CANCELED // 2.8, 2.9 ร้านยกเลิก
+// }
+
+// enum CustomerType {
+//   LINE
+//   WALK_IN
+//   OTHER_CONTACT
+// }
+
+// enum SendMethod {
+//   LINE_NOTIFY // สำหรับแจ้งเตือนร้านค้า (ใช้ Store.lineNotifyToken)
+//   LINE_MESSAGING_API // สำหรับแจ้งเตือนลูกค้า (ต้องมี User's LINE ID)
+//   EMAIL // 2.10 แจ้งเตือนในอีเมล
+// }
+
+// type EmployeeSetting {
+//   allowCustomerSelectEmployee Boolean @default(true)
+//   autoAssignEmployee          Boolean @default(false)
+
+//   maxQueuePerEmployeePerDay Int? // null หรือ 0 = ไม่จำกัด
+// }
+
+// type BookingRule {
+//   minAdvanceBookingHours Int @default(3) // จองล่วงหน้าขั้นต่ำ (ชั่วโมง) 
+//   maxAdvanceBookingDays  Int @default(1) // จองล่วงหน้าสูงสุด (วัน)
+//   maxQueuePerPhone       Int @default(3) // จำนวนคิวสูงสุดต่อบริการ
+// }
+
+// type CancelRule {
+//   minCancelBeforeHours Int     @default(3) // ต้องยกเลิกล่วงหน้ากี่ชั่วโมง
+//   allowCustomerCancel  Boolean @default(true)
+// }
+
+// // Enum วันในสัปดาห์
+// enum DayOfWeek {
+//   MON
+//   TUE
+//   WED
+//   THU
+//   FRI
+//   SAT
+//   SUN
+// }
+
+// enum LeaveType {
+//   SICK
+//   VACATION
+//   PERSONAL
+//   OTHER
+// }

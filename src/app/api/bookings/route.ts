@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dayjs from 'dayjs'; // ต้องติดตั้ง dayjs: npm install dayjs
 
-import { PrismaClient } from "@prisma/client";
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import { Booking } from '@/interfaces/Booking';
+import { prisma } from '../../../../lib/prisma';
 
-const prisma = new PrismaClient();
 
 // --------------------------------------------------------------------------
 // 📜 Interface สำหรับข้อมูลที่ส่งมาจาก Request Body

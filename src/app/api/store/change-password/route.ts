@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
 import { ChangePassword } from '@/interfaces/User';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-
-const prisma = new PrismaClient();
-
 import bcrypt from 'bcryptjs'; // ใช้สำหรับการแฮชและเปรียบเทียบรหัสผ่าน
+import { prisma } from '../../../../../lib/prisma';
 
 /**
  * PATCH /api/admin/change-password

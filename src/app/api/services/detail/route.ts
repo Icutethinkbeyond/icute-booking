@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Employee } from '@/interfaces/Store';
 
-import { PrismaClient } from "@prisma/client";
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../../../../../lib/prisma';
 
 /**
  * GET /api/services/detail?serviceId=[ID]

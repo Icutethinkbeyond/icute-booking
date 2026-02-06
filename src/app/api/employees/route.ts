@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import bcrypt from "bcryptjs";
 import { Employee } from "@/interfaces/Store";
-import { EmployeeBreakTime } from '../../../interfaces/Store';
 import { deleteImage, handleImageUpload } from "@/utils/services/cloudinary.service";
 import dayjs from "dayjs";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../../lib/prisma";
 
 // [GET] ดึงข้อมูลพนักงานทั้งหมด พร้อม Pagination
 export async function GET(request: NextRequest) {

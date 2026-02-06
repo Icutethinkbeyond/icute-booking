@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
-import { Holiday, Store } from '@/interfaces/Store';
+import { Holiday } from '@/interfaces/Store';
 import { getCurrentUserAndStoreIdsByToken } from '@/utils/lib/auth';
 import dayjs from 'dayjs';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../../../../lib/prisma';
 
 // [GET] ดึงข้อมูลแบบ Pagination
 export async function GET(request: NextRequest) {

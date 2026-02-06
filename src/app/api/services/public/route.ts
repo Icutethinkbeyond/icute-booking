@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from "@prisma/client"; // นำเข้า Prisma Client
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../../../../../lib/prisma';
 /**
  * GET /api/public/services?store_username="xxxx"
  * สำหรับดึงรายการบริการทั้งหมดของร้านค้า พร้อม Pagination
